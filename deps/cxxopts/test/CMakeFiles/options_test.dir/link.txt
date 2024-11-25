@@ -1,0 +1,1 @@
+/usr/bin/c++  -Wall -Werror -Wextra -Wshadow -Weffc++ -Wsign-compare -Wshadow -Wwrite-strings -Wpointer-arith -Winit-self -Wconversion -Wno-sign-conversion -Wsuggest-override CMakeFiles/options_test.dir/main.cpp.o CMakeFiles/options_test.dir/options.cpp.o -o options_test 

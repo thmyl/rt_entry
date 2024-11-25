@@ -1,0 +1,1 @@
+/usr/bin/c++  -Wall -Werror -Wextra -Wshadow -Weffc++ -Wsign-compare -Wshadow -Wwrite-strings -Wpointer-arith -Winit-self -Wconversion -Wno-sign-conversion -Wsuggest-override CMakeFiles/link_test.dir/link_a.cpp.o CMakeFiles/link_test.dir/link_b.cpp.o -o link_test 

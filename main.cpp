@@ -1,0 +1,65 @@
+#include <iostream>
+#include <cstdio>
+#include "graph.h"
+
+void SetDevice(int device_id=0){
+    int device_count=0;
+    cudaGetDeviceCount(&device_count);
+    cudaSetDevice(device_id);
+    cudaDeviceProp device_prop;
+    cudaGetDeviceProperties(&device_prop,device_id);
+    printf("Maximum dimensions of grid size: (%d, %d, %d)\n",
+           device_prop.maxGridSize[0], device_prop.maxGridSize[1], device_prop.maxGridSize[2]);
+    printf("Maximum dimensions of block size: (%d, %d, %d)\n",
+           device_prop.maxThreadsDim[0], device_prop.maxThreadsDim[1], device_prop.maxThreadsDim[2]);
+    size_t available_memory,total_memory;
+    cudaMemGetInfo(&available_memory,&total_memory);
+    // std::cout<<"==========================================================\n";
+    std::cout<<"Total GPUs visible: "<<device_count;
+    std::cout<<", using ["<<device_id<<"]: "<<device_prop.name<<std::endl;
+    std::cout<<"Available Memory: "<<int(available_memory/1024/1024)<<" MB, ";
+    std::cout<<"Total Memory: "<<int(total_memory/1024/1024)<<" MB\n";
+}
+
+int main(int argc, char **argv){
+  // freopen("out.txt", "w", stdout);
+  // char* datafile = "/home/myl/graph/Graph_method/SIFT1M.hvecs";
+  // char* queryfile = "/home/myl/graph/Graph_method/bigann_query.bvecs";
+  // char* gtfile = "/home/myl/graph/Graph_method/idx_1M.ivecs";
+  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  std::cout<<"buffer_size = "<<FLAGS_buffer_size<<std::endl;
+  std::cout<<"n_subspaces = "<<FLAGS_n_subspaces<<std::endl;
+  std::cout<<"data_name = "<<FLAGS_data_name<<std::endl;
+  std::cout<<"data_path = "<<FLAGS_data_path<<std::endl;
+  std::cout<<"query_path = "<<FLAGS_query_path<<std::endl;
+  std::cout<<"gt_path = "<<FLAGS_gt_path<<std::endl;
+  std::cout<<"entries_size = "<<FLAGS_entries_size<<std::endl;
+  std::cout<<"max_hits = "<<FLAGS_max_hits<<std::endl;
+  std::cout<<"expand_ratio = "<<FLAGS_expand_ratio<<std::endl;
+  std::cout<<"point_ratio = "<<FLAGS_point_ratio<<std::endl;
+  std::cout<<"grid_size = "<<FLAGS_grid_size<<std::endl;
+
+  std::ofstream outfile;
+  outfile.open(OUTFILE, std::ios_base::app);
+  outfile <<  "\n---------- expand_ratio = " << FLAGS_expand_ratio << "\t" << "point_ratio = " << FLAGS_point_ratio <<" ----------\n\n" << std::flush;
+  outfile.close();
+
+  char* datafile = (char*)FLAGS_data_path.c_str();
+  char* queryfile = (char*)FLAGS_query_path.c_str();
+  char* gtfile = (char*)FLAGS_gt_path.c_str();
+
+  SetDevice(1);
+  // entry
+	Entry entry(FLAGS_n_subspaces, FLAGS_buffer_size, FLAGS_data_name, FLAGS_entries_size, FLAGS_max_hits, FLAGS_expand_ratio, FLAGS_point_ratio, FLAGS_grid_size);
+  entry.Input(datafile, queryfile, gtfile);
+  entry.Projection();
+  entry.BlockUp();
+  entry.InitRT();
+
+  // graph
+  entry.Search();
+  entry.CleanUp();
+  // Graph graph(entry);
+  // graph.Search_entry();
+  return 0;
+}

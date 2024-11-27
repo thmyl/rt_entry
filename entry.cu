@@ -83,7 +83,7 @@ void Entry::Projection(){
     std::cerr << "!!!! CUBLAS initialization error\n";
     return;
   }
-  matrixMultiply(handle, d_mean, d_rotation, d_mr_row, 1, dim_, dim_, alpha, beta);
+  matrixMultiply(handle, d_mean, d_rotation, d_mr_row, t_n, dim_, dim_, alpha, beta);
   cublasDestroy(handle);
   Timing::startTiming("replicateVector");
   d_pca_queries.resize(nq * dim_);
@@ -181,22 +181,14 @@ void Entry::InitRT(){
 
     subspaces_[space].hits.resize(nq * max_hits);
     subspaces_[space].n_hits_per_query.resize(nq);
+    subspaces_[space].hits_offset.resize(nq * max_hits);
   }
+  preheat_cublas(nq, dim_, dim_);
 }
 
 void Entry::Search(){
   Timing::startTiming("search");
   //pca投影
-  /*Timing::startTiming("pca projection");
-  thrust::device_vector<float> d_queries_mz = d_queries_;
-  subtraction(thrust::raw_pointer_cast(d_queries_mz.data()), thrust::raw_pointer_cast(d_mean.data()), nq, dim_);
-  for(int space = 0; space < n_subspaces; space++){
-    auto &d_queries = subspaces_[space].d_queries;
-    auto &d_rotation = subspaces_[space].d_rotation;
-    d_queries.resize(nq);
-    rotate(thrust::raw_pointer_cast(d_queries.data()), thrust::raw_pointer_cast(d_queries_mz.data()), thrust::raw_pointer_cast(d_rotation.data()), nq, dim_);
-  }
-  Timing::stopTiming();*/
   Timing::startTiming("pca projection");
   float alpha = 1.0, beta = -1.0;
   matrixMultiply(handle_, d_queries_, d_rotation, d_pca_queries, nq, dim_, dim_, alpha, beta);
@@ -229,18 +221,19 @@ void Entry::Search(){
     // Timing::startTiming("before collect candidates onesubspace");
     auto &hits = subspaces_[0].hits;
     auto &n_hits_per_query = subspaces_[0].n_hits_per_query;
+    auto &hits_offset = subspaces_[0].hits_offset;
     auto &aabb_pid = subspaces_[0].aabb_pid;
     auto &prefix_sum = subspaces_[0].prefix_sum;
     auto &n_aabbs = subspaces_[0].n_aabbs;
     // Timing::stopTiming();
 
     // Timing::startTiming("collect candidates onesubspace");
-    collect_candidates_onesubspace(hits, n_hits_per_query, max_hits, aabb_pid, prefix_sum, n_aabbs);
+    collect_candidates_onesubspace(hits, n_hits_per_query, hits_offset, max_hits, aabb_pid, prefix_sum, n_aabbs);
     // Timing::stopTiming();
   }
   Timing::stopTiming(2);
   Timing::stopTiming(2);
-  check_candidates();
+  // check_candidates();
   check_entries();
 }
 

@@ -11,6 +11,14 @@
 #include "file_read.h"
 #include "matrix.h"
 
+struct QueryAabb{
+  uint n_hits;
+  uint aabb_id;
+  uint st;
+  uint ed;
+  uint offset;
+};
+
 class Entry{
   public:
     Entry(){
@@ -55,6 +63,8 @@ class Entry{
     void Search();
     void collect_candidates_onesubspace(thrust::device_vector<uint> &hits,
                                         thrust::device_vector<uint> &n_hits_per_query,
+                                        // thrust::device_vector<QueryAabb> &qa,
+                                        thrust::device_vector<uint> &hits_offset,
                                         uint &max_hits, 
                                         thrust::device_vector<uint> &aabb_pid,
                                         thrust::device_vector<uint> &prefix_sum,
@@ -128,6 +138,8 @@ class Entry{
       
       thrust::device_vector<uint> hits;
       thrust::device_vector<uint> n_hits_per_query;
+      // thrust::device_vector<QueryAabb> qa;
+      thrust::device_vector<uint> hits_offset;
 
       OptiXRT rt;
     };

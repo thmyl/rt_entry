@@ -25,5 +25,5 @@
 
 #define KDTREE
 #define DIM 128
-#define COUNT_DIM 128
+#define COUNT_DIM 32
 // #define GRID

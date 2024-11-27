@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdio>
 #include "graph.h"
+#include "matrix.h"
 
 void SetDevice(int device_id=0){
     int device_count=0;
@@ -26,6 +27,7 @@ int main(int argc, char **argv){
   // char* datafile = "/home/myl/graph/Graph_method/SIFT1M.hvecs";
   // char* queryfile = "/home/myl/graph/Graph_method/bigann_query.bvecs";
   // char* gtfile = "/home/myl/graph/Graph_method/idx_1M.ivecs";
+  // test();
   gflags::ParseCommandLineFlags(&argc, &argv, true);
   std::cout<<"buffer_size = "<<FLAGS_buffer_size<<std::endl;
   std::cout<<"n_subspaces = "<<FLAGS_n_subspaces<<std::endl;
@@ -48,7 +50,7 @@ int main(int argc, char **argv){
   char* queryfile = (char*)FLAGS_query_path.c_str();
   char* gtfile = (char*)FLAGS_gt_path.c_str();
 
-  SetDevice(1);
+  SetDevice(0);
   // entry
 	Entry entry(FLAGS_n_subspaces, FLAGS_buffer_size, FLAGS_data_name, FLAGS_entries_size, FLAGS_max_hits, FLAGS_expand_ratio, FLAGS_point_ratio, FLAGS_grid_size);
   entry.Input(datafile, queryfile, gtfile);

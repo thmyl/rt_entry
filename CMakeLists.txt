@@ -61,6 +61,7 @@ add_executable(test
   kdtree.cpp
   flags.cpp
   graph.cu
+  graph_helper.cu
 )
 
 # target_link_libraries(test

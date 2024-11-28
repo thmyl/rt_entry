@@ -24,10 +24,6 @@ void SetDevice(int device_id=0){
 
 int main(int argc, char **argv){
   // freopen("out.txt", "w", stdout);
-  // char* datafile = "/home/myl/graph/Graph_method/SIFT1M.hvecs";
-  // char* queryfile = "/home/myl/graph/Graph_method/bigann_query.bvecs";
-  // char* gtfile = "/home/myl/graph/Graph_method/idx_1M.ivecs";
-  // test();
   gflags::ParseCommandLineFlags(&argc, &argv, true);
   std::cout<<"buffer_size = "<<FLAGS_buffer_size<<std::endl;
   std::cout<<"n_subspaces = "<<FLAGS_n_subspaces<<std::endl;
@@ -35,11 +31,10 @@ int main(int argc, char **argv){
   std::cout<<"data_path = "<<FLAGS_data_path<<std::endl;
   std::cout<<"query_path = "<<FLAGS_query_path<<std::endl;
   std::cout<<"gt_path = "<<FLAGS_gt_path<<std::endl;
-  std::cout<<"entries_size = "<<FLAGS_entries_size<<std::endl;
+  std::cout<<"n_entries = "<<FLAGS_n_entries<<std::endl;
   std::cout<<"max_hits = "<<FLAGS_max_hits<<std::endl;
   std::cout<<"expand_ratio = "<<FLAGS_expand_ratio<<std::endl;
   std::cout<<"point_ratio = "<<FLAGS_point_ratio<<std::endl;
-  std::cout<<"grid_size = "<<FLAGS_grid_size<<std::endl;
 
   std::ofstream outfile;
   outfile.open(OUTFILE, std::ios_base::app);
@@ -52,16 +47,21 @@ int main(int argc, char **argv){
 
   SetDevice(0);
   // entry
-	Entry entry(FLAGS_n_subspaces, FLAGS_buffer_size, FLAGS_data_name, FLAGS_entries_size, FLAGS_max_hits, FLAGS_expand_ratio, FLAGS_point_ratio, FLAGS_grid_size);
-  entry.Input(datafile, queryfile, gtfile);
-  entry.Projection();
-  entry.BlockUp();
-  entry.InitRT();
+	// Entry entry(FLAGS_n_subspaces, FLAGS_buffer_size, FLAGS_data_name, FLAGS_entries_size, FLAGS_max_hits, FLAGS_expand_ratio, FLAGS_point_ratio);
+  // entry.Input(datafile, queryfile, gtfile);
+  // entry.Projection();
+  // entry.BlockUp();
+  // entry.InitRT();
+  // entry.Search();
+  // entry.CleanUp();
 
-  // graph
-  entry.Search();
-  entry.CleanUp();
-  // Graph graph(entry);
-  // graph.Search_entry();
+  Graph graph(FLAGS_n_subspaces, FLAGS_buffer_size, FLAGS_n_entries, FLAGS_max_hits, FLAGS_expand_ratio, FLAGS_point_ratio,
+              FLAGS_data_name, FLAGS_data_path, FLAGS_query_path, FLAGS_gt_path);
+  graph.Input();
+  graph.Projection();
+  graph.Init_entry();
+  graph.Search();
+  graph.CleanUp();
+
   return 0;
 }

@@ -174,7 +174,13 @@ __global__ void calc_hits_offset(uint nq, uint max_hits, uint* hits, uint* n_hit
 }
 
 
-void Entry::collect_candidates_onesubspace(thrust::device_vector<uint> &hits,
+void RT_Entry::collect_candidates_onesubspace(
+                                         thrust::device_vector<float> &d_pca_points,
+                                         thrust::device_vector<float> &d_pca_queries,
+                                         thrust::device_vector<uint> &d_entries,
+                                         thrust::device_vector<float> &d_entries_dist,
+                                         uint n_entries,
+                                         thrust::device_vector<uint> &hits,
                                          thrust::device_vector<uint> &n_hits_per_query,
                                          thrust::device_vector<uint> &hits_offset,
                                          uint &max_hits, 
@@ -213,7 +219,7 @@ void Entry::collect_candidates_onesubspace(thrust::device_vector<uint> &hits,
   // Timing::stopTiming();
 
   // Timing::startTiming("selectTopk");
-  selectTopk<<<nq, 32>>>(entries_size, d_entries_ptr, d_entries_dist_ptr, d_candidates_ptr, d_candidates_dist_ptr, d_n_candidates_ptr, buffer_size, nq, hits_ptr, n_hits_per_query_ptr, max_hits, aabb_pid_ptr, prefix_sum_ptr, n_aabbs);
+  selectTopk<<<nq, 32>>>(n_entries, d_entries_ptr, d_entries_dist_ptr, d_candidates_ptr, d_candidates_dist_ptr, d_n_candidates_ptr, buffer_size, nq, hits_ptr, n_hits_per_query_ptr, max_hits, aabb_pid_ptr, prefix_sum_ptr, n_aabbs);
   CUDA_SYNC_CHECK();
   // Timing::stopTiming();
   
@@ -241,8 +247,9 @@ __global__ void check_candidates_kernel(uint *d_candidates, uint *d_n_candidates
   }
 }
 
-void Entry::check_candidates(){
+void RT_Entry::check_candidates(thrust::device_vector<uint> &d_gt_){
   printf("checking candidates...\n");
+  thrust::host_vector<uint> h_n_candidates(nq, 0);
   thrust::copy(d_n_candidates.begin(), d_n_candidates.end(), h_n_candidates.begin());
   float sum_candidates = 0;
   for(int i=0; i<nq; i++){
@@ -289,65 +296,6 @@ void Entry::check_candidates(){
   outfile.close();
 }
 
-
-__global__ void check_entries_kernel(uint *d_entries, uint entries_size, uint nq, uint *d_gt, uint gt_k, float *d_recall_1, float *d_recall_10, float *d_recall_100){
-  uint tid = blockIdx.x * blockDim.x + threadIdx.x;
-  if(tid < nq){
-    uint offset = tid * entries_size;
-    for(int i=0; i<gt_k; i++){
-      uint gt = d_gt[tid * gt_k + i];
-      for(int j=0; j<entries_size; j++){
-        if(gt == d_entries[offset + j]){
-          if(i<1)d_recall_1[tid] += 1;
-          if(i<10)d_recall_10[tid] += 1;
-          if(i<100)d_recall_100[tid] += 1;
-          break;
-        }
-      }
-    }
-  }
-}
-
-void Entry::check_entries(){
-  printf("checking entries...\n");
-
-  auto *d_entries_ptr = thrust::raw_pointer_cast(d_entries.data());
-  auto *d_gt_ptr = thrust::raw_pointer_cast(d_gt_.data());
-  thrust::device_vector<float> d_recall_1(nq, 0);
-  thrust::device_vector<float> d_recall_10(nq, 0);
-  thrust::device_vector<float> d_recall_100(nq, 0);
-  check_entries_kernel<<<(nq + 255)/256, 256>>>(d_entries_ptr, entries_size, nq, d_gt_ptr, gt_k,
-                                                    thrust::raw_pointer_cast(d_recall_1.data()),
-                                                    thrust::raw_pointer_cast(d_recall_10.data()),
-                                                    thrust::raw_pointer_cast(d_recall_100.data()));
-  CUDA_SYNC_CHECK();
-  thrust::host_vector<float> h_recall_1 = d_recall_1;
-  thrust::host_vector<float> h_recall_10 = d_recall_10;
-  thrust::host_vector<float> h_recall_100 = d_recall_100;
-  float sum_1 = 0;
-  float sum_10 = 0;
-  float sum_100 = 0;
-  for(int i=0; i<nq; i++){
-    sum_1 += h_recall_1[i];
-    sum_10 += h_recall_10[i];
-    sum_100 += h_recall_100[i];
-  }
-  sum_1 = sum_1 / nq;
-  sum_10 = sum_10 / nq / 10;
-  sum_100 = sum_100 / nq / 100;
-  printf("recall@1 = %f\n", sum_1);
-  printf("recall@10 = %f\n", sum_10);
-  printf("recall@100 = %f\n", sum_100);
-
-  std::ofstream outfile;
-  outfile.open(OUTFILE, std::ios_base::app);
-  outfile << "entries recall:\n";
-  outfile <<  "recall@1 = " << sum_1 << " ms\n";
-  outfile <<  "recall@10 = " << sum_10 << " ms\n";
-  outfile <<  "recall@100 = " << sum_100 << " ms\n" << std::flush;
-  outfile.close();
-}
-
 __global__ void subspace_copy_kernel(float *d_dst, float *d_src, uint offset, uint n, uint d){
   uint b_id = blockIdx.x;
   uint t_id = threadIdx.x;
@@ -358,7 +306,7 @@ __global__ void subspace_copy_kernel(float *d_dst, float *d_src, uint offset, ui
   }
 }
 
-void Entry::subspace_copy(thrust::device_vector<float3> &d_dst, thrust::device_vector<float> &d_src, uint offset){
+void RT_Entry::subspace_copy(thrust::device_vector<float3> &d_dst, thrust::device_vector<float> &d_src, uint offset){
   auto *d_dst_ptr = thrust::raw_pointer_cast(d_dst.data());
   auto *d_src_ptr = thrust::raw_pointer_cast(d_src.data());
   float* d_dst_ptr_ = reinterpret_cast<float*>(d_dst_ptr);

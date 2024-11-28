@@ -35,7 +35,7 @@ void rotate(float3* C, float* A, float* B, uint nq, uint dim_){
 }
 
 void matrixMultiply(cublasHandle_t &handle, thrust::device_vector<float> &A, thrust::device_vector<float> &B, thrust::device_vector<float> &C, uint M_, uint N_, uint K_, float alpha, float beta){
-  
+  printf("M_ = %d, N_ = %d, K_ = %d\n", M_, N_, K_);
   auto *A_ptr = thrust::raw_pointer_cast(A.data());
   auto *B_ptr = thrust::raw_pointer_cast(B.data());
   auto *C_ptr = thrust::raw_pointer_cast(C.data());

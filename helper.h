@@ -37,10 +37,10 @@
 // #define eps 1e-2
 typedef unsigned int num_t;
 
-struct Edge{
-    int src;
-    int dst;
-};
+// struct Edge{
+//     int src;
+//     int dst;
+// };
 
 enum class Distribution:int{
     uniform=0,

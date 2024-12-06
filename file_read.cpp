@@ -98,8 +98,8 @@ void file_read::read_fbin_file(const char *filename, uint &n, uint &d,
   }
   auto rtn = fread(&n, sizeof(n), 1, file);
   assert(rtn == 1);
-  uint limit = 10000000; // 最多读取1M
-  n = std::min(n, limit);
+  // uint limit = 10000000; // 最多读取1M
+  // n = std::min(n, limit);
   assert(fread(&d, sizeof(d), 1, file) == 1);
   data.resize(n * d);
   fread(data.data(), sizeof(float), n * d, file);
@@ -177,5 +177,24 @@ void file_read::read_ivecs_file(const char* filename, uint& n, uint& d,
     fread(&d, sizeof(d), 1, file);
     fread(data.data()+i*d, sizeof(uint), d, file);
   }
+  fclose(file);
+}
+
+void file_read::read_graph(const char* filename, const uint& n, uint& degree, thrust::host_vector<uint> &data){
+  printf("Read graph function\n");
+  FILE* file = fopen(filename, "rb");
+  if(file == NULL){
+    printf("File open failed\n");
+    return;
+  }
+  int filelength = 0;
+  fseek(file, 0, SEEK_END);
+  filelength = ftell(file);
+  fseek(file, 0, SEEK_SET);
+  degree = filelength / (n*4);
+  printf("n: %d, degree: %d\n", n, degree);
+
+  data.resize(n*degree);
+  fread(data.data(), sizeof(uint), n*degree, file);
   fclose(file);
 }

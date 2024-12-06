@@ -22,80 +22,85 @@ __global__ void calcDistance(uint *d_candidates, float *d_candidates_dist, uint 
     for(int i=warp_id; i<num; i+=n_warp){
       uint p_id = aabb_pid[start + i];
       //用32个lane计算距离
-      #if COUNT_DIM > 0
+
+    // read d_query
+      #if ENTRY_DIM > 0
         float q1 = 0;
-        if (lane_id < COUNT_DIM) {
+        if (lane_id < ENTRY_DIM) {
           q1 = d_query[q_id * DIM + lane_id];
         }
       #endif
-      #if COUNT_DIM > 32
+      #if ENTRY_DIM > 32
         float q2 = 0;
-        if (lane_id + 32 < COUNT_DIM) {
+        if (lane_id + 32 < ENTRY_DIM) {
           q2 = d_query[q_id * DIM + lane_id + 32];
         }
       #endif
-      #if COUNT_DIM > 64
+      #if ENTRY_DIM > 64
         float q3 = 0;
-        if (lane_id + 64 < COUNT_DIM) {
+        if (lane_id + 64 < ENTRY_DIM) {
           q3 = d_query[q_id * DIM + lane_id + 64];
         }
       #endif
-      #if COUNT_DIM > 96
+      #if ENTRY_DIM > 96
         float q4 = 0;
-        if (lane_id + 96 < COUNT_DIM) {
+        if (lane_id + 96 < ENTRY_DIM) {
           q4 = d_query[q_id * DIM + lane_id + 96];
         }
       #endif
 
-      #if COUNT_DIM > 0
+    // read d_data
+      #if ENTRY_DIM > 0
         float p1 = 0;
-        if (lane_id < COUNT_DIM) {
+        if (lane_id < ENTRY_DIM) {
           p1 = d_data[p_id * DIM + lane_id];
         }
       #endif
-      #if COUNT_DIM > 32
+      #if ENTRY_DIM > 32
         float p2 = 0;
-        if (lane_id + 32 < COUNT_DIM) {
+        if (lane_id + 32 < ENTRY_DIM) {
           p2 = d_data[p_id * DIM + lane_id + 32];
         }
       #endif
-      #if COUNT_DIM > 64
+      #if ENTRY_DIM > 64
         float p3 = 0;
-        if (lane_id + 64 < COUNT_DIM) {
+        if (lane_id + 64 < ENTRY_DIM) {
           p3 = d_data[p_id * DIM + lane_id + 64];
         }
       #endif
-      #if COUNT_DIM > 96
+      #if ENTRY_DIM > 96
         float p4 = 0;
-        if (lane_id + 96 < COUNT_DIM) {
+        if (lane_id + 96 < ENTRY_DIM) {
           p4 = d_data[p_id * DIM + lane_id + 96];
         }
       #endif
 
-      #if COUNT_DIM > 0
+    // calculate distance
+      #if ENTRY_DIM > 0
         float delta1 = (p1 - q1) * (p1 - q1);
       #endif
-      #if COUNT_DIM > 32
+      #if ENTRY_DIM > 32
         float delta2 = (p2 - q2) * (p2 - q2);
       #endif
-      #if COUNT_DIM > 64
+      #if ENTRY_DIM > 64
         float delta3 = (p3 - q3) * (p3 - q3);
       #endif
-      #if COUNT_DIM > 96
+      #if ENTRY_DIM > 96
         float delta4 = (p4 - q4) * (p4 - q4);
       #endif
-
+    
+    // reduce
       float dist = 0;
-      #if COUNT_DIM > 0
+      #if ENTRY_DIM > 0
         dist += delta1;
       #endif
-      #if COUNT_DIM > 32
+      #if ENTRY_DIM > 32
         dist += delta2;
       #endif
-      #if COUNT_DIM > 64
+      #if ENTRY_DIM > 64
         dist += delta3;
       #endif
-      #if COUNT_DIM > 96
+      #if ENTRY_DIM > 96
         dist += delta4;
       #endif
 
@@ -105,6 +110,7 @@ __global__ void calcDistance(uint *d_candidates, float *d_candidates_dist, uint 
       dist += __shfl_down_sync(FULL_MASK, dist, 2);
       dist += __shfl_down_sync(FULL_MASK, dist, 1);
 
+    // write
       if(lane_id == 0){
         uint offset = i + hits_offset[q_id * max_hits + hit_id];
         if(offset < buffer_size){

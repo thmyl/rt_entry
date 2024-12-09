@@ -21,6 +21,7 @@ There are two kinds of parameters. One is runtime parameter, which can be specif
 DEFINE_string(data_path, "/data/myl/sift1M/sift1M_base.fvecs", "path of datasets");
 ```
 If you do this, you need to compile and run again.
+
 2. Specify the value of the parameter at run time
 ```bash
 ./test --data_path=/data/myl/sift1M/sift1M_base.fvecs --query_path=/data/myl/sift1M/sift1M_query.fvecs

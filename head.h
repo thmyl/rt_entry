@@ -26,7 +26,8 @@
 // #define KDTREE
 #define DIM 128
 #define ENTRY_DIM 32 //dimensions used in entry search
-#define GRAPH_DIM 128 //dimensions used in graph search
+#define GRAPH_DIM 64 //dimensions used in graph search
 #define USE_L2_DIST_
-// #define REORDER
+#define REORDER
+// #define DETAIL //Whether to output detailed information
 // #define GRID

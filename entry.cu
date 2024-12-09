@@ -19,9 +19,11 @@ void RT_Entry::BlockUp(){
     auto &prefix_sum = subspaces_[space].prefix_sum;
 
     computeMinMax(world_bounds, h_points);
-    printf("world bound of space%d: (%f, %f, %f) - (%f, %f, %f)\n", space, 
-           world_bounds.minX, world_bounds.minY, world_bounds.minZ, 
-           world_bounds.maxX, world_bounds.maxY, world_bounds.maxZ);
+    #ifdef DETAIL
+      printf("world bound of space%d: (%f, %f, %f) - (%f, %f, %f)\n", space, 
+            world_bounds.minX, world_bounds.minY, world_bounds.minZ, 
+            world_bounds.maxX, world_bounds.maxY, world_bounds.maxZ);
+    #endif
 
     float3* h_points_ptr = thrust::raw_pointer_cast(subspaces_[space].h_points.data());
     Kdtree kdtree(h_points_ptr, np, np * point_ratio, world_bounds, h_aabbs);
@@ -64,7 +66,9 @@ void RT_Entry::InitRT(){
 void RT_Entry::Search(thrust::device_vector<float> &d_pca_points, thrust::device_vector<float> &d_pca_queries, thrust::device_vector<uint> &d_gt_, thrust::device_vector<uint> &d_entries, thrust::device_vector<float> &d_entries_dist, uint n_entries){
   // Timing::startTiming("search_entry");
   //rt搜索
-  // Timing::startTiming("rt search");
+  #ifdef DETAIL
+    Timing::startTiming("rt search");
+  #endif
   for(uint space = 0; space < n_subspaces; space++){
     auto &rt = subspaces_[space].rt;
     auto &hits = subspaces_[space].hits;
@@ -82,7 +86,9 @@ void RT_Entry::Search(thrust::device_vector<float> &d_pca_points, thrust::device
     sum = sum/nq;
     printf("average hits = %f AABBs\n", sum);*/
   }
-  // Timing::stopTiming(2);
+  #ifdef DETAIL
+    Timing::stopTiming(2);
+  #endif
 
   //合并搜索结果
   // Timing::startTiming("collect candidates");
@@ -102,7 +108,7 @@ void RT_Entry::Search(thrust::device_vector<float> &d_pca_points, thrust::device
   }
   // Timing::stopTiming(2);
   // Timing::stopTiming(2);
-  // check_candidates();
+  // check_candidates(d_gt_);
   // check_entries(d_gt_);
 }
 

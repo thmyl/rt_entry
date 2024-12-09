@@ -219,15 +219,23 @@ void RT_Entry::collect_candidates_onesubspace(
   CUDA_SYNC_CHECK();
   // Timing::stopTiming();
   
-  // Timing::startTiming("calcDistance");
+  #ifdef DETAIL
+    Timing::startTiming("calcDistance");
+  #endif
   calcDistance<<<nq * max_hits, 128>>>(d_candidates_ptr, d_candidates_dist_ptr, d_n_candidates_ptr, buffer_size, nq, d_queries_ptr, d_points_ptr, hits_ptr, n_hits_per_query_ptr, hits_offset_ptr, max_hits, aabb_pid_ptr, prefix_sum_ptr, n_aabbs);
   CUDA_SYNC_CHECK();
-  // Timing::stopTiming();
+  #ifdef DETAIL
+    Timing::stopTiming();
+  #endif
 
-  // Timing::startTiming("selectTopk");
+  #ifdef DETAIL
+    Timing::startTiming("selectTopk");
+  #endif
   selectTopk<<<nq, 32>>>(n_entries, d_entries_ptr, d_entries_dist_ptr, d_candidates_ptr, d_candidates_dist_ptr, d_n_candidates_ptr, buffer_size, nq, hits_ptr, n_hits_per_query_ptr, max_hits, aabb_pid_ptr, prefix_sum_ptr, n_aabbs);
   CUDA_SYNC_CHECK();
-  // Timing::stopTiming();
+  #ifdef DETAIL
+    Timing::stopTiming();
+  #endif
   
   // Timing::stopTiming();
 }

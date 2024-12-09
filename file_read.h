@@ -12,5 +12,6 @@ class file_read{
     static void read_bvecs_file(const char*, uint&, uint&, thrust::host_vector<float> &data);
     static void read_ivecs_file(const char*, uint&, uint&, thrust::host_vector<uint> &data);
     static void read_graph(const char*, const uint&, uint&, thrust::host_vector<uint> &data);
+    static void read_hh_file(const char*, uint&, uint&, thrust::host_vector<float> &data);
     file_read(){};
 };

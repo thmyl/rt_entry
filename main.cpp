@@ -9,10 +9,12 @@ void SetDevice(int device_id=0){
     cudaSetDevice(device_id);
     cudaDeviceProp device_prop;
     cudaGetDeviceProperties(&device_prop,device_id);
-    printf("Maximum dimensions of grid size: (%d, %d, %d)\n",
-           device_prop.maxGridSize[0], device_prop.maxGridSize[1], device_prop.maxGridSize[2]);
-    printf("Maximum dimensions of block size: (%d, %d, %d)\n",
-           device_prop.maxThreadsDim[0], device_prop.maxThreadsDim[1], device_prop.maxThreadsDim[2]);
+    #ifdef DETAIL
+      printf("Maximum dimensions of grid size: (%d, %d, %d)\n",
+            device_prop.maxGridSize[0], device_prop.maxGridSize[1], device_prop.maxGridSize[2]);
+      printf("Maximum dimensions of block size: (%d, %d, %d)\n",
+            device_prop.maxThreadsDim[0], device_prop.maxThreadsDim[1], device_prop.maxThreadsDim[2]);
+    #endif
     size_t available_memory,total_memory;
     cudaMemGetInfo(&available_memory,&total_memory);
     // std::cout<<"==========================================================\n";
@@ -25,17 +27,19 @@ void SetDevice(int device_id=0){
 int main(int argc, char **argv){
   // freopen("out.txt", "w", stdout);
   gflags::ParseCommandLineFlags(&argc, &argv, true);
-  std::cout<<"buffer_size = "<<FLAGS_buffer_size<<std::endl;
-  std::cout<<"n_subspaces = "<<FLAGS_n_subspaces<<std::endl;
-  std::cout<<"data_name = "<<FLAGS_data_name<<std::endl;
-  std::cout<<"data_path = "<<FLAGS_data_path<<std::endl;
-  std::cout<<"query_path = "<<FLAGS_query_path<<std::endl;
-  std::cout<<"gt_path = "<<FLAGS_gt_path<<std::endl;
-  std::cout<<"graph_path = "<<FLAGS_graph_path<<std::endl;
-  std::cout<<"n_entries = "<<FLAGS_n_entries<<std::endl;
-  std::cout<<"max_hits = "<<FLAGS_max_hits<<std::endl;
-  std::cout<<"expand_ratio = "<<FLAGS_expand_ratio<<std::endl;
-  std::cout<<"point_ratio = "<<FLAGS_point_ratio<<std::endl;
+  #ifdef DETAIL
+    std::cout<<"buffer_size = "<<FLAGS_buffer_size<<std::endl;
+    std::cout<<"n_subspaces = "<<FLAGS_n_subspaces<<std::endl;
+    std::cout<<"data_name = "<<FLAGS_data_name<<std::endl;
+    std::cout<<"data_path = "<<FLAGS_data_path<<std::endl;
+    std::cout<<"query_path = "<<FLAGS_query_path<<std::endl;
+    std::cout<<"gt_path = "<<FLAGS_gt_path<<std::endl;
+    std::cout<<"graph_path = "<<FLAGS_graph_path<<std::endl;
+    std::cout<<"n_entries = "<<FLAGS_n_entries<<std::endl;
+    std::cout<<"max_hits = "<<FLAGS_max_hits<<std::endl;
+    std::cout<<"expand_ratio = "<<FLAGS_expand_ratio<<std::endl;
+    std::cout<<"point_ratio = "<<FLAGS_point_ratio<<std::endl;
+  #endif
 
   std::ofstream outfile;
   outfile.open(OUTFILE, std::ios_base::app);
@@ -47,21 +51,15 @@ int main(int argc, char **argv){
   char* gtfile = (char*)FLAGS_gt_path.c_str();
 
   SetDevice(1);
-  // entry
-	// Entry entry(FLAGS_n_subspaces, FLAGS_buffer_size, FLAGS_data_name, FLAGS_entries_size, FLAGS_max_hits, FLAGS_expand_ratio, FLAGS_point_ratio);
-  // entry.Input(datafile, queryfile, gtfile);
-  // entry.Projection();
-  // entry.BlockUp();
-  // entry.InitRT();
-  // entry.Search();
-  // entry.CleanUp();
 
   Graph graph(FLAGS_n_subspaces, FLAGS_buffer_size, FLAGS_n_entries, FLAGS_max_hits, FLAGS_expand_ratio, FLAGS_point_ratio,
               FLAGS_data_name, FLAGS_data_path, FLAGS_query_path, FLAGS_gt_path, FLAGS_graph_path, FLAGS_ALGO, FLAGS_search_width);
   graph.Input();
   graph.RB_Graph();
-  graph.Projection();
-  graph.Init_entry();
+  if(FLAGS_ALGO!=0) {
+    graph.Projection();
+    graph.Init_entry();
+  }
   graph.Search();
   graph.CleanUp();
 

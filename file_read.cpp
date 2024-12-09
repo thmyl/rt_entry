@@ -15,37 +15,92 @@ static const char *get_last_m_chars(const char *str, int m) {
 
 void file_read::read_data(const char *datafile, uint &n, uint &d,
                           thrust::host_vector<float> &data){
-  printf("Read data function\n");
+  #ifdef DETAIL
+    printf("Read data function\n");
+  #endif
   if(std::string(get_last_m_chars(datafile, 3)) == "txt"){
-      printf("Reading a txt file\n");
+      #ifdef DETAIL
+        printf("Reading a txt file\n");
+      #endif
       read_txt_file(datafile, n, d, data);
-      printf("n = %d, d = %d\n", n, d);
+      #ifdef DETAIL
+        printf("n = %d, d = %d\n", n, d);
+      #endif
     }
     else if(std::string(get_last_m_chars(datafile, 5)) == "fvecs"){
-      printf("Reading a fvecs file\n");
+      #ifdef DETAIL
+        printf("Reading a fvecs file\n");
+      #endif
       read_fvecs_file(datafile, n, d, data);
-      printf("n = %d, d = %d\n", n, d);
+      #ifdef DETAIL
+        printf("n = %d, d = %d\n", n, d);
+      #endif
     }
     else if(std::string(get_last_m_chars(datafile, 4)) == "fbin"){
-      printf("Reading a fbin file\n");
+      #ifdef DETAIL
+        printf("Reading a fbin file\n");
+      #endif
       read_fbin_file(datafile, n, d, data);
-      printf("n = %d, d = %d\n", n, d);
+      #ifdef DETAIL
+        printf("n = %d, d = %d\n", n, d);
+      #endif
     }
     else if(std::string(get_last_m_chars(datafile, 5)) == "hvecs"){
-      printf("Reading a fvecs file\n");
+      #ifdef DETAIL
+        printf("Reading a hvecs file\n");
+      #endif
       read_hvecs_file(datafile, n, d, data);
-      printf("n = %d, d = %d\n", n, d);
+      #ifdef DETAIL
+        printf("n = %d, d = %d\n", n, d);
+      #endif
     }
     else if(std::string(get_last_m_chars(datafile, 5)) == "bvecs"){
-      printf("Reading a fvecs file\n");
+      #ifdef DETAIL
+        printf("Reading a bvecs file\n");
+      #endif
       read_bvecs_file(datafile, n, d, data);
-      printf("n = %d, d = %d\n", n, d);
+      #ifdef DETAIL
+        printf("n = %d, d = %d\n", n, d);
+      #endif
     }
+    else if(std::string(get_last_m_chars(datafile, 2)) == "hh"){
+      #ifdef DETAIL
+        printf("Reading a hh file\n");
+      #endif
+      read_hh_file(datafile, n, d, data);
+      #ifdef DETAIL
+        printf("n = %d, d = %d\n", n, d);
+      #endif
+    }
+    else{
+      #ifdef DETAIL
+        printf("Unknown file type\n");
+      #endif
+    }
+}
+
+void file_read::read_hh_file(const char* filename, uint& n, uint& d,
+                             thrust::host_vector<float>& data){
+  FILE* file = fopen(filename, "rb");
+  if(file == NULL){
+    printf("File open failed\n");
+    return;
+  }
+  assert(fread(&d, sizeof(d), 1, file) == 1);
+  long long filelength = 0;
+  fseek(file, 0, SEEK_END);
+  filelength = ftell(file);
+  fseek(file, 0, SEEK_SET);
+  n = (filelength - 4) / (d*4);
+  size_t dataSize = size_t(n) * size_t(d);
+  data.resize(dataSize);
+  fread(&d, sizeof(d), 1, file);
+  fread(data.data(), sizeof(float), 1UL*dataSize, file);
+  fclose(file);
 }
 
 void file_read::read_txt_file(const char *filename, uint &n, uint &d,
                               thrust::host_vector<float> &data) {
-  printf("Read txt file function\n");
   FILE *file = fopen(filename, "r");
   if (file == NULL) {
     printf("File open failed\n");
@@ -64,7 +119,6 @@ void file_read::read_txt_file(const char *filename, uint &n, uint &d,
 
 void file_read::read_fvecs_file(const char *filename, uint &n, uint &d,
                                 thrust::host_vector<float> &data) {
-  printf("Read fvecs file function\n");
   FILE *file = fopen(filename, "rb");
   if (file == NULL) {
     printf("File open failed\n");
@@ -73,12 +127,11 @@ void file_read::read_fvecs_file(const char *filename, uint &n, uint &d,
 
   int rtn = fread(&d, sizeof(d), 1, file);
   assert(rtn == 1);
-  int filelength = 0;
+  long long filelength = 0;
   fseek(file, 0, SEEK_END);
   filelength = ftell(file);
   fseek(file, 0, SEEK_SET);
   n = filelength / ((d + 1) * 4);
-  printf("n: %d, d: %d\n", n, d);
 
   data.resize(n * d);
   for (int i = 0; i < n; i++) {
@@ -90,25 +143,22 @@ void file_read::read_fvecs_file(const char *filename, uint &n, uint &d,
 
 void file_read::read_fbin_file(const char *filename, uint &n, uint &d,
                                thrust::host_vector<float> &data) {
-  printf("Read fin file function\n");
   FILE *file = fopen(filename, "rb");
   if (file == NULL) {
     printf("File open failed\n");
     return;
   }
-  auto rtn = fread(&n, sizeof(n), 1, file);
-  assert(rtn == 1);
+  assert(fread(&n, sizeof(n), 1, file));
   // uint limit = 10000000; // 最多读取1M
   // n = std::min(n, limit);
   assert(fread(&d, sizeof(d), 1, file) == 1);
   data.resize(n * d);
-  fread(data.data(), sizeof(float), n * d, file);
+  fread(data.data(), sizeof(float), 1LL * size_t(n) * size_t(d), file);
   fclose(file);
 }
 
 void file_read::read_hvecs_file(const char* filename, uint& n, uint& d,
                                 thrust::host_vector<float>& data){
-  printf("Read hvecs file function\n");
   FILE* file = fopen(filename, "rb");
   if(file == NULL){
     printf("File open failed\n");
@@ -120,7 +170,6 @@ void file_read::read_hvecs_file(const char* filename, uint& n, uint& d,
   filelength = ftell(file);
   fseek(file, 0, SEEK_SET);
   n = (filelength / 4 - 1)/d;
-  printf("n: %d, d: %d\n", n, d);
   
   data.resize(n*d);
   fread(&d, sizeof(d), 1, file);
@@ -130,7 +179,6 @@ void file_read::read_hvecs_file(const char* filename, uint& n, uint& d,
 
 void file_read::read_bvecs_file(const char* filename, uint& n, uint& d,
                                 thrust::host_vector<float>& data){
-  printf("Read bvecs file function\n");
   FILE* file = fopen(filename, "rb");
   if(file == NULL){
     printf("File open failed\n");
@@ -142,7 +190,6 @@ void file_read::read_bvecs_file(const char* filename, uint& n, uint& d,
   filelength = ftell(file);
   fseek(file, 0, SEEK_SET);
   n = filelength / (d+4);
-  printf("n: %d, d: %d\n", n, d);
   
   data.resize(n*d);
   for(int i = 0; i < n; i++){
@@ -158,19 +205,17 @@ void file_read::read_bvecs_file(const char* filename, uint& n, uint& d,
 
 void file_read::read_ivecs_file(const char* filename, uint& n, uint& d,
                                 thrust::host_vector<uint>& data){
-  printf("Read ivecs file function\n");
   FILE* file = fopen(filename, "rb");
   if(file == NULL){
     printf("File open failed\n");
     return;
   }
   assert(fread(&d, sizeof(d), 1, file) == 1);
-  int filelength = 0;
+  long long filelength = 0;
   fseek(file, 0, SEEK_END);
   filelength = ftell(file);
   fseek(file, 0, SEEK_SET);
   n = filelength / ((d+1)*4);
-  printf("n: %d, d: %d\n", n, d);
   
   data.resize(n*d);
   for(int i = 0; i < n; i++){
@@ -181,20 +226,19 @@ void file_read::read_ivecs_file(const char* filename, uint& n, uint& d,
 }
 
 void file_read::read_graph(const char* filename, const uint& n, uint& degree, thrust::host_vector<uint> &data){
-  printf("Read graph function\n");
   FILE* file = fopen(filename, "rb");
   if(file == NULL){
     printf("File open failed\n");
     return;
   }
-  int filelength = 0;
+  long long filelength = 0;
   fseek(file, 0, SEEK_END);
   filelength = ftell(file);
   fseek(file, 0, SEEK_SET);
   degree = filelength / (n*4);
-  printf("n: %d, degree: %d\n", n, degree);
 
-  data.resize(n*degree);
-  fread(data.data(), sizeof(uint), n*degree, file);
+  size_t dataSize = size_t(n) * size_t(degree);
+  data.resize(dataSize);
+  fread(data.data(), sizeof(uint), 1UL*dataSize, file);
   fclose(file);
 }

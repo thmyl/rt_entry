@@ -2,7 +2,6 @@
 #include <cuda_runtime.h>
 #include "head.h"
 #define SIZE 512
-#define shift 9
 #define num_hash 3
 
 __device__
@@ -947,7 +946,7 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, uint* d_results
 // graph_search
   //TODO: max_iter
   int max_iter = n_candidates / search_width;
-  // uint max_iter = 1;
+  // uint max_iter = 0;
   int flag_all_blocks = 1;
   int iter = 0;
   int crt_flag = 0;
@@ -961,7 +960,7 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, uint* d_results
   int first_position_of_flag;
   iteration = 0;
   while(flag_all_blocks && iter < max_iter){
-    // iter ++;
+    iter ++;
 
     for(int i=t_id; i<n_points_per_batch; i+=blockSize){
       neighbors_array[n_candidates + i].first = MAX;
@@ -988,6 +987,7 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, uint* d_results
           neighbors_array[n_candidates + i + search_cnt * degree].second = np;
         }
         else{
+					// if(q_id == 0) printf("target_point=%d\n", target_point);
           neighbors_array[n_candidates + i + search_cnt * degree].second = target_point;
           add(target_point, random_number, data);
         }

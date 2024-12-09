@@ -23,7 +23,9 @@ Graph::Graph(uint n_subspaces_, uint buffer_size_, uint entries_size_, uint max_
   ALGO = ALGO_;
   search_width = search_width_;
   n_candidates = pow(2.0, ceil(log(n_candidates)/log(2)));
-  printf("n_candidates = %d\n", n_candidates);
+  #ifdef DETAIL
+    printf("n_candidates = %d\n", n_candidates);
+  #endif
 
 	cublasStatus_t status = cublasCreate(&handle_);
 	if (status != CUBLAS_STATUS_SUCCESS) {
@@ -35,16 +37,21 @@ Graph::Graph(uint n_subspaces_, uint buffer_size_, uint entries_size_, uint max_
 void Graph::Init_entry(){
 	rt_entry->BlockUp();
 	rt_entry->InitRT();
-	d_entries.resize(nq * n_entries);
 	d_entries_dist.resize(nq * n_entries);
 }
 
 void Graph::Input(){
-  printf("Reading data_file: %s ...\n", datafile);
+  #ifdef DETAIL
+    printf("Reading data_file: %s ...\n", datafile);
+  #endif
   file_read::read_data(datafile, np, dim_, h_points_);
-  printf("Reading query_file: %s ...\n", queryfile);
+  #ifdef DETAIL
+    printf("Reading query_file: %s ...\n", queryfile);
+  #endif
   file_read::read_data(queryfile, nq, dim_, h_queries_);
-  printf("Reading gt_file: %s ...\n", gtfile);
+  #ifdef DETAIL
+    printf("Reading gt_file: %s ...\n", gtfile);
+  #endif
   file_read::read_ivecs_file(gtfile, nq, gt_k, h_gt_);
 
   if(ALGO == 0){
@@ -54,11 +61,13 @@ void Graph::Input(){
   
   d_queries_.resize(h_queries_.size());
   thrust::copy(h_queries_.begin(), h_queries_.end(), d_queries_.begin());
+
   d_gt_.resize(h_gt_.size());
   thrust::copy(h_gt_.begin(), h_gt_.end(), d_gt_.begin());
 
 	rt_entry->set_size(dim_, np, nq, gt_k);
   d_results.resize(nq * topk);
+  d_entries.resize(nq * n_entries);
 }
 
 void Graph::RB_Graph(){
@@ -71,13 +80,20 @@ void Graph::RB_Graph(){
   }
   else{
     fclose(graph_file);
-    printf("reading graph...\n");
+    #ifdef DETAIL
+      printf("reading graph...\n");
+    #endif
     file_read::read_graph(graphfile, np, degree, h_graph_);
+    #ifdef DETAIL
+      printf("graph size = %d\n", h_graph_.size());
+    #endif
     d_graph_.resize(h_graph_.size());
     thrust::copy(h_graph_.begin(), h_graph_.end(), d_graph_.begin());
 
     offset_shift_ = ceil(log(degree) / log(2));
-    printf("offset_shift_ = %d\n", offset_shift_);
+    #ifdef DETAIL
+      printf("offset_shift_ = %d\n", offset_shift_);
+    #endif
   }
 }
 
@@ -140,10 +156,10 @@ void Graph::Projection(){
   }
   matrixMultiply(handle, d_mean, d_rotation, d_mr_row, t_n, dim_, dim_, alpha, beta);
   cublasDestroy(handle);
-  Timing::startTiming("replicateVector");
+  // Timing::startTiming("replicateVector");
   d_pca_queries.resize(nq * dim_);
   replicateVector(d_pca_queries, d_mr_row, nq, dim_);
-  Timing::stopTiming();
+  // Timing::stopTiming();
 
 	rt_entry->set_pca_points(h_pca_points);
 }
@@ -153,11 +169,13 @@ void Graph::Search(){
 
   //----- pca projection -----
   if(ALGO == 1 || ALGO == 2){
-    // Timing::startTiming("pca projection");
+    Timing::startTiming("pca projection");
     float alpha = 1.0, beta = -1.0;
     matrixMultiply(handle_, d_queries_, d_rotation, d_pca_queries, nq, dim_, dim_, alpha, beta);
-    // Timing::stopTiming(2);
+    Timing::stopTiming(2);
+    d_queries_.resize(0);
   }
+  d_rotation.resize(0);
 
   if(ALGO == 1){
   //----- rt search -----
@@ -171,7 +189,7 @@ void Graph::Search(){
     Timing::stopTiming(2);
 
 	Timing::stopTiming(2);
-	check_entries(d_gt_);
+	if(ALGO == 1) check_entries(d_gt_);
   check_results(d_gt_);
 }
 
@@ -205,6 +223,6 @@ void Graph::GraphSearch(){
 }
 
 void Graph::CleanUp(){
-	rt_entry->CleanUp();
+	if(ALGO == 1) rt_entry->CleanUp();
 	cublasDestroy(handle_);
 }

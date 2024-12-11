@@ -35,7 +35,7 @@ int main(int argc, char **argv){
     std::cout<<"query_path = "<<FLAGS_query_path<<std::endl;
     std::cout<<"gt_path = "<<FLAGS_gt_path<<std::endl;
     std::cout<<"graph_path = "<<FLAGS_graph_path<<std::endl;
-    std::cout<<"n_entries = "<<FLAGS_n_entries<<std::endl;
+    std::cout<<"n_candidates = "<<FLAGS_n_candidates<<std::endl;
     std::cout<<"max_hits = "<<FLAGS_max_hits<<std::endl;
     std::cout<<"expand_ratio = "<<FLAGS_expand_ratio<<std::endl;
     std::cout<<"point_ratio = "<<FLAGS_point_ratio<<std::endl;
@@ -50,9 +50,9 @@ int main(int argc, char **argv){
   char* queryfile = (char*)FLAGS_query_path.c_str();
   char* gtfile = (char*)FLAGS_gt_path.c_str();
 
-  SetDevice(1);
+  SetDevice(0);
 
-  Graph graph(FLAGS_n_subspaces, FLAGS_buffer_size, FLAGS_n_entries, FLAGS_max_hits, FLAGS_expand_ratio, FLAGS_point_ratio,
+  Graph graph(FLAGS_n_subspaces, FLAGS_buffer_size, FLAGS_n_candidates, FLAGS_max_hits, FLAGS_expand_ratio, FLAGS_point_ratio,
               FLAGS_data_name, FLAGS_data_path, FLAGS_query_path, FLAGS_gt_path, FLAGS_graph_path, FLAGS_ALGO, FLAGS_search_width);
   graph.Input();
   graph.RB_Graph();

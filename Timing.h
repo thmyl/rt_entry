@@ -41,10 +41,10 @@ public:
 				std::cout << "time " << h.name.c_str() << ": " << t << " ms\n" << std::flush;
       else if(print == 2){
         std::cout << "time " << h.name.c_str() << ": " << t << " ms\n" << std::flush;
-        std::ofstream outfile;
-        outfile.open(OUTFILE, std::ios_base::app);
-        outfile <<  "time " << h.name.c_str() << ": " << t << " ms\n" << std::flush;
-        outfile.close();
+        // std::ofstream outfile;
+        // outfile.open(OUTFILE, std::ios_base::app);
+        // outfile <<  "time " << h.name.c_str() << ": " << t << " ms\n" << std::flush;
+        // outfile.close();
       }
 			return t;
     }

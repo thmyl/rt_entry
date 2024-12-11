@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdlib>
 #include <thrust/host_vector.h>
+#include <thrust/device_vector.h>
+#include <fstream>
 
 class file_read{
   public:

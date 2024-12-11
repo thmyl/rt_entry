@@ -108,7 +108,9 @@ void RT_Entry::Search(thrust::device_vector<float> &d_pca_points, thrust::device
   }
   // Timing::stopTiming(2);
   // Timing::stopTiming(2);
-  // check_candidates(d_gt_);
+  // #ifdef DETAIL
+  //   check_candidates(d_gt_);
+  // #endif
   // check_entries(d_gt_);
 }
 

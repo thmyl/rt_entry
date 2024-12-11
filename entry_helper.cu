@@ -214,10 +214,14 @@ void RT_Entry::collect_candidates_onesubspace(
 
   // Timing::startTiming("calcDistance_kselect");
 
-  // Timing::startTiming("hits offset");
+  #ifdef DETAIL
+    Timing::startTiming("hits offset");
+  #endif
   calc_hits_offset<<<(nq+31)/32, 32>>>(nq, max_hits, hits_ptr, n_hits_per_query_ptr, aabb_pid_ptr, prefix_sum_ptr, hits_offset_ptr);
   CUDA_SYNC_CHECK();
-  // Timing::stopTiming();
+  #ifdef DETAIL
+    Timing::stopTiming();
+  #endif
   
   #ifdef DETAIL
     Timing::startTiming("calcDistance");

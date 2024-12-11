@@ -29,5 +29,5 @@
 #define GRAPH_DIM 64 //dimensions used in graph search
 #define USE_L2_DIST_
 #define REORDER
-// #define DETAIL //Whether to output detailed information
+#define DETAIL //Whether to output detailed information
 // #define GRID

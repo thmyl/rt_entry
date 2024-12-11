@@ -55,13 +55,14 @@ add_executable(test
   entry.cu
   entry_helper.cu
   matrix.cu
-  file_read.cpp
+  file_read.cu
   pca.cpp
   raytracing.cpp
   kdtree.cpp
   flags.cpp
   graph.cu
   graph_helper.cu
+  graph_search.cuh
 )
 
 # target_link_libraries(test

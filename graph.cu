@@ -7,7 +7,7 @@ Graph::~Graph(){
   // rt_entry->CleanUp();
 }
 
-Graph::Graph(uint n_subspaces_, uint buffer_size_, uint entries_size_, uint max_hits_, double expand_ratio_, double point_ratio_,
+Graph::Graph(uint n_subspaces_, uint buffer_size_, uint n_candidates_, uint max_hits_, double expand_ratio_, double point_ratio_,
 						 std::string data_name_, std::string &data_path_, std::string &query_path_, std::string &gt_path_, std::string &graph_path_, uint ALGO_, uint search_width_){
   rt_entry = new RT_Entry(n_subspaces_, buffer_size_, max_hits_, expand_ratio_, point_ratio_);
 	datafile = (char*)data_path_.c_str();
@@ -15,11 +15,14 @@ Graph::Graph(uint n_subspaces_, uint buffer_size_, uint entries_size_, uint max_
 	gtfile = (char*)gt_path_.c_str();
   graphfile = (char*)graph_path_.c_str();
 	data_name = data_name_;
-	rotation_matrix_path = data_name + "/O.fvecs";
-	mean_matrix_path = data_name + "/mean.fvecs";
-	pca_base_path = data_name + "/pca_base.fvecs";
-	n_entries = entries_size_;
-  n_candidates = n_entries;
+	rotation_matrix_path = data_name + "/O.fbin";
+	mean_matrix_path = data_name + "/mean.fbin";
+	pca_base_path = data_name + "/pca_base.fbin";
+	
+  // n_entries = n_candidates_;
+  n_entries = 1000;
+  n_candidates = n_candidates_;
+  
   ALGO = ALGO_;
   search_width = search_width_;
   n_candidates = pow(2.0, ceil(log(n_candidates)/log(2)));
@@ -169,10 +172,14 @@ void Graph::Search(){
 
   //----- pca projection -----
   if(ALGO == 1 || ALGO == 2){
-    Timing::startTiming("pca projection");
+    #ifdef DETAIL
+      Timing::startTiming("pca projection");
+    #endif
     float alpha = 1.0, beta = -1.0;
     matrixMultiply(handle_, d_queries_, d_rotation, d_pca_queries, nq, dim_, dim_, alpha, beta);
-    Timing::stopTiming(2);
+    #ifdef DETAIL
+      Timing::stopTiming(2);
+    #endif
     d_queries_.resize(0);
   }
   d_rotation.resize(0);
@@ -197,8 +204,6 @@ void Graph::GraphSearch(){
   int hash_len, bit, hash;
   hash_parameter(n_candidates, hash_len, bit, hash);
   constexpr int WARP_SIZE = 32;
-	constexpr int NumWarpQ = 32;
-	constexpr int NumThreadQ = 1;
 
   //变量名
   float *d_points_ptr;
@@ -215,7 +220,7 @@ void Graph::GraphSearch(){
   auto *d_graph_ptr = thrust::raw_pointer_cast(d_graph_.data());
   auto *d_entries_ptr = thrust::raw_pointer_cast(d_entries.data());
   auto *d_entries_dist_ptr = thrust::raw_pointer_cast(d_entries_dist.data());
-  GraphSearchKernel<uint, float, WARP_SIZE, NumWarpQ, NumThreadQ><<<nq, 64, ((search_width << offset_shift_) + n_candidates) * sizeof(KernelPair<float, int>)>>>
+  GraphSearchKernel<uint, float, WARP_SIZE><<<nq, 64, ((search_width << offset_shift_) + n_candidates) * sizeof(KernelPair<float, int>)>>>
     (d_points_ptr, d_queries_ptr, d_results_ptr, d_graph_ptr, np,
     offset_shift_, n_candidates, topk, search_width,
     d_entries_ptr, d_entries_dist_ptr, n_entries, ALGO);

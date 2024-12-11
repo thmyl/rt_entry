@@ -35,7 +35,9 @@ void rotate(float3* C, float* A, float* B, uint nq, uint dim_){
 }
 
 void matrixMultiply(cublasHandle_t &handle, thrust::device_vector<float> &A, thrust::device_vector<float> &B, thrust::device_vector<float> &C, uint M_, uint N_, uint K_, float alpha, float beta){
-  printf("M_ = %d, N_ = %d, K_ = %d\n", M_, N_, K_);
+  #ifdef DETAIL
+    printf("M_ = %d, N_ = %d, K_ = %d\n", M_, N_, K_);
+  #endif
   auto *A_ptr = thrust::raw_pointer_cast(A.data());
   auto *B_ptr = thrust::raw_pointer_cast(B.data());
   auto *C_ptr = thrust::raw_pointer_cast(C.data());
@@ -92,8 +94,10 @@ void matrixMultiply(cublasHandle_t &handle, float* &A, float* &B, float* &C, uin
 }
 
 void preheat_cublas(uint M_, uint N_, uint K_){
-  printf("pre cublas\n");
-  Timing::startTiming("pre cublas");
+  #ifdef DETAIL
+    printf("pre cublas\n");
+    Timing::startTiming("pre cublas");
+  #endif
   cublasHandle_t handle;
   cublasCreate(&handle);
   float* A;
@@ -124,7 +128,9 @@ void preheat_cublas(uint M_, uint N_, uint K_){
                 CUDA_R_32F,
                 CUBLAS_GEMM_DEFAULT_TENSOR_OP);
   cudaDeviceSynchronize();
-  Timing::stopTiming();
+  #ifdef DETAIL
+    Timing::stopTiming();
+  #endif
   cudaFree(A);
   cudaFree(B);
   cudaFree(C);

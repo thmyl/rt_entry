@@ -5,7 +5,7 @@
 class Graph{
 public:
 	Graph(){}
-	Graph(uint n_subspaces_, uint buffer_size_, uint entries_size_, uint max_hits_, double expand_ratio_, double point_ratio_,
+	Graph(uint n_subspaces_, uint buffer_size_, uint n_candidates_, uint max_hits_, double expand_ratio_, double point_ratio_,
 				std::string data_name_, std::string &data_path_, std::string &query_path_, std::string &gt_path_, std::string &graph_path_, uint ALGO_, uint search_width_);
 	~Graph();
 	void Init_entry();

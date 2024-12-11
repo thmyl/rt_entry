@@ -47,7 +47,7 @@ int abs(int x){
     return x < 0 ? -x : x;
 }
 
-template<typename IdType, typename FloatType, int WARP_SIZE, int NumWarpQ, int NumThreadQ>
+template<typename IdType, typename FloatType, int WARP_SIZE>
 __global__ void GraphSearchKernel(float* d_data, float* d_query, uint* d_results, uint* d_graph, uint np,
                       uint offset_shift, uint n_candidates, uint topk, uint search_width,
                       uint* d_entries, float* d_entries_dist, uint n_entries, uint ALGO){

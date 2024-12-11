@@ -13,7 +13,7 @@ DECLARE_string(data_path);
 DECLARE_string(query_path);
 DECLARE_string(gt_path);
 DECLARE_string(graph_path);
-DECLARE_uint32(n_entries);
+DECLARE_uint32(n_candidates);
 DECLARE_uint32(max_hits);
 DECLARE_double(expand_ratio);
 DECLARE_double(point_ratio);

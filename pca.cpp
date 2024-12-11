@@ -67,6 +67,8 @@ void PCA::save_mean_rotation(const char *mean_path, const char *rotation_path){
 		return;
 	}
 	printf("dim = %d, meanvecRow.size() = %d\n", dim, meanvecRow.size());
+	uint row = 1;
+	fwrite(&row, sizeof(uint), 1, mean_file);
 	fwrite(&dim, sizeof(uint), 1, mean_file);
 	for(int i=0; i<dim; i++){
 		float tmp = meanvecRow(i);
@@ -75,8 +77,9 @@ void PCA::save_mean_rotation(const char *mean_path, const char *rotation_path){
 	fclose(mean_file);
 // write rotation file
 	printf("dim = %d, vec.cols() = %d, vec.rows() = %d\n", dim, vec.cols(), vec.rows());
+	fwrite(&dim, sizeof(uint), 1, rotation_file);
+	fwrite(&dim, sizeof(uint), 1, rotation_file);
 	for(int i=0; i<dim; i++){
-		fwrite(&dim, sizeof(uint), 1, rotation_file);
 		for(int j=0; j<dim; j++){
 			float tmp = vec(i,j);
 			fwrite(&tmp, sizeof(float), 1, rotation_file);
@@ -90,6 +93,8 @@ void PCA::read_mean_rotation(const char *mean_path, const char *rotation_path){
 	FILE *mean_file = fopen(mean_path, "rb");
 	FILE *rotation_file = fopen(rotation_path, "rb");
 // read mean file
+	uint row;
+	fread(&row, sizeof(uint), 1, mean_file);
 	fread(&dim, sizeof(uint), 1, mean_file);
 	meanvecRow.resize(dim);
 	for(int i=0; i<dim; i++){
@@ -100,9 +105,10 @@ void PCA::read_mean_rotation(const char *mean_path, const char *rotation_path){
 	fclose(mean_file);
 // read rotation file
 	vec.resize(dim, dim);
+	fread(&dim, sizeof(uint), 1, rotation_file);
+	fread(&dim, sizeof(uint), 1, rotation_file);
 	for(int i=0; i<dim; i++){
 		uint d;
-		fread(&d, sizeof(uint), 1, rotation_file);
 		for(int j=0; j<d; j++){
 			float tmp;
 			fread(&tmp, sizeof(float), 1, rotation_file);
@@ -121,8 +127,9 @@ void PCA::calc_result(uint pj_dim){
 
 void PCA::save_result(uint pj_dim, const char *pca_base_path){
 	FILE *pca_base_file = fopen(pca_base_path, "wb");
+	fwrite(&nb, sizeof(uint), 1, pca_base_file);
+	fwrite(&pj_dim, sizeof(uint), 1, pca_base_file);
 	for(int i=0; i<nb; i++){
-		fwrite(&pj_dim, sizeof(uint), 1, pca_base_file);
 		for(int j=0; j<pj_dim; j++){
 			float tmp = B_res(i,j);
 			fwrite(&tmp, sizeof(float), 1, pca_base_file);

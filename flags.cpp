@@ -12,6 +12,7 @@ DEFINE_uint32(search_width, 1, "search width");
 // DEFINE_string(query_path, "/data/myl/sift1M/sift1M_query.fvecs", "path of queries");
 // DEFINE_string(gt_path, "/data/myl/sift1M/sift1M_groundtruth.ivecs", "path of the ground truth");
 // DEFINE_string(graph_path, "/home/myl/rt_entry/input_file/sift1M_degree32.nsw", "path of the graph");
+// DEFINE_string(graph_path, "/home/myl/rt_entry/input_file/sift1M_last64_64_16.nsw", "path of the graph");
 
 /* sift10m */
 DEFINE_string(data_name, "sift10M", "name of datasets");
@@ -19,9 +20,11 @@ DEFINE_string(data_path, "/data/myl/sift10M/sift10M_base.fbin", "path of dataset
 DEFINE_string(query_path, "/data/myl/sift10M/sift10M_query.bvecs", "path of queries");
 DEFINE_string(gt_path, "/data/myl/sift10M/sift10M_groundtruth.ivecs", "path of the ground truth");
 DEFINE_string(graph_path, "/home/myl/rt_entry/input_file/sift10M_degree32.nsw", "path of the graph");
+// DEFINE_string(graph_path, "/home/myl/rt_entry/input_file/sift10M_128_16.nsw", "path of the graph");
 
 DEFINE_uint32(n_candidates, 64, "candidates size");
-DEFINE_uint32(max_hits, 80, "max hits");
+DEFINE_uint32(max_hits, 1, "max hits");
 DEFINE_double(expand_ratio, 0.8, "expand ratio");
 DEFINE_double(point_ratio, 0.0025, "point ratio");
+DEFINE_uint32(topk, 10, "topk");
 // DEFINE_double(grid_size, 16.0, "grid size");

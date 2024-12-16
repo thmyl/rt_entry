@@ -39,6 +39,7 @@ int main(int argc, char **argv){
     std::cout<<"max_hits = "<<FLAGS_max_hits<<std::endl;
     std::cout<<"expand_ratio = "<<FLAGS_expand_ratio<<std::endl;
     std::cout<<"point_ratio = "<<FLAGS_point_ratio<<std::endl;
+    std::cout<<"topk = "<<FLAGS_topk<<std::endl;
   #endif
 
   std::ofstream outfile;
@@ -50,10 +51,10 @@ int main(int argc, char **argv){
   char* queryfile = (char*)FLAGS_query_path.c_str();
   char* gtfile = (char*)FLAGS_gt_path.c_str();
 
-  SetDevice(0);
+  SetDevice(1);
 
   Graph graph(FLAGS_n_subspaces, FLAGS_buffer_size, FLAGS_n_candidates, FLAGS_max_hits, FLAGS_expand_ratio, FLAGS_point_ratio,
-              FLAGS_data_name, FLAGS_data_path, FLAGS_query_path, FLAGS_gt_path, FLAGS_graph_path, FLAGS_ALGO, FLAGS_search_width);
+              FLAGS_data_name, FLAGS_data_path, FLAGS_query_path, FLAGS_gt_path, FLAGS_graph_path, FLAGS_ALGO, FLAGS_search_width, FLAGS_topk);
   graph.Input();
   graph.RB_Graph();
   if(FLAGS_ALGO!=0) {

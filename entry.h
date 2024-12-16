@@ -89,7 +89,7 @@ class RT_Entry{
     float expand_ratio = 0.8f;
     float point_ratio = 0.0025f;
 
-  private:
+  public:
     uint n_subspaces = 1;
     struct Subspace{
       thrust::host_vector<float3> h_points;

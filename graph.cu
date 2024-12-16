@@ -2,14 +2,24 @@
 #include "auto_tune_bloom.h"
 #include "warpselect/structure_on_device.cuh"
 #include "graph_search.cuh"
+#include <thrust/unique.h>
+
+__global__ void mapIdKernel(uint *d_unique, uint unique_size, uint *d_map_id){
+  uint tid = blockIdx.x * blockDim.x + threadIdx.x;
+  if(tid < unique_size){
+    d_map_id[d_unique[tid]] = tid;
+  }
+}
 
 Graph::~Graph(){
   // rt_entry->CleanUp();
 }
 
 Graph::Graph(uint n_subspaces_, uint buffer_size_, uint n_candidates_, uint max_hits_, double expand_ratio_, double point_ratio_,
-						 std::string data_name_, std::string &data_path_, std::string &query_path_, std::string &gt_path_, std::string &graph_path_, uint ALGO_, uint search_width_){
+						 std::string data_name_, std::string &data_path_, std::string &query_path_, std::string &gt_path_, std::string &graph_path_, uint ALGO_, uint search_width_, uint topk_){
   rt_entry = new RT_Entry(n_subspaces_, buffer_size_, max_hits_, expand_ratio_, point_ratio_);
+  point_ratio = point_ratio_;
+  n_hits = max_hits_;
 	datafile = (char*)data_path_.c_str();
 	queryfile = (char*)query_path_.c_str();
 	gtfile = (char*)gt_path_.c_str();
@@ -20,8 +30,8 @@ Graph::Graph(uint n_subspaces_, uint buffer_size_, uint n_candidates_, uint max_
 	pca_base_path = data_name + "/pca_base.fbin";
 	
   // n_entries = n_candidates_;
-  n_entries = 1000;
   n_candidates = n_candidates_;
+  topk = topk_;
   
   ALGO = ALGO_;
   search_width = search_width_;
@@ -40,7 +50,7 @@ Graph::Graph(uint n_subspaces_, uint buffer_size_, uint n_candidates_, uint max_
 void Graph::Init_entry(){
 	rt_entry->BlockUp();
 	rt_entry->InitRT();
-	d_entries_dist.resize(nq * n_entries);
+	// d_entries_dist.resize(nq * n_entries);
 }
 
 void Graph::Input(){
@@ -70,7 +80,16 @@ void Graph::Input(){
 
 	rt_entry->set_size(dim_, np, nq, gt_k);
   d_results.resize(nq * topk);
-  d_entries.resize(nq * n_entries);
+  // d_entries.resize(nq * n_entries);
+  // n_entries = point_ratio * np * n_hits;
+  n_entries = n_candidates;
+  if(ALGO==1) n_entries = point_ratio * np;
+  
+  #ifdef REORDER
+    candidates_.resize(nq * n_candidates);
+    map_id.resize(np);
+    unique_candidates.resize(nq * n_candidates);
+  #endif
 }
 
 void Graph::RB_Graph(){
@@ -123,7 +142,7 @@ void Graph::Projection(){
   else 
     fclose(pca_base_file);
 
-  h_points_.resize(0);
+  // h_points_.resize(0);
 
   // 读取文件并计算points的投影
   printf("read PCA file\n");
@@ -196,7 +215,7 @@ void Graph::Search(){
     Timing::stopTiming(2);
 
 	Timing::stopTiming(2);
-	if(ALGO == 1) check_entries(d_gt_);
+	// if(ALGO == 1) check_entries(d_gt_);
   check_results(d_gt_);
 }
 
@@ -220,11 +239,63 @@ void Graph::GraphSearch(){
   auto *d_graph_ptr = thrust::raw_pointer_cast(d_graph_.data());
   auto *d_entries_ptr = thrust::raw_pointer_cast(d_entries.data());
   auto *d_entries_dist_ptr = thrust::raw_pointer_cast(d_entries_dist.data());
+
+  auto *d_hits = thrust::raw_pointer_cast((rt_entry->subspaces_[0]).hits.data());
+  auto *d_aabb_pid = thrust::raw_pointer_cast((rt_entry->subspaces_[0]).aabb_pid.data());
+  auto *d_prefix_sum = thrust::raw_pointer_cast((rt_entry->subspaces_[0]).prefix_sum.data());
+
+  auto *d_candidates = thrust::raw_pointer_cast(candidates_.data());
+
   GraphSearchKernel<uint, float, WARP_SIZE><<<nq, 64, ((search_width << offset_shift_) + n_candidates) * sizeof(KernelPair<float, int>)>>>
-    (d_points_ptr, d_queries_ptr, d_results_ptr, d_graph_ptr, np,
-    offset_shift_, n_candidates, topk, search_width,
-    d_entries_ptr, d_entries_dist_ptr, n_entries, ALGO);
+    (d_points_ptr, d_queries_ptr, d_results_ptr, d_graph_ptr, d_candidates, np,
+    offset_shift_, n_candidates, topk, search_width, 
+    d_hits, d_aabb_pid, d_prefix_sum, n_entries, n_hits, ALGO);
   cudaDeviceSynchronize();
+
+  /*#ifdef REORDER
+  Timing::startTiming("reorder");
+    thrust::copy(candidates_.begin(), candidates_.end(), unique_candidates.begin());
+    thrust::sort(unique_candidates.begin(), unique_candidates.end());
+    auto end = thrust::unique(unique_candidates.begin(), unique_candidates.end());
+    unique_candidates.resize(end - unique_candidates.begin());
+    auto *d_unique = thrust::raw_pointer_cast(unique_candidates.data());
+    auto *d_map_id = thrust::raw_pointer_cast(map_id.data());
+
+    uint blockSize = 64;
+    mapIdKernel<<<(unique_candidates.size() + blockSize - 1) / blockSize, blockSize>>>(d_unique, unique_candidates.size(), d_map_id);
+    cudaDeviceSynchronize();
+
+    thrust::host_vector<float> h_full_vector;
+    h_full_vector.resize(unique_candidates.size() * dim_);
+    full_vector.resize(unique_candidates.size() * dim_);
+
+    Timing::startTiming("reorder_copy");
+
+    // for(int i=0; i<unique_candidates.size(); i++){
+    //   int id = unique_candidates[i];
+    //   for(int j=0; j<dim_; j++){
+    //     h_full_vector[i * dim_ + j] = h_points_[id * dim_ + j];
+    //   }
+    // }
+    // thrust::copy(h_full_vector.begin(), h_full_vector.end(), full_vector.begin());
+    for(int i=0; i<unique_candidates.size(); i++){
+      int id = unique_candidates[i];
+      thrust::copy(h_points_.begin() + id * dim_, h_points_.begin() + (id + 1) * dim_, full_vector.begin() + i * dim_);
+    }
+
+    Timing::stopTiming(2);
+
+    auto *full_vector_ptr = thrust::raw_pointer_cast(full_vector.data());
+    auto *full_queries_ptr = thrust::raw_pointer_cast(d_queries_.data());
+    auto *candidates_ptr = thrust::raw_pointer_cast(candidates_.data());
+
+    Timing::startTiming("reorder_kernel");
+    ReorderKernel<uint, float, WARP_SIZE><<<nq, 64, n_candidates * sizeof(KernelPair<float, int>)>>>
+    (full_vector_ptr, full_queries_ptr, d_results_ptr, d_map_id, candidates_ptr, n_candidates, topk);
+    cudaDeviceSynchronize();
+    Timing::stopTiming(2);
+  Timing::stopTiming(2);
+  #endif*/
 }
 
 void Graph::CleanUp(){

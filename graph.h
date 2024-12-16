@@ -6,7 +6,7 @@ class Graph{
 public:
 	Graph(){}
 	Graph(uint n_subspaces_, uint buffer_size_, uint n_candidates_, uint max_hits_, double expand_ratio_, double point_ratio_,
-				std::string data_name_, std::string &data_path_, std::string &query_path_, std::string &gt_path_, std::string &graph_path_, uint ALGO_, uint search_width_);
+				std::string data_name_, std::string &data_path_, std::string &query_path_, std::string &gt_path_, std::string &graph_path_, uint ALGO_, uint search_width_, uint topk_);
 	~Graph();
 	void Init_entry();
 	void Search();
@@ -50,6 +50,12 @@ public:
 
 	thrust::device_vector<uint> d_results;
 
+	//reorder
+	thrust::device_vector<uint> candidates_;
+	thrust::device_vector<uint> map_id;
+	thrust::device_vector<float> full_vector;
+	thrust::device_vector<uint> unique_candidates;
+
 private:
 	uint								 ALGO = 1;
 	uint                 dim_;
@@ -58,8 +64,10 @@ private:
 	uint                 gt_k;
 	uint                 n_entries = 64;
 	uint								 degree;
-	uint                 topk = 10;
+	uint                 topk = 3;
 	uint 							   n_candidates;
 	uint								 search_width = 1;
 	uint 							   offset_shift_;
+	float 							 point_ratio;
+	uint 								 n_hits;
 };

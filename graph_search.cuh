@@ -49,8 +49,8 @@ int abs(int x){
 
 template<typename IdType, typename FloatType, int WARP_SIZE>
 __global__ void GraphSearchKernel(float* d_data, float* d_query, uint* d_results, uint* d_graph, uint* d_candidates, uint np,
-                      uint offset_shift, uint n_candidates, uint topk, uint search_width,
-                      uint* d_hits, uint* d_aabb_pid, uint* d_prefix_sum, uint n_entries, uint n_hits, uint ALGO){
+                      uint offset_shift, uint n_candidates, uint topk, uint search_width, uint* d_entries,
+                      uint* d_hits, uint* d_aabb_pid, uint* d_prefix_sum, uint ALGO){
   
   uint t_id = threadIdx.x;
   uint b_id = blockIdx.x;//query_id
@@ -63,6 +63,7 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, uint* d_results
 	uint aabb_id; //TODO: n_hits=1
 	uint aabb_st;
 	uint aabb_size;
+  uint n_entries;
 	if(ALGO==1){
 		aabb_id = d_hits[q_id];
 		aabb_st = d_prefix_sum[aabb_id];
@@ -70,6 +71,7 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, uint* d_results
 		n_entries = aabb_size;
 	}
 	else n_entries = n_candidates;
+  // n_entries = n_candidates;
 
   uint* crt_results = d_results + q_id * topk;
   uint degree = (1<<offset_shift);
@@ -460,7 +462,7 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, uint* d_results
   #endif
 
 // insert entry points
-  // uint* enter_points = d_entries + q_id * n_entries;
+  uint* enter_points = d_entries + q_id * n_entries;
 
   uint iteration;
   uint step_id;
@@ -977,7 +979,7 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, uint* d_results
   int first_position_of_flag;
   iteration = 0;
   while(flag_all_blocks && iter < max_iter){
-    iter ++;
+    // iter ++;
 
     for(int i=t_id; i<n_points_per_batch; i+=blockSize){
       neighbors_array[n_candidates + i].first = MAX;
@@ -1535,7 +1537,7 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, uint* d_results
   }
 
 // 重排序
-  #ifdef REORDER
+  /*#ifdef REORDER
   if(GRAPH_DIM != DIM){
     for(int i = warp_id; i < n_candidates; i += n_warp){
       int p_id = abs(neighbors_array[i].second);
@@ -1953,11 +1955,17 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, uint* d_results
     }
     __syncthreads();
   }
-  #endif
+  #endif*/
 
-  for(int i=t_id; i<topk; i+=blockSize){
-    crt_results[i] = abs(neighbors_array[i].second);
-  }
+  #ifdef REORDER
+    for(int i=t_id; i<n_candidates; i+=blockSize){
+      d_candidates[q_id * n_candidates + i] = abs(neighbors_array[i].second);
+    }
+  #else
+    for(int i=t_id; i<topk; i+=blockSize){
+      crt_results[i] = abs(neighbors_array[i].second);
+    }
+  #endif
 }
 
 template<typename IdType, typename FloatType, int WARP_SIZE>

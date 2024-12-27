@@ -24,6 +24,15 @@ void SetDevice(int device_id=0){
     std::cout<<"Total Memory: "<<int(total_memory/1024/1024)<<" MB\n";
 }
 
+void check_gpu_memory() {
+  size_t free_memory, total_memory;
+  cudaMemGetInfo(&free_memory, &total_memory);
+  
+  std::cout << "Free memory: " << free_memory / 1024 / 1024 << " MB" << std::endl;
+  std::cout << "Total memory: " << total_memory / 1024 / 1024 << " MB" << std::endl;
+  std::cout << "Used memory: " << (total_memory - free_memory) / 1024 / 1024 << " MB" << std::endl;
+}
+
 int main(int argc, char **argv){
   // freopen("out.txt", "w", stdout);
   gflags::ParseCommandLineFlags(&argc, &argv, true);
@@ -62,6 +71,7 @@ int main(int argc, char **argv){
     graph.Init_entry();
   }
   graph.Search();
+  check_gpu_memory();
   graph.CleanUp();
 
   return 0;

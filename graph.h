@@ -2,6 +2,11 @@
 #include "entry.h"
 #include "pca.h"
 
+struct Pair{
+	float dist;
+	uint id;
+};
+
 class Graph{
 public:
 	Graph(){}
@@ -17,6 +22,8 @@ public:
 	void check_results(thrust::device_vector<uint> &d_gt_);
 	void RB_Graph();
 	void GraphSearch();
+	void parallel_reorder(uint* candidates, uint* results, uint n_candidates, uint topk, uint dim_, uint nq, float* queries, uint np, float* points, Pair* candidates_dist);
+	void CopyHostToDevice(thrust::host_vector<float> &h_data, thrust::device_vector<float> &d_data, uint n, uint d, uint d_);
 
 public:
 	RT_Entry* 					 rt_entry;
@@ -49,12 +56,13 @@ public:
 	thrust::device_vector<float> d_entries_dist;
 
 	thrust::device_vector<uint> d_results;
+	thrust::host_vector<uint> h_results;
 
 	//reorder
-	thrust::device_vector<uint> candidates_;
-	thrust::device_vector<uint> map_id;
-	thrust::device_vector<float> full_vector;
-	thrust::device_vector<uint> unique_candidates;
+	thrust::device_vector<uint> d_candidates;
+	thrust::host_vector<uint> h_candidates;
+
+	thrust::host_vector<Pair> candidates_dist;
 
 private:
 	uint								 ALGO = 1;

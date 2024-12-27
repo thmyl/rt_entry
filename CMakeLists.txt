@@ -90,6 +90,8 @@ target_compile_options(test PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:
     -std=c++14
     -gencode arch=compute_75,code=sm_75
     -lineinfo
+    -fopenmp
+    -mavx2
 >)
 
 target_link_libraries(test

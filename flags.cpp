@@ -19,8 +19,9 @@ DEFINE_string(data_name, "sift10M", "name of datasets");
 DEFINE_string(data_path, "/data/myl/sift10M/sift10M_base.fbin", "path of datasets");
 DEFINE_string(query_path, "/data/myl/sift10M/sift10M_query.bvecs", "path of queries");
 DEFINE_string(gt_path, "/data/myl/sift10M/sift10M_groundtruth.ivecs", "path of the ground truth");
-DEFINE_string(graph_path, "/home/myl/rt_entry/input_file/sift10M_degree32.nsw", "path of the graph");
+// DEFINE_string(graph_path, "/home/myl/rt_entry/input_file/sift10M_degree32.nsw", "path of the graph");
 // DEFINE_string(graph_path, "/home/myl/rt_entry/input_file/sift10M_128_16.nsw", "path of the graph");
+DEFINE_string(graph_path, "/home/myl/rt_entry/input_file/sift10M_128_8.nsw", "path of the graph");
 
 DEFINE_uint32(n_candidates, 64, "candidates size");
 DEFINE_uint32(max_hits, 1, "max hits");

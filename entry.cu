@@ -57,10 +57,11 @@ void RT_Entry::InitRT(){
 
     d_aabbs.resize(0);
   }
-  preheat_cublas(nq, dim_, dim_);
-  d_candidates.resize(nq * buffer_size);
-  d_candidates_dist.resize(nq * buffer_size);
-  d_n_candidates.resize(nq);
+  // preheat_cublas(nq, dim_, dim_);
+  preheat_cublas(nq, DIM, DIM);
+  // d_candidates.resize(nq * buffer_size);
+  // d_candidates_dist.resize(nq * buffer_size);
+  // d_n_candidates.resize(nq);
 }
 
 void RT_Entry::Search(thrust::device_vector<float> &d_pca_points, thrust::device_vector<float> &d_pca_queries, thrust::device_vector<uint> &d_gt_, thrust::device_vector<uint> &d_entries, thrust::device_vector<float> &d_entries_dist, uint n_entries){
@@ -73,6 +74,7 @@ void RT_Entry::Search(thrust::device_vector<float> &d_pca_points, thrust::device
     auto &rt = subspaces_[space].rt;
     auto &hits = subspaces_[space].hits;
     auto &n_hits_per_query = subspaces_[space].n_hits_per_query;
+    printf("dim_ = %d\n", dim_);
     rt.search(thrust::raw_pointer_cast(d_pca_queries.data()), nq, space*3, dim_, thrust::raw_pointer_cast(hits.data()), thrust::raw_pointer_cast(n_hits_per_query.data()), max_hits);
     
     /*thrust::host_vector<uint> h_n_hits_per_query = n_hits_per_query;
@@ -103,13 +105,13 @@ void RT_Entry::Search(thrust::device_vector<float> &d_pca_points, thrust::device
     // Timing::stopTiming();
 
     // Timing::startTiming("collect candidates onesubspace");
-    collect_candidates_onesubspace(d_pca_points, d_pca_queries, d_entries, d_entries_dist, n_entries, hits, n_hits_per_query, hits_offset, max_hits, aabb_pid, prefix_sum, n_aabbs);
+    // collect_candidates_onesubspace(d_pca_points, d_pca_queries, d_entries, d_entries_dist, n_entries, hits, n_hits_per_query, hits_offset, max_hits, aabb_pid, prefix_sum, n_aabbs);
     // Timing::stopTiming();
   }
   // Timing::stopTiming(2);
   // Timing::stopTiming(2);
   // #ifdef DETAIL
-  //   check_candidates(d_gt_);
+    // check_candidates(d_gt_);
   // #endif
   // check_entries(d_gt_);
 }

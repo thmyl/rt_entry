@@ -110,9 +110,9 @@ void Graph::RB_Graph(){
       printf("reading graph...\n");
     #endif
     file_read::read_graph(graphfile, np, degree, h_graph_);
-    #ifdef DETAIL
-      printf("graph size = %d\n", h_graph_.size());
-    #endif
+    // #ifdef DETAIL
+    //   printf("graph size = %d\n", h_graph_.size());
+    // #endif
     d_graph_.resize(h_graph_.size());
     thrust::copy(h_graph_.begin(), h_graph_.end(), d_graph_.begin());
 
@@ -156,8 +156,21 @@ void Graph::Projection(){
   assert(t_n == np && t_d == dim_);
   // d_pca_points.resize(h_pca_points.size());
   // thrust::copy(h_pca_points.begin(), h_pca_points.end(), d_pca_points.begin());
+  
+  //debug begin
   //只拷贝前DIM维
   CopyHostToDevice(h_pca_points, d_pca_points, np, dim_, DIM);
+  // printf("reading PCA DIM file...\n");
+  // thrust::host_vector<float> h_pca_points_DIM;
+  // std::string pca_base_DIM_path = data_name + "/pca_base_32.fbin";
+  // file_read::read_data(pca_base_DIM_path.c_str(), t_n, t_d, h_pca_points_DIM);
+  // assert(t_n == np && t_d == DIM);
+  // d_pca_points.resize(h_pca_points_DIM.size());
+  // printf("copying pca points...\n");
+  // thrust::copy(h_pca_points_DIM.begin(), h_pca_points_DIM.end(), d_pca_points.begin());
+  // printf("finish copying pca points\n");
+  // h_pca_points_DIM.resize(0);
+  //debug end
   
   thrust::host_vector<float> h_rotation;
   file_read::read_data(rotation_matrix_path.c_str(), t_n, t_d, h_rotation);
@@ -190,7 +203,20 @@ void Graph::Projection(){
   replicateVector(d_pca_queries, d_mr_row, nq, DIM);
   // Timing::stopTiming();
 
-	rt_entry->set_pca_points(h_pca_points, dim_);
+  if(ALGO==1){
+    #ifdef DETAIL
+      printf("setting pca points...\n");
+    #endif
+    rt_entry->set_pca_points(h_pca_points, dim_);
+    #ifdef DETAIL
+      printf("finish setting pca points\n");
+    #endif
+  }
+  
+  #ifdef DETAIL
+    printf("finish projection\n");
+  #endif
+  preheat_cublas(nq, DIM, dim_);
 }
 
 void Graph::Search(){
@@ -207,8 +233,8 @@ void Graph::Search(){
       Timing::stopTiming(2);
     #endif
     d_queries_.resize(0);
+    d_rotation.resize(0);
   }
-  d_rotation.resize(0);
 
   if(ALGO == 1){
   //----- rt search -----
@@ -219,7 +245,7 @@ void Graph::Search(){
   //----- TODO: graph search -----
     Timing::startTiming("graph search");
     GraphSearch();
-    Timing::stopTiming(2);
+    Timing::stopTiming();
 
 	Timing::stopTiming(2);
 	// if(ALGO == 1) check_entries(d_gt_);

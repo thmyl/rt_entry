@@ -84,6 +84,7 @@ void Graph::check_results(thrust::device_vector<uint> &d_gt_){
 
   auto *d_results_ptr = thrust::raw_pointer_cast(d_results.data());
   auto *d_gt_ptr = thrust::raw_pointer_cast(d_gt_.data());
+  printf("gt_k = %d\n", gt_k);
   thrust::device_vector<float> d_recall_1(nq, 0);
   thrust::device_vector<float> d_recall_10(nq, 0);
   thrust::device_vector<float> d_recall_100(nq, 0);
@@ -112,10 +113,10 @@ void Graph::check_results(thrust::device_vector<uint> &d_gt_){
 
   std::ofstream outfile;
   outfile.open(OUTFILE, std::ios_base::app);
-  outfile << "results recall:\n";
-  outfile <<  "recall@1 = " << sum_1 << " ms\n";
-  outfile <<  "recall@10 = " << sum_10 << " ms\n";
-  outfile <<  "recall@100 = " << sum_100 << " ms\n" << std::flush;
+  // outfile << "results recall:\n";
+  // outfile <<  "recall@1 = " << sum_1 << " ms\n";
+  outfile <<  "recall@10 = " << sum_10 << " ms\n" << std::flush;
+  // outfile <<  "recall@100 = " << sum_100 << " ms\n" << std::flush;
   outfile.close();
 }
 
@@ -165,7 +166,7 @@ void Graph::parallel_reorder(uint* candidates, uint* results, uint n_candidates,
 
     // 计算距离并填充cur_candidates_dist
     for (int j = 0; j < n_candidates; ++j) {
-      uint p_id = candidates[q_id * n_candidates + j];
+      long long p_id = candidates[q_id * n_candidates + j];
       // p_id = j;
       cur_candidates_dist[j].id = p_id;
       __m256 dis_vec = _mm256_setzero_ps(); // 初始化为0

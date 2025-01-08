@@ -31,6 +31,11 @@ void check_gpu_memory() {
   std::cout << "Free memory: " << free_memory / 1024 / 1024 << " MB" << std::endl;
   std::cout << "Total memory: " << total_memory / 1024 / 1024 << " MB" << std::endl;
   std::cout << "Used memory: " << (total_memory - free_memory) / 1024 / 1024 << " MB" << std::endl;
+
+  std::ofstream outfile;
+  outfile.open(OUTFILE, std::ios_base::app);
+  outfile <<  "Used memory: " << (total_memory - free_memory) / 1024 / 1024 << " MB\n" << std::flush;
+  outfile.close();
 }
 
 int main(int argc, char **argv){
@@ -53,14 +58,22 @@ int main(int argc, char **argv){
 
   std::ofstream outfile;
   outfile.open(OUTFILE, std::ios_base::app);
-  outfile <<  "\n---------- expand_ratio = " << FLAGS_expand_ratio << "\t" << "point_ratio = " << FLAGS_point_ratio <<" ----------\n\n" << std::flush;
+  // outfile <<  "\n---------- expand_ratio = " << FLAGS_expand_ratio << "\t" << "point_ratio = " << FLAGS_point_ratio <<" ----------\n\n" << std::flush;
+  int reorder = 0;
+  #ifdef REORDER
+    reorder = 1;
+  #endif
+  outfile <<  "\n---------- n_candidates = " << FLAGS_n_candidates << "\t" 
+                        << "graph_path = " << FLAGS_graph_path << "\t" 
+                        << "DIM = " << DIM << "\t" 
+                        << "REORDER = " << reorder <<" ----------\n\n" << std::flush;
   outfile.close();
 
   char* datafile = (char*)FLAGS_data_path.c_str();
   char* queryfile = (char*)FLAGS_query_path.c_str();
   char* gtfile = (char*)FLAGS_gt_path.c_str();
 
-  SetDevice(1);
+  SetDevice(3);
 
   Graph graph(FLAGS_n_subspaces, FLAGS_buffer_size, FLAGS_n_candidates, FLAGS_max_hits, FLAGS_expand_ratio, FLAGS_point_ratio,
               FLAGS_data_name, FLAGS_data_path, FLAGS_query_path, FLAGS_gt_path, FLAGS_graph_path, FLAGS_ALGO, FLAGS_search_width, FLAGS_topk);
@@ -68,6 +81,8 @@ int main(int argc, char **argv){
   graph.RB_Graph();
   if(FLAGS_ALGO!=0) {
     graph.Projection();
+  }
+  if(FLAGS_ALGO==1) {
     graph.Init_entry();
   }
   graph.Search();

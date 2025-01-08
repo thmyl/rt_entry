@@ -58,7 +58,6 @@ void RT_Entry::InitRT(){
     d_aabbs.resize(0);
   }
   // preheat_cublas(nq, dim_, dim_);
-  preheat_cublas(nq, DIM, DIM);
   // d_candidates.resize(nq * buffer_size);
   // d_candidates_dist.resize(nq * buffer_size);
   // d_n_candidates.resize(nq);
@@ -123,4 +122,14 @@ void RT_Entry::CleanUp(){
   }
 }
 
-
+void RT_Entry::set_pca_points(thrust::host_vector<float> &h_pca_points, uint points_dim){
+  long long sizeof_points = h_pca_points.size();
+  std::cout<<"sizeof_points = "<<sizeof_points<<std::endl;
+  for(int space = 0; space < n_subspaces; space++){
+    subspaces_[space].h_points.resize(np);
+    for(long long i=0; i<np; i++){
+      long long offset = i*points_dim + space*3;
+      subspaces_[space].h_points[i] = float3{h_pca_points[offset], h_pca_points[offset+1], h_pca_points[offset+2]};
+    }
+  }
+}

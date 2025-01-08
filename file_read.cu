@@ -200,7 +200,7 @@ void file_read::read_fbin_file(const char *filename, uint &n, uint &d,
   }
   infile.read((char*)&n, 4);
   infile.read((char*)&d, 4);
-  data.resize(n*d);
+  data.resize(1LL*n*d);
   auto* data_ptr = thrust::raw_pointer_cast(data.data());
   infile.read((char*)data_ptr, 1LL*n*d*sizeof(float));
   infile.close();
@@ -262,8 +262,9 @@ void file_read::read_bvecs_file(const char* filename, uint& n, uint& d,
   infile.seekg(0, std::ios::end);
   filelength = infile.tellg();
   n = filelength / (d+4);
+  if(n>100000000) n = 100000000;//读取前100M
 
-  data.resize(n*d);
+  data.resize(1LL * n*d);
   infile.seekg(0, std::ios::beg);
   auto* data_ptr = thrust::raw_pointer_cast(data.data());
   for(int i=0; i<n; i++){
@@ -271,7 +272,7 @@ void file_read::read_bvecs_file(const char* filename, uint& n, uint& d,
     unsigned char tmp_data[d];
     infile.read((char*)tmp_data, d);
     for(int j=0; j<d; j++){
-      data_ptr[i*d+j] = (float)tmp_data[j];
+      data_ptr[1LL*i*d+j] = (float)tmp_data[j];
     }
   }
   infile.close();
@@ -345,9 +346,9 @@ void file_read::read_graph(const char* filename, const uint& n, uint& degree, th
   infile.seekg(0, std::ios::end);
   filelength = infile.tellg();
   infile.seekg(0, std::ios::beg);
-  degree = filelength / (n*4);
+  degree = filelength / (1LL*n*4);
 
-  data.resize(n*degree);
+  data.resize(1LL*n*degree);
   auto* data_ptr = thrust::raw_pointer_cast(data.data());
   infile.read((char*)data_ptr, 1LL*n*degree*sizeof(uint));
   infile.close();

@@ -16,7 +16,7 @@ public:
     C.resize(dim, dim);
     for (int i = 0; i < nb; i++) {
       for (int j = 0; j < dim; j++) {
-        B(i, j) = datasets[i * dim + j];
+        B(i, j) = datasets[1LL * i * dim + j];
       }
     }
   }

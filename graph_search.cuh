@@ -462,7 +462,7 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, uint* d_results
   #endif
 
 // insert entry points
-  uint* enter_points = d_entries + q_id * n_entries;
+  // uint* enter_points = d_entries + q_id * n_entries;
 
   uint iteration;
   uint step_id;
@@ -502,7 +502,7 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, uint* d_results
 		__syncthreads();
 
 		for(int i = warp_id; i < n_points_per_batch; i+=n_warp){
-			uint p_id = neighbors_array[n_candidates + i].second;
+			long long p_id = neighbors_array[n_candidates + i].second;
 			if(p_id >= np) continue;
 		// read point
 			#if GRAPH_DIM > 0
@@ -976,10 +976,10 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, uint* d_results
 //   if(t_id == 0 && b_id == 0){
 //     printf("n_candidate=%d n_entries=%d tmp_flag=%d\n", n_candidates, n_entries, tmp_flag);
 //   }
-  int first_position_of_flag;
+  long long first_position_of_flag;
   iteration = 0;
   while(flag_all_blocks && iter < max_iter){
-    // iter ++;
+    iter ++;
 
     for(int i=t_id; i<n_points_per_batch; i+=blockSize){
       neighbors_array[n_candidates + i].first = MAX;
@@ -998,7 +998,7 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, uint* d_results
       tmp_flag &= ~(1 << first_position_of_tmp_flag);
 
       //read neighbors
-      auto offset = first_position_of_flag << offset_shift;
+      long long offset = first_position_of_flag << (1LL * offset_shift);
       uint* neighbors = d_graph + offset;
       for(int i=t_id; i<degree; i+=blockSize){
         int target_point = neighbors[i];
@@ -1039,7 +1039,7 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, uint* d_results
 
     //compute distance between query and search_width points
     for(int i = warp_id; i < search_cnt * degree; i += n_warp){
-      int p_id = neighbors_array[n_candidates + i].second;
+      long long p_id = neighbors_array[n_candidates + i].second;
       if(p_id >= np) {
         neighbors_array[n_candidates + i].first = MAX;
         continue;

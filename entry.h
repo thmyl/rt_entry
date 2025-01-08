@@ -64,15 +64,7 @@ class RT_Entry{
       gt_k = _gt_k;
     }
     uint get_n_subspaces(){return n_subspaces;}
-    void set_pca_points(thrust::host_vector<float> &h_pca_points, uint points_dim){
-      for(int space = 0; space < n_subspaces; space++){
-        subspaces_[space].h_points.resize(np);
-        for(int i=0; i<np; i++){
-          uint offset = i*points_dim + space*3;
-          subspaces_[space].h_points[i] = float3{h_pca_points[offset], h_pca_points[offset+1], h_pca_points[offset+2]};
-        }
-      }
-    }
+    void set_pca_points(thrust::host_vector<float> &h_pca_points, uint points_dim);
   
   private:
     uint                 dim_;

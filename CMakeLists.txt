@@ -45,6 +45,11 @@ include(${PROJECT_SOURCE_DIR}/cmake/configure_optix.cmake)
 
 cuda_compile_and_embed(embedded_ptx_code devicePrograms.cu)
 
+# 加入此句就可以直接引用#include<Dense>
+include_directories(${CMAKE_SOURCE_DIR}/Eigen)
+include_directories(${CMAKE_SOURCE_DIR}/kpca)
+# include_directories(${CMAKE_SOURCE_DIR}/file)
+
 # 添加可执行文件
 # add_executable(test ${SOURCES})
 add_executable(test
@@ -56,8 +61,10 @@ add_executable(test
   entry_helper.cu
   matrix.cu
   file_read.cu
-  pca.cpp
-  raytracing.cpp
+  # pca.cpp
+  kpca/kpca.cu
+  kpca/pca.cu
+  raytracing.cu
   kdtree.cpp
   flags.cpp
   graph.cu

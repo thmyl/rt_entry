@@ -38,4 +38,5 @@ DEFINE_uint32(max_hits, 1, "max hits");
 DEFINE_double(expand_ratio, 0.8, "expand ratio");
 DEFINE_double(point_ratio, 0.0025, "point ratio");
 DEFINE_uint32(topk, 10, "topk");
+DEFINE_uint32(n_clusters, 10, "n_clusters");
 // DEFINE_double(grid_size, 16.0, "grid size");

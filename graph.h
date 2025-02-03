@@ -1,6 +1,7 @@
 #pragma once
 #include "entry.h"
-#include "pca.h"
+#include "kpca/pca.h"
+#include "kpca/kpca.h"
 
 struct Pair{
 	float dist;
@@ -17,11 +18,13 @@ public:
 	void Search();
 	void Input();
 	void Projection();
+	void PCACluster();
 	void CleanUp();
 	void check_entries(thrust::device_vector<uint> &d_gt_);
 	void check_results(thrust::device_vector<uint> &d_gt_);
 	void RB_Graph();
 	void GraphSearch();
+	void NearestCluster();
 	void parallel_reorder(uint* candidates, uint* results, uint n_candidates, uint topk, uint dim_, uint nq, float* queries, uint np, float* points, Pair* candidates_dist);
 	void CopyHostToDevice(thrust::host_vector<float> &h_data, thrust::device_vector<float> &d_data, uint n, uint d, uint d_);
 
@@ -35,6 +38,7 @@ public:
 	std::string          rotation_matrix_path;
 	std::string          mean_matrix_path;
 	std::string          pca_base_path;
+	std::string					 pca_cluster_path;
 	cublasHandle_t       handle_;
 	
 	thrust::host_vector<float> h_points_;
@@ -64,6 +68,12 @@ public:
 
 	thrust::host_vector<Pair> candidates_dist;
 
+	//pca_cluster
+	KPCA* kpca;
+	thrust::device_vector<uint> d_belong;
+	thrust::device_vector<float> d_dist;
+	thrust::host_vector<uint> h_belong;
+
 private:
 	uint								 ALGO = 1;
 	uint                 dim_;
@@ -76,6 +86,8 @@ private:
 	uint 							   n_candidates;
 	uint								 search_width = 1;
 	uint 							   offset_shift_;
-	float 							 point_ratio;
 	uint 								 n_hits;
+	uint 								 n_clusters;
+	float 							 expand_ratio;
+	float 							 point_ratio;
 };

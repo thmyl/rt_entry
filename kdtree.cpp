@@ -13,6 +13,7 @@ Kdtree::Kdtree(float3* _data, uint _n, uint _max_node, OptixAabb world_bound, th
   }
   id = new uint[n];
   for(int i=0; i<n; i++)id[i] = i;
+  // printf("begin build...\n");
   // root = new Kdnode;
   build(0, n, 0, world_bound, aabbs);
 }
@@ -98,7 +99,7 @@ void Kdtree::computeAabbPid(thrust::device_vector<uint> &aabb_pid, thrust::devic
 
 void Kdtree::build(uint l, uint r, uint node_id, OptixAabb box_bound, thrust::host_vector<OptixAabb> &aabbs){
   if(r-l<=max_node){
-    add_aabb(l, r, box_bound, aabbs);
+    if(r>l) add_aabb(l, r, box_bound, aabbs);
     // aabbs.push_back(box_bound);
     return;
   }

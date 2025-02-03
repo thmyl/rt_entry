@@ -15,11 +15,14 @@ Graph::~Graph(){
   // rt_entry->CleanUp();
 }
 
-Graph::Graph(uint n_subspaces_, uint buffer_size_, uint n_candidates_, uint max_hits_, double expand_ratio_, double point_ratio_,
+Graph::Graph(uint n_clusters_, uint buffer_size_, uint n_candidates_, uint max_hits_, double expand_ratio_, double point_ratio_,
 						 std::string data_name_, std::string &data_path_, std::string &query_path_, std::string &gt_path_, std::string &graph_path_, uint ALGO_, uint search_width_, uint topk_){
-  rt_entry = new RT_Entry(n_subspaces_, buffer_size_, max_hits_, expand_ratio_, point_ratio_);
   point_ratio = point_ratio_;
   n_hits = max_hits_;
+  expand_ratio = expand_ratio_;
+  // uint n_subspaces = 1;
+  n_clusters = n_clusters_;
+  rt_entry = new RT_Entry(n_clusters, n_hits, expand_ratio, point_ratio);
 	datafile = (char*)data_path_.c_str();
 	queryfile = (char*)query_path_.c_str();
 	gtfile = (char*)gt_path_.c_str();
@@ -28,6 +31,7 @@ Graph::Graph(uint n_subspaces_, uint buffer_size_, uint n_candidates_, uint max_
 	rotation_matrix_path = data_name + "/O.fbin";
 	mean_matrix_path = data_name + "/mean.fbin";
 	pca_base_path = data_name + "/pca_base.fbin";
+  pca_cluster_path = data_name + "/pca_cluster.bin";
 	
   // n_entries = n_candidates_;
   n_candidates = n_candidates_;
@@ -80,10 +84,14 @@ void Graph::Input(){
   d_gt_.resize(h_gt_.size());
   thrust::copy(h_gt_.begin(), h_gt_.end(), d_gt_.begin());
 
-	rt_entry->set_size(DIM, np, nq, gt_k);
+	// rt_entry->set_size(DIM, np, nq, gt_k);
+  rt_entry->set_size(3, np, nq, gt_k);
   d_results.resize(nq * topk);
   h_results.resize(nq * topk);
   n_entries = n_candidates;
+  d_belong.resize(nq);thrust::fill(d_belong.begin(), d_belong.end(), 0);
+  d_dist.resize(nq); thrust::fill(d_dist.begin(), d_dist.end(), FLT_MAX);
+  h_belong.resize(nq);thrust::fill(h_belong.begin(), h_belong.end(), 0);
   // d_entries.resize(nq * n_entries);
   // n_entries = point_ratio * np * n_hits;
   // n_entries = n_candidates;
@@ -203,15 +211,15 @@ void Graph::Projection(){
   replicateVector(d_pca_queries, d_mr_row, nq, DIM);
   // Timing::stopTiming();
 
-  if(ALGO==1){
-    #ifdef DETAIL
-      printf("setting pca points...\n");
-    #endif
-    rt_entry->set_pca_points(h_pca_points, dim_);
-    #ifdef DETAIL
-      printf("finish setting pca points\n");
-    #endif
-  }
+  // if(ALGO==1){
+  //   #ifdef DETAIL
+  //     printf("setting pca points...\n");
+  //   #endif
+  //   rt_entry->set_pca_points(h_pca_points, dim_);
+  //   #ifdef DETAIL
+  //     printf("finish setting pca points\n");
+  //   #endif
+  // }
   
   #ifdef DETAIL
     printf("finish projection\n");
@@ -219,11 +227,45 @@ void Graph::Projection(){
   preheat_cublas(nq, DIM, dim_);
 }
 
+void Graph::PCACluster(){
+  // n_clusters=_n_clusters;
+  uint n_components = 3;
+  uint n_iteration = 5;
+  float* h_points_ptr = thrust::raw_pointer_cast(h_points_.data());
+  kpca = new KPCA(h_points_ptr, np, nq, dim_, n_clusters, n_components, n_iteration);
+  
+  FILE *pca_cluster_file = fopen(pca_cluster_path.c_str(), "rb");
+  if(pca_cluster_file == NULL){
+    printf("building pca cluster...\n");
+    printf("n_clusters = %d\n", n_clusters);
+    // fclose(pca_cluster_file);
+
+    kpca->InitLists(0);//使用随机初始化方法
+    kpca->Learn();
+    //把lists和n_cluster个旋转矩阵存储下来
+    kpca->SaveLearnedData();
+    kpca->WriteCluster(pca_cluster_path.c_str());
+  }
+  else{
+    printf("reading pca cluster...\n");
+    fclose(pca_cluster_file);
+    kpca->ReadCluster(pca_cluster_path.c_str());
+  }
+
+  //向rt_entry传递数据
+  rt_entry->set_pca_clusters(kpca);
+  preheat_cublas(nq, DIM, dim_);
+
+  // Timing::startTiming("calc nearest cluster");
+  //   NearestCluster();
+  //   Timing::stopTiming(2);
+}
+
 void Graph::Search(){
 	Timing::startTiming("search");
 
   //----- pca projection -----
-  if(ALGO == 1 || ALGO == 2){
+  if(ALGO==1 || ALGO == 2){
     #ifdef DETAIL
       Timing::startTiming("pca projection");
     #endif
@@ -232,15 +274,22 @@ void Graph::Search(){
     #ifdef DETAIL
       Timing::stopTiming(2);
     #endif
-    d_queries_.resize(0);
+    // d_queries_.resize(0);
     d_rotation.resize(0);
   }
-
-  if(ALGO == 1){
-  //----- rt search -----
-    Timing::startTiming("search_entry");
-    rt_entry->Search(d_pca_points, d_pca_queries, d_gt_, d_entries, d_entries_dist, n_entries);
+  if(ALGO==1){
+    //----- pca cluster -----
+    Timing::startTiming("calc nearest cluster");
+    NearestCluster();
     Timing::stopTiming(2);
+    //----- rt search -----
+    Timing::startTiming("search_entry");
+    rt_entry->Search(kpca, d_belong, d_gt_, d_entries, d_entries_dist, n_entries);
+    Timing::stopTiming(2);
+
+    // thrust::host_vector<uint> h_hits(rt_entry->d_hits_);
+    // printf("sizeof hits = %d\n", h_hits.size());
+    // for(int i=0; i<100; i++)printf("%d ", h_hits[i]);printf("\n");
   }
   //----- TODO: graph search -----
     Timing::startTiming("graph search");
@@ -276,9 +325,13 @@ void Graph::GraphSearch(){
   auto *d_entries_ptr = thrust::raw_pointer_cast(d_entries.data());
   auto *d_entries_dist_ptr = thrust::raw_pointer_cast(d_entries_dist.data());
 
-  auto *d_hits = thrust::raw_pointer_cast((rt_entry->subspaces_[0]).hits.data());
-  auto *d_aabb_pid = thrust::raw_pointer_cast((rt_entry->subspaces_[0]).aabb_pid.data());
-  auto *d_prefix_sum = thrust::raw_pointer_cast((rt_entry->subspaces_[0]).prefix_sum.data());
+  // auto *d_hits = thrust::raw_pointer_cast((rt_entry->subspaces_[0]).hits.data());
+  // auto *d_aabb_pid = thrust::raw_pointer_cast((rt_entry->subspaces_[0]).aabb_pid.data());
+  // auto *d_prefix_sum = thrust::raw_pointer_cast((rt_entry->subspaces_[0]).prefix_sum.data());
+
+  auto *d_hits = thrust::raw_pointer_cast(rt_entry->d_hits_.data());
+  auto *d_aabb_pid = thrust::raw_pointer_cast(rt_entry->d_aabb_pid_.data());
+  auto *d_prefix_sum = thrust::raw_pointer_cast(rt_entry->d_prefix_sum_.data());
 
   auto *d_candidates_ptr = thrust::raw_pointer_cast(d_candidates.data());
 

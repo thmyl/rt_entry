@@ -54,6 +54,7 @@ int main(int argc, char **argv){
     std::cout<<"expand_ratio = "<<FLAGS_expand_ratio<<std::endl;
     std::cout<<"point_ratio = "<<FLAGS_point_ratio<<std::endl;
     std::cout<<"topk = "<<FLAGS_topk<<std::endl;
+    std::cout<<"n_clusters = "<<FLAGS_n_clusters<<std::endl;
   #endif
 
   std::ofstream outfile;
@@ -75,13 +76,12 @@ int main(int argc, char **argv){
 
   SetDevice(3);
 
-  Graph graph(FLAGS_n_subspaces, FLAGS_buffer_size, FLAGS_n_candidates, FLAGS_max_hits, FLAGS_expand_ratio, FLAGS_point_ratio,
+  Graph graph(FLAGS_n_clusters, FLAGS_buffer_size, FLAGS_n_candidates, FLAGS_max_hits, FLAGS_expand_ratio, FLAGS_point_ratio,
               FLAGS_data_name, FLAGS_data_path, FLAGS_query_path, FLAGS_gt_path, FLAGS_graph_path, FLAGS_ALGO, FLAGS_search_width, FLAGS_topk);
   graph.Input();
   graph.RB_Graph();
-  if(FLAGS_ALGO!=0) {
-    graph.Projection();
-  }
+  if(FLAGS_ALGO==1) graph.PCACluster();
+  if(FLAGS_ALGO==1 || FLAGS_ALGO==2) graph.Projection();
   if(FLAGS_ALGO==1) {
     graph.Init_entry();
   }

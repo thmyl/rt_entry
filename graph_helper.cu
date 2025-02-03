@@ -218,3 +218,61 @@ void Graph::CopyHostToDevice(thrust::host_vector<float> &h_data, thrust::device_
     thrust::copy(h_data.begin() + i*d, h_data.begin()+ i*d + d_, d_data.begin() + i*d_);
   }
 }
+
+__global__ void calc_dist(float* data1, float* data2, uint n, uint d, uint* belong, float* dist, int cluster_id){
+  uint tid = blockIdx.x * blockDim.x + threadIdx.x;
+  if(tid < n){
+    float dis = 0;
+    for(int i=0; i<d; i++){
+      dis += (data1[tid*d+i] - data2[tid*d+i]) * (data1[tid*d+i] - data2[tid*d+i]);
+    }
+    if(dis < dist[tid]){
+      dist[tid] = dis;
+      belong[tid] = cluster_id;
+    }
+    // float old_dist = dist[tid];
+    // if (dis < old_dist) {
+    //   dist[tid] = dis;
+    //   belong[tid] = cluster_id;
+    // }
+    // dist[tid] = dis;
+  }
+}
+
+void Graph::NearestCluster(){
+  printf("NearestCluster...\n");
+  uint* d_belong_ptr = thrust::raw_pointer_cast(d_belong.data());
+  float* d_dist_ptr = thrust::raw_pointer_cast(d_dist.data());
+
+  for(int cluster_id=0; cluster_id<n_clusters; cluster_id++){
+    matrixMultiply(handle_, d_queries_, kpca->d_rotation[cluster_id], kpca->d_transforms[cluster_id], nq, kpca->n_components, dim_, 1.0, -1.0);
+    matrixMultiply(handle_, kpca->d_transforms[cluster_id], kpca->d_t[cluster_id], kpca->d_reconstructed[cluster_id], nq, dim_, kpca->n_components, 1.0, 1.0);
+    // printf("d_query_size = %d\n", d_queries_.size());
+    // printf("d_rotation_size = %d\n", kpca->d_rotation[cluster_id].size());
+    // printf("d_transforms_size = %d\n", kpca->d_transforms[cluster_id].size());
+    // printf("d_t_size = %d\n", kpca->d_t[cluster_id].size());
+    // printf("d_reconstructed_size = %d\n", kpca->d_reconstructed[cluster_id].size());
+    // printf("d_belong_size = %d\n", d_belong.size());
+    // printf("d_dist_size = %d\n", d_dist.size());
+    float* d_queries_ptr = thrust::raw_pointer_cast(d_queries_.data());
+    float* d_reconstructed_ptr = thrust::raw_pointer_cast(kpca->d_reconstructed[cluster_id].data());
+    calc_dist<<<(nq + 255)/256, 256>>>(d_queries_ptr, d_reconstructed_ptr, nq, dim_, d_belong_ptr, d_dist_ptr, cluster_id);
+    // cudaDeviceSynchronize();
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess) {
+      fprintf(stderr, "CUDA kernel error in cluster %d: %s\n", cluster_id, cudaGetErrorString(err));
+      return;
+    }
+
+    err = cudaDeviceSynchronize();
+    if (err != cudaSuccess) {
+      fprintf(stderr, "CUDA synchronization error in cluster %d: %s\n", cluster_id, cudaGetErrorString(err));
+      return;
+    }
+  }
+
+  // printf("d_size = %d\n", d_belong.size());
+  // printf("h_size = %d\n", h_belong.size());
+  // thrust::copy(d_belong.begin(), d_belong.end(), h_belong.begin());
+  // for(int i=0; i<100; i++)printf("%d ", h_belong[i]);printf("\n");
+}

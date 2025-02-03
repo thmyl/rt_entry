@@ -18,4 +18,5 @@ DECLARE_uint32(max_hits);
 DECLARE_double(expand_ratio);
 DECLARE_double(point_ratio);
 DECLARE_uint32(topk);
+DECLARE_uint32(n_clusters);
 // DECLARE_double(grid_size);

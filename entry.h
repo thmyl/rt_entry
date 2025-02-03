@@ -10,6 +10,7 @@
 #include "helper.h"
 #include "file_read.h"
 #include "matrix.h"
+#include <kpca.h>
 
 struct QueryAabb{
   uint n_hits;
@@ -22,16 +23,10 @@ struct QueryAabb{
 class RT_Entry{
   public:
     RT_Entry(){
-      // rotation_matrix_path = data_name + "/O.fvecs";
-      // mean_matrix_path = data_name + "/mean.fvecs";
-      // pca_base_path = data_name + "/pca_base.fvecs";
       n_subspaces = 1;
-      buffer_size = 200000;
-      
     }
-    RT_Entry(uint n_subspaces_, uint buffer_size_, uint max_hits_, double expand_ratio_, double point_ratio_){
+    RT_Entry(uint n_subspaces_, uint max_hits_, double expand_ratio_, double point_ratio_){
       n_subspaces = n_subspaces_;
-      buffer_size = buffer_size_;
       max_hits = max_hits_;
       expand_ratio = static_cast<float>(expand_ratio_);
       point_ratio = static_cast<float>(point_ratio_);
@@ -41,7 +36,8 @@ class RT_Entry{
     void BlockUp();
     void InitRT();
     void CleanUp();
-    void Search(thrust::device_vector<float> &d_pca_points, thrust::device_vector<float> &d_pca_queries, thrust::device_vector<uint> &d_gt_, thrust::device_vector<uint> &d_entries, thrust::device_vector<float> &d_entries_dist, uint n_entries);
+    void Search(thrust::device_vector<float> &d_pca_queries, thrust::device_vector<uint> &d_gt_, thrust::device_vector<uint> &d_entries, thrust::device_vector<float> &d_entries_dist, uint n_entries);
+    void Search(KPCA* kpca, thrust::device_vector<uint> &d_belong, thrust::device_vector<uint> &d_gt_, thrust::device_vector<uint> &d_entries, thrust::device_vector<float> &d_entries_dist, uint n_entries);
     void collect_candidates_onesubspace(
                                         thrust::device_vector<float> &d_pca_points,
                                         thrust::device_vector<float> &d_pca_queries,
@@ -65,6 +61,8 @@ class RT_Entry{
     }
     uint get_n_subspaces(){return n_subspaces;}
     void set_pca_points(thrust::host_vector<float> &h_pca_points, uint points_dim);
+    void set_pca_clusters(KPCA* kpca);
+    // void distribute_hits(thrust::device_vector<uint> &d_belong);
   
   private:
     uint                 dim_;
@@ -84,6 +82,7 @@ class RT_Entry{
   public:
     uint n_subspaces = 1;
     struct Subspace{
+      uint sub_np;
       thrust::host_vector<float3> h_points;
 
       OptixAabb world_bounds;
@@ -93,11 +92,17 @@ class RT_Entry{
       thrust::device_vector<uint> aabb_pid;
       uint n_aabbs;
       
-      thrust::device_vector<uint> hits;
-      thrust::device_vector<uint> n_hits_per_query;
-      thrust::device_vector<uint> hits_offset;
+      // thrust::device_vector<uint> hits;
+      // thrust::device_vector<uint> n_hits_per_query;
+      // thrust::device_vector<uint> hits_offset;
 
       OptiXRT rt;
     };
     std::vector<Subspace> subspaces_;
+
+    thrust::host_vector<uint> aabb_offset;
+    thrust::device_vector<uint> d_prefix_sum_;
+    thrust::device_vector<uint> d_aabb_pid_;
+    thrust::device_vector<uint> d_hits_;
+    uint n_aabbs_;
 };

@@ -5,8 +5,10 @@
 extern "C" char embedded_ptx_code[];
 
 void OptiXRT::CreateContext(){
+  #ifdef DETAIL
   printf("Create context\n");
-
+  #endif
+  
   CUDA_CHECK(cudaFree(0));
   OPTIX_CHECK(optixInit());
   cuCtxGetCurrent(&cuda_context_);
@@ -19,15 +21,17 @@ void OptiXRT::CreateContext(){
 }
 
 void OptiXRT::CreateModule(){
+  #ifdef DETAIL
   printf("Create module\n");
-
+  #endif
+  
   module_compile_options_.maxRegisterCount=OPTIX_COMPILE_DEFAULT_MAX_REGISTER_COUNT;
   module_compile_options_.optLevel=OPTIX_COMPILE_OPTIMIZATION_DEFAULT;
   module_compile_options_.debugLevel=OPTIX_COMPILE_DEBUG_LEVEL_NONE;
 
   pipeline_compile_options_.traversableGraphFlags=OPTIX_TRAVERSABLE_GRAPH_FLAG_ALLOW_SINGLE_GAS;
   pipeline_compile_options_.usesMotionBlur=false;
-  pipeline_compile_options_.numPayloadValues=2; // ray payload
+  pipeline_compile_options_.numPayloadValues=3; // ray payload
   pipeline_compile_options_.numAttributeValues=0; // attribute in optixReportIntersection()
   pipeline_compile_options_.exceptionFlags=OPTIX_EXCEPTION_FLAG_NONE;
   pipeline_compile_options_.pipelineLaunchParamsVariableName="params";
@@ -49,8 +53,10 @@ void OptiXRT::CreateModule(){
 }
 
 void OptiXRT::CreateProgramGroups(){
+  #ifdef DETAIL
   printf("Create program groups\n");
-
+  #endif
+  
   char log[2048];
   size_t sizeof_log=sizeof(log);
   OptixProgramGroupOptions program_group_options={};
@@ -89,8 +95,10 @@ void OptiXRT::CreateProgramGroups(){
 }
 
 void OptiXRT::CreatePipeline(){
+  #ifdef DETAIL
   printf("Create pipeline\n");
-
+  #endif
+  
   char log[2048];
   size_t sizeof_log=sizeof(log);
 
@@ -138,8 +146,10 @@ void OptiXRT::CreatePipeline(){
 }
 
 void OptiXRT::CreateSBT(){
+  #ifdef DETAIL
   printf("Create SBT\n");
-
+  #endif
+  
   // build raygen record
   CUdeviceptr d_raygen_record=0;
   const size_t raygen_record_size=sizeof(RayGenRecord);
@@ -261,7 +271,9 @@ void OptiXRT::BuildAccel(OptixAabb* d_aabbs, uint num){
 }
 
 void OptiXRT::CleanUp(){
+#ifdef DETAIL
     printf("Clean up RT ...\n");
+#endif
 
     CUDA_CHECK(cudaFree(reinterpret_cast<void*>(sbt_.raygenRecord)));
     CUDA_CHECK(cudaFree(reinterpret_cast<void*>(sbt_.missRecordBase)));
@@ -275,18 +287,16 @@ void OptiXRT::CleanUp(){
     OPTIX_CHECK(optixModuleDestroy(optix_module_));
     CUDA_CHECK(cudaStreamDestroy(cuda_stream_));
     OPTIX_CHECK(optixDeviceContextDestroy(optix_context_));
-// #ifdef _DETAIL_
+#ifdef DETAIL
     printf("Finish cleaning up RT\n");
-// #endif
+#endif
 }
 
-void OptiXRT::search(float* d_queries, uint nq, uint offset, uint dim, uint* hits, uint* n_hits_per_query, uint max_hits){
+void OptiXRT::search(float* d_queries, uint nq, uint offset, uint dim, uint* hits){
   // Timing::startTiming("before_optixSearch1");
   h_params_.handle = gas_handle_;
   h_params_.queries = d_queries;
   h_params_.hits = hits;
-  h_params_.n_hits_per_query = n_hits_per_query;
-  h_params_.max_hits = max_hits;
   h_params_.dim = dim;
   h_params_.offset = offset;
   // Timing::stopTiming();
@@ -335,3 +345,34 @@ void OptiXRT::search(float* d_queries, uint nq, uint offset, uint dim, uint* hit
   // printf("RT Search Time = %f ms\n",search_time_);
 }
 
+void OptiXRT::search(float* d_queries, uint nq, uint offset, uint dim, uint* hits, uint* d_belong, uint rt_id){
+  // Timing::startTiming("before_optixSearch1");
+  h_params_.handle = gas_handle_;
+  h_params_.queries = d_queries;
+  h_params_.hits = hits;
+  // h_params_.n_hits_per_query = n_hits_per_query;
+  // h_params_.max_hits = max_hits;
+  h_params_.dim = dim;
+  h_params_.offset = offset;
+  h_params_.belong = d_belong;
+  h_params_.rt_id = rt_id;
+  // Timing::stopTiming();
+
+  // Timing::startTiming("before_optixSearch2");
+  CUDA_CHECK(cudaMemcpy(reinterpret_cast<void*>(d_params_ptr_),&h_params_,sizeof(LaunchParams),cudaMemcpyHostToDevice));
+  #ifdef DETAIL
+  Timing::startTiming("optixLaunch");
+  #endif
+  OPTIX_CHECK(optixLaunch(
+    optix_pipeline_,
+    cuda_stream_,
+    reinterpret_cast<CUdeviceptr>(d_params_ptr_),
+    sizeof(LaunchParams),
+    &sbt_,
+    nq,
+    1,1
+  ));
+  #ifdef DETAIL
+  Timing::stopTiming();
+  #endif
+}

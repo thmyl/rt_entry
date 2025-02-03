@@ -31,8 +31,9 @@ extern "C" __global__ void __raygen__rg(){
   unsigned int rayIdx = idx.x;
   // float3 ray_origin = params.queries[rayIdx];
   uint dim = params.dim;
-  uint offset = rayIdx * dim;
-  float3 ray_origin = make_float3(params.queries[offset], params.queries[offset + 1], params.queries[offset + 2]);
+  uint offset = params.offset;
+  uint q_offset = rayIdx * dim;
+  float3 ray_origin = make_float3(params.queries[q_offset], params.queries[q_offset + 1], params.queries[q_offset + 2]);
   // float3 ray_origin = make_float3(1, 1, 1);
   float3 ray_direction = make_float3(1,0,0);
 
@@ -41,19 +42,24 @@ extern "C" __global__ void __raygen__rg(){
   float tmax = 1.e-16f;
   unsigned int id = 0;
 
-  optixTrace(
-    params.handle,
-    ray_origin,
-    ray_direction,
-    tmin,
-    tmax,
-    0.0f,
-    OptixVisibilityMask(255),
-    OPTIX_RAY_FLAG_NONE,
-    0,0,0,
-    reinterpret_cast<unsigned int&>(queryIdx),
-    reinterpret_cast<unsigned int&>(id)
-  );
+  uint belong = params.belong[queryIdx];
+  uint rt_id = params.rt_id;
+  if(belong == rt_id){
+    optixTrace(
+      params.handle,
+      ray_origin,
+      ray_direction,
+      tmin,
+      tmax,
+      0.0f,
+      OptixVisibilityMask(255),
+      OPTIX_RAY_FLAG_NONE,
+      0,0,0,
+      reinterpret_cast<unsigned int&>(queryIdx),
+      reinterpret_cast<unsigned int&>(id),
+      reinterpret_cast<unsigned int&>(offset)
+    );
+  }
 }
 
 extern "C" __global__ void __miss__ms(){
@@ -63,16 +69,25 @@ extern "C" __global__ void __closesthit__ch(){
 
 }
 
-extern "C" __global__ void __intersection__aabb(){
+/*extern "C" __global__ void __intersection__aabb(){
   unsigned int id = optixGetPayload_1();//第i个相交的aabb
+  unsigned int offset = optixGetPayload_2();
   unsigned int primIdx = optixGetPrimitiveIndex();
   unsigned int queryIdx = optixGetPayload_0();
-  params.hits[queryIdx * params.max_hits + id] = primIdx;
+  params.hits[queryIdx * params.max_hits + id] = primIdx + offset;
   params.n_hits_per_query[queryIdx] = id+1;
   if(id+1 >= params.max_hits){
     optixReportIntersection( 0, 0 );
   }
   else optixSetPayload_1(id+1);
+}*/
+extern "C" __global__ void __intersection__aabb(){
+  unsigned int id = optixGetPayload_1();//第i个相交的aabb
+  unsigned int offset = optixGetPayload_2();
+  unsigned int primIdx = optixGetPrimitiveIndex();
+  unsigned int queryIdx = optixGetPayload_0();
+  params.hits[queryIdx] = primIdx + offset;
+  optixReportIntersection( 0, 0 );
 }
 
 // extern "C" __global__ void __intersection__aabb(){

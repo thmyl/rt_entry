@@ -4,8 +4,8 @@
 #include "graph_search.cuh"
 #include <thrust/unique.h>
 
-__global__ void mapIdKernel(uint *d_unique, uint unique_size, uint *d_map_id){
-  uint tid = blockIdx.x * blockDim.x + threadIdx.x;
+__global__ void mapIdKernel(int *d_unique, int unique_size, int *d_map_id){
+  int tid = blockIdx.x * blockDim.x + threadIdx.x;
   if(tid < unique_size){
     d_map_id[d_unique[tid]] = tid;
   }
@@ -15,8 +15,8 @@ Graph::~Graph(){
   // rt_entry->CleanUp();
 }
 
-Graph::Graph(uint n_subspaces_, uint buffer_size_, uint n_candidates_, uint max_hits_, double expand_ratio_, double point_ratio_,
-						 std::string data_name_, std::string &data_path_, std::string &query_path_, std::string &gt_path_, std::string &graph_path_, uint ALGO_, uint search_width_, uint topk_){
+Graph::Graph(int n_subspaces_, int buffer_size_, int n_candidates_, int max_hits_, double expand_ratio_, double point_ratio_,
+						 std::string data_name_, std::string &data_path_, std::string &query_path_, std::string &gt_path_, std::string &graph_path_, int ALGO_, int search_width_, int topk_){
   rt_entry = new RT_Entry(n_subspaces_, buffer_size_, max_hits_, expand_ratio_, point_ratio_);
   point_ratio = point_ratio_;
   n_hits = max_hits_;
@@ -132,7 +132,7 @@ void Graph::Projection(){
       printf("computing PCA matrix...\n");
       pca.calc_eigenvalues();//计算mean和rotation
       pca.save_mean_rotation(mean_matrix_path.c_str(), rotation_matrix_path.c_str());
-			uint n_subspaces = rt_entry->get_n_subspaces();
+			int n_subspaces = rt_entry->get_n_subspaces();
       printf("the first %d ratio = %f\n", n_subspaces*3, pca.Ratio(n_subspaces*3));
     }
     else {
@@ -150,7 +150,7 @@ void Graph::Projection(){
 
   // 读取文件并计算points的投影
   printf("read PCA file\n");
-  uint t_n, t_d;
+  int t_n, t_d;
   thrust::host_vector<float> h_pca_points;
   file_read::read_data(pca_base_path.c_str(), t_n, t_d, h_pca_points);
   assert(t_n == np && t_d == dim_);
@@ -240,7 +240,7 @@ void Graph::Search(){
   //----- rt search -----
     Timing::startTiming("search_entry");
     rt_entry->Search(d_pca_points, d_pca_queries, d_gt_, d_entries, d_entries_dist, n_entries);
-    Timing::stopTiming(2);
+    Timing::stopTiming();
   }
   //----- TODO: graph search -----
     Timing::startTiming("graph search");
@@ -282,7 +282,7 @@ void Graph::GraphSearch(){
 
   auto *d_candidates_ptr = thrust::raw_pointer_cast(d_candidates.data());
 
-  GraphSearchKernel<uint, float, WARP_SIZE><<<nq, 64, ((search_width << offset_shift_) + n_candidates) * sizeof(KernelPair<float, int>)>>>
+  GraphSearchKernel<int, float, WARP_SIZE><<<nq, 64, ((search_width << offset_shift_) + n_candidates) * sizeof(KernelPair<float, int>)>>>
     (d_points_ptr, d_queries_ptr, d_results_ptr, d_graph_ptr, d_candidates_ptr, np,
     offset_shift_, n_candidates, topk, search_width, d_entries_ptr,
     d_hits, d_aabb_pid, d_prefix_sum, ALGO);

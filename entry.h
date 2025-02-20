@@ -12,11 +12,11 @@
 #include "matrix.h"
 
 struct QueryAabb{
-  uint n_hits;
-  uint aabb_id;
-  uint st;
-  uint ed;
-  uint offset;
+  int n_hits;
+  int aabb_id;
+  int st;
+  int ed;
+  int offset;
 };
 
 class RT_Entry{
@@ -29,7 +29,7 @@ class RT_Entry{
       buffer_size = 200000;
       
     }
-    RT_Entry(uint n_subspaces_, uint buffer_size_, uint max_hits_, double expand_ratio_, double point_ratio_){
+    RT_Entry(int n_subspaces_, int buffer_size_, int max_hits_, double expand_ratio_, double point_ratio_){
       n_subspaces = n_subspaces_;
       buffer_size = buffer_size_;
       max_hits = max_hits_;
@@ -41,61 +41,61 @@ class RT_Entry{
     void BlockUp();
     void InitRT();
     void CleanUp();
-    void Search(thrust::device_vector<float> &d_pca_points, thrust::device_vector<float> &d_pca_queries, thrust::device_vector<uint> &d_gt_, thrust::device_vector<uint> &d_entries, thrust::device_vector<float> &d_entries_dist, uint n_entries);
+    void Search(thrust::device_vector<float> &d_pca_points, thrust::device_vector<float> &d_pca_queries, thrust::device_vector<int> &d_gt_, thrust::device_vector<int> &d_entries, thrust::device_vector<float> &d_entries_dist, int n_entries);
     void collect_candidates_onesubspace(
                                         thrust::device_vector<float> &d_pca_points,
                                         thrust::device_vector<float> &d_pca_queries,
-                                        thrust::device_vector<uint> &d_entries,
+                                        thrust::device_vector<int> &d_entries,
                                         thrust::device_vector<float> &d_entries_dist,
-                                        uint n_entries,
-                                        thrust::device_vector<uint> &hits,
-                                        thrust::device_vector<uint> &n_hits_per_query,
-                                        thrust::device_vector<uint> &hits_offset,
-                                        uint &max_hits, 
-                                        thrust::device_vector<uint> &aabb_pid,
-                                        thrust::device_vector<uint> &prefix_sum,
-                                        uint &n_aabbs);
-    void check_candidates(thrust::device_vector<uint> &d_gt_);
-    void subspace_copy(thrust::device_vector<float3> &d_dst, thrust::device_vector<float> &d_src, uint offset);
-    void set_size(uint _dim_, uint _np, uint _nq, uint _gt_k){
+                                        int n_entries,
+                                        thrust::device_vector<int> &hits,
+                                        thrust::device_vector<int> &n_hits_per_query,
+                                        thrust::device_vector<int> &hits_offset,
+                                        int &max_hits, 
+                                        thrust::device_vector<int> &aabb_pid,
+                                        thrust::device_vector<int> &prefix_sum,
+                                        int &n_aabbs);
+    void check_candidates(thrust::device_vector<int> &d_gt_);
+    void subspace_copy(thrust::device_vector<float3> &d_dst, thrust::device_vector<float> &d_src, int offset);
+    void set_size(int _dim_, int _np, int _nq, int _gt_k){
       dim_ = _dim_;
       np = _np;
       nq = _nq;
       gt_k = _gt_k;
     }
-    uint get_n_subspaces(){return n_subspaces;}
-    void set_pca_points(thrust::host_vector<float> &h_pca_points, uint points_dim);
+    int get_n_subspaces(){return n_subspaces;}
+    void set_pca_points(thrust::host_vector<float> &h_pca_points, int points_dim);
   
   private:
-    uint                 dim_;
-    uint                 nq;
-    uint                 np;
-    uint                 gt_k;
+    int                 dim_;
+    int                 nq;
+    int                 np;
+    int                 gt_k;
     
-    thrust::device_vector<uint> d_candidates;
+    thrust::device_vector<int> d_candidates;
     thrust::device_vector<float> d_candidates_dist;
-    thrust::device_vector<uint> d_n_candidates;
-    uint                 buffer_size;
+    thrust::device_vector<int> d_n_candidates;
+    int                 buffer_size;
 
-    uint max_hits = 80;
+    int max_hits = 80;
     float expand_ratio = 0.8f;
     float point_ratio = 0.0025f;
 
   public:
-    uint n_subspaces = 1;
+    int n_subspaces = 1;
     struct Subspace{
       thrust::host_vector<float3> h_points;
 
       OptixAabb world_bounds;
       thrust::host_vector<OptixAabb> h_aabbs;
       thrust::device_vector<OptixAabb> d_aabbs;
-      thrust::device_vector<uint> prefix_sum;
-      thrust::device_vector<uint> aabb_pid;
-      uint n_aabbs;
+      thrust::device_vector<int> prefix_sum;
+      thrust::device_vector<int> aabb_pid;
+      int n_aabbs;
       
-      thrust::device_vector<uint> hits;
-      thrust::device_vector<uint> n_hits_per_query;
-      thrust::device_vector<uint> hits_offset;
+      thrust::device_vector<int> hits;
+      thrust::device_vector<int> n_hits_per_query;
+      thrust::device_vector<int> hits_offset;
 
       OptiXRT rt;
     };

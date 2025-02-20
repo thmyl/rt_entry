@@ -73,7 +73,8 @@ int main(int argc, char **argv){
   char* queryfile = (char*)FLAGS_query_path.c_str();
   char* gtfile = (char*)FLAGS_gt_path.c_str();
 
-  SetDevice(3);
+  SetDevice(2);
+  omp_set_num_threads(128);
 
   Graph graph(FLAGS_n_subspaces, FLAGS_buffer_size, FLAGS_n_candidates, FLAGS_max_hits, FLAGS_expand_ratio, FLAGS_point_ratio,
               FLAGS_data_name, FLAGS_data_path, FLAGS_query_path, FLAGS_gt_path, FLAGS_graph_path, FLAGS_ALGO, FLAGS_search_width, FLAGS_topk);

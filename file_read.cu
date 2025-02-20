@@ -13,7 +13,7 @@ static const char *get_last_m_chars(const char *str, int m) {
   }
 }
 
-void file_read::read_data(const char *datafile, uint &n, uint &d,
+void file_read::read_data(const char *datafile, int &n, int &d,
                           thrust::host_vector<float> &data){
   #ifdef DETAIL
     printf("Read data function\n");
@@ -79,7 +79,7 @@ void file_read::read_data(const char *datafile, uint &n, uint &d,
     }
 }
 
-void file_read::read_hh_file(const char* filename, uint& n, uint& d,
+void file_read::read_hh_file(const char* filename, int& n, int& d,
                              thrust::host_vector<float>& data){
   // FILE* file = fopen(filename, "rb");
   // if(file == NULL){
@@ -116,7 +116,7 @@ void file_read::read_hh_file(const char* filename, uint& n, uint& d,
   infile.close();
 }
 
-void file_read::read_txt_file(const char *filename, uint &n, uint &d,
+void file_read::read_txt_file(const char *filename, int &n, int &d,
                               thrust::host_vector<float> &data) {
   FILE *file = fopen(filename, "r");
   if (file == NULL) {
@@ -134,7 +134,7 @@ void file_read::read_txt_file(const char *filename, uint &n, uint &d,
   fclose(file);
 }
 
-void file_read::read_fvecs_file(const char *filename, uint &n, uint &d,
+void file_read::read_fvecs_file(const char *filename, int &n, int &d,
                                 thrust::host_vector<float> &data) {
   // FILE *file = fopen(filename, "rb");
   // if (file == NULL) {
@@ -178,7 +178,7 @@ void file_read::read_fvecs_file(const char *filename, uint &n, uint &d,
   infile.close();
 }
 
-void file_read::read_fbin_file(const char *filename, uint &n, uint &d,
+void file_read::read_fbin_file(const char *filename, int &n, int &d,
                                thrust::host_vector<float> &data) {
   // FILE *file = fopen(filename, "rb");
   // if (file == NULL) {
@@ -186,7 +186,7 @@ void file_read::read_fbin_file(const char *filename, uint &n, uint &d,
   //   return;
   // }
   // assert(fread(&n, sizeof(n), 1, file));
-  // // uint limit = 10000000; // 最多读取1M
+  // // int limit = 10000000; // 最多读取1M
   // // n = std::min(n, limit);
   // assert(fread(&d, sizeof(d), 1, file) == 1);
   // data.resize(n * d);
@@ -206,7 +206,7 @@ void file_read::read_fbin_file(const char *filename, uint &n, uint &d,
   infile.close();
 }
 
-void file_read::read_hvecs_file(const char* filename, uint& n, uint& d,
+void file_read::read_hvecs_file(const char* filename, int& n, int& d,
                                 thrust::host_vector<float>& data){
   FILE* file = fopen(filename, "rb");
   if(file == NULL){
@@ -227,7 +227,7 @@ void file_read::read_hvecs_file(const char* filename, uint& n, uint& d,
   fclose(file);
 }
 
-void file_read::read_bvecs_file(const char* filename, uint& n, uint& d,
+void file_read::read_bvecs_file(const char* filename, int& n, int& d,
                                 thrust::host_vector<float>& data){
   // FILE* file = fopen(filename, "rb");
   // if(file == NULL){
@@ -278,8 +278,8 @@ void file_read::read_bvecs_file(const char* filename, uint& n, uint& d,
   infile.close();
 }
 
-void file_read::read_ivecs_file(const char* filename, uint& n, uint& d,
-                                thrust::host_vector<uint>& data){
+void file_read::read_ivecs_file(const char* filename, int& n, int& d,
+                                thrust::host_vector<int>& data){
   // FILE* file = fopen(filename, "rb");
   // if(file == NULL){
   //   printf("File open failed\n");
@@ -295,7 +295,7 @@ void file_read::read_ivecs_file(const char* filename, uint& n, uint& d,
   // data.resize(n*d);
   // for(int i = 0; i < n; i++){
   //   fread(&d, sizeof(d), 1, file);
-  //   fread(data.data()+i*d, sizeof(uint), d, file);
+  //   fread(data.data()+i*d, sizeof(int), d, file);
   // }
   // fclose(file);
 
@@ -320,7 +320,7 @@ void file_read::read_ivecs_file(const char* filename, uint& n, uint& d,
   infile.close();
 }
 
-void file_read::read_graph(const char* filename, const uint& n, uint& degree, thrust::host_vector<uint> &data){
+void file_read::read_graph(const char* filename, const int& n, int& degree, thrust::host_vector<int> &data){
   // FILE* file = fopen(filename, "rb");
   // if(file == NULL){
   //   printf("File open failed\n");
@@ -334,7 +334,7 @@ void file_read::read_graph(const char* filename, const uint& n, uint& degree, th
 
   // size_t dataSize = size_t(n) * size_t(degree);
   // data.resize(dataSize);
-  // fread(data.data(), sizeof(uint), 1UL*dataSize, file);
+  // fread(data.data(), sizeof(int), 1UL*dataSize, file);
   // fclose(file);
 
   std::ifstream infile(filename, std::ios::binary);
@@ -350,6 +350,6 @@ void file_read::read_graph(const char* filename, const uint& n, uint& degree, th
 
   data.resize(1LL*n*degree);
   auto* data_ptr = thrust::raw_pointer_cast(data.data());
-  infile.read((char*)data_ptr, 1LL*n*degree*sizeof(uint));
+  infile.read((char*)data_ptr, 1LL*n*degree*sizeof(int));
   infile.close();
 }

@@ -4,26 +4,26 @@
 
 struct Pair{
 	float dist;
-	uint id;
+	int id;
 };
 
 class Graph{
 public:
 	Graph(){}
-	Graph(uint n_subspaces_, uint buffer_size_, uint n_candidates_, uint max_hits_, double expand_ratio_, double point_ratio_,
-				std::string data_name_, std::string &data_path_, std::string &query_path_, std::string &gt_path_, std::string &graph_path_, uint ALGO_, uint search_width_, uint topk_);
+	Graph(int n_subspaces_, int buffer_size_, int n_candidates_, int max_hits_, double expand_ratio_, double point_ratio_,
+				std::string data_name_, std::string &data_path_, std::string &query_path_, std::string &gt_path_, std::string &graph_path_, int ALGO_, int search_width_, int topk_);
 	~Graph();
 	void Init_entry();
 	void Search();
 	void Input();
 	void Projection();
 	void CleanUp();
-	void check_entries(thrust::device_vector<uint> &d_gt_);
-	void check_results(thrust::device_vector<uint> &d_gt_);
+	void check_entries(thrust::device_vector<int> &d_gt_);
+	void check_results(thrust::device_vector<int> &d_gt_);
 	void RB_Graph();
 	void GraphSearch();
-	void parallel_reorder(uint* candidates, uint* results, uint n_candidates, uint topk, uint dim_, uint nq, float* queries, uint np, float* points, Pair* candidates_dist);
-	void CopyHostToDevice(thrust::host_vector<float> &h_data, thrust::device_vector<float> &d_data, uint n, uint d, uint d_);
+	void parallel_reorder(int* candidates, int* results, int n_candidates, int topk, int dim_, int nq, float* queries, int np, float* points, Pair* candidates_dist);
+	void CopyHostToDevice(thrust::host_vector<float> &h_data, thrust::device_vector<float> &d_data, int n, int d, int d_);
 
 public:
 	RT_Entry* 					 rt_entry;
@@ -39,43 +39,43 @@ public:
 	
 	thrust::host_vector<float> h_points_;
 	thrust::host_vector<float> h_queries_;
-	thrust::host_vector<uint> h_gt_;
-	thrust::host_vector<uint> h_graph_;
+	thrust::host_vector<int> h_gt_;
+	thrust::host_vector<int> h_graph_;
 	
 	thrust::device_vector<float> d_points_;
 	thrust::device_vector<float> d_queries_;
-	thrust::device_vector<uint> d_gt_;
-	thrust::device_vector<uint> d_graph_;
+	thrust::device_vector<int> d_gt_;
+	thrust::device_vector<int> d_graph_;
 	
 	thrust::device_vector<float> d_rotation;
 	
 	thrust::device_vector<float> d_pca_queries;
 	thrust::device_vector<float> d_pca_points;
 
-	thrust::device_vector<uint> d_entries;
+	thrust::device_vector<int> d_entries;
 	thrust::device_vector<float> d_entries_dist;
 
-	thrust::device_vector<uint> d_results;
-	thrust::host_vector<uint> h_results;
+	thrust::device_vector<int> d_results;
+	thrust::host_vector<int> h_results;
 
 	//reorder
-	thrust::device_vector<uint> d_candidates;
-	thrust::host_vector<uint> h_candidates;
+	thrust::device_vector<int> d_candidates;
+	thrust::host_vector<int> h_candidates;
 
 	thrust::host_vector<Pair> candidates_dist;
 
 private:
-	uint								 ALGO = 1;
-	uint                 dim_;
-	uint                 nq;
-	uint                 np;
-	uint                 gt_k;
-	uint                 n_entries = 64;
-	uint								 degree;
-	uint                 topk = 3;
-	uint 							   n_candidates;
-	uint								 search_width = 1;
-	uint 							   offset_shift_;
+	int								 ALGO = 1;
+	int                 dim_;
+	int                 nq;
+	int                 np;
+	int                 gt_k;
+	int                 n_entries = 64;
+	int								 degree;
+	int                 topk = 3;
+	int 							   n_candidates;
+	int								 search_width = 1;
+	int 							   offset_shift_;
 	float 							 point_ratio;
-	uint 								 n_hits;
+	int 								 n_hits;
 };

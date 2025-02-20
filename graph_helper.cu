@@ -2,12 +2,12 @@
 #include <immintrin.h>
 #include <omp.h>
 
-__global__ void check_entries_kernel(uint *d_entries, uint n_entries, uint nq, uint *d_gt, uint gt_k, float *d_recall_1, float *d_recall_10, float *d_recall_100){
-  uint tid = blockIdx.x * blockDim.x + threadIdx.x;
+__global__ void check_entries_kernel(int *d_entries, int n_entries, int nq, int *d_gt, int gt_k, float *d_recall_1, float *d_recall_10, float *d_recall_100){
+  int tid = blockIdx.x * blockDim.x + threadIdx.x;
   if(tid < nq){
-    uint offset = tid * n_entries;
+    int offset = tid * n_entries;
     for(int i=0; i<gt_k; i++){
-      uint gt = d_gt[tid * gt_k + i];
+      int gt = d_gt[tid * gt_k + i];
       for(int j=0; j<n_entries; j++){
         if(gt == d_entries[offset + j]){
           if(i<1)d_recall_1[tid] += 1;
@@ -20,7 +20,7 @@ __global__ void check_entries_kernel(uint *d_entries, uint n_entries, uint nq, u
   }
 }
 
-void Graph::check_entries(thrust::device_vector<uint> &d_gt_){
+void Graph::check_entries(thrust::device_vector<int> &d_gt_){
   printf("checking entries...\n");
 
   auto *d_entries_ptr = thrust::raw_pointer_cast(d_entries.data());
@@ -61,12 +61,12 @@ void Graph::check_entries(thrust::device_vector<uint> &d_gt_){
 }
 
 
-__global__ void check_results_kernel(uint *d_results, uint n_results, uint nq, uint *d_gt, uint gt_k, float *d_recall_1, float *d_recall_10, float *d_recall_100){
-  uint tid = blockIdx.x * blockDim.x + threadIdx.x;
+__global__ void check_results_kernel(int *d_results, int n_results, int nq, int *d_gt, int gt_k, float *d_recall_1, float *d_recall_10, float *d_recall_100){
+  int tid = blockIdx.x * blockDim.x + threadIdx.x;
   if(tid < nq){
-    uint offset = tid * n_results;
+    int offset = tid * n_results;
     for(int i=0; i<gt_k; i++){
-      uint gt = d_gt[tid * gt_k + i];
+      int gt = d_gt[tid * gt_k + i];
       for(int j=0; j<n_results; j++){
         if(gt == d_results[offset + j]){
           if(i<1)d_recall_1[tid] += 1;
@@ -79,7 +79,7 @@ __global__ void check_results_kernel(uint *d_results, uint n_results, uint nq, u
   }
 }
 
-void Graph::check_results(thrust::device_vector<uint> &d_gt_){
+void Graph::check_results(thrust::device_vector<int> &d_gt_){
   printf("checking results...\n");
 
   auto *d_results_ptr = thrust::raw_pointer_cast(d_results.data());
@@ -124,11 +124,11 @@ bool cmp(Pair a, Pair b){
   return a.dist < b.dist;
 }
 
-/*void Graph::paralled_reorder(uint* candidates, uint* results, uint n_candidates, uint topk, uint dim_, uint nq, float* points, uint np, float* queries, Pair* candidates_dist){
+/*void Graph::paralled_reorder(int* candidates, int* results, int n_candidates, int topk, int dim_, int nq, float* points, int np, float* queries, Pair* candidates_dist){
   for(int q_id=0; q_id<nq; q_id++){
     Pair* cur_candidates_dist = candidates_dist + q_id * n_candidates;
     for(int j=0; j<n_candidates; j++){
-      uint p_id = candidates[q_id*n_candidates+j];
+      int p_id = candidates[q_id*n_candidates+j];
       cur_candidates_dist[j].id = p_id;
       float dis = 0;
       for(int d=0; d<dim_; d++){
@@ -143,18 +143,18 @@ bool cmp(Pair a, Pair b){
   }
 }*/
 
-void Graph::parallel_reorder(uint* candidates, uint* results, uint n_candidates, uint topk, uint dim_, uint nq, float* points, uint np, float* queries, Pair* candidates_dist) {
+void Graph::parallel_reorder(int* candidates, int* results, int n_candidates, int topk, int dim_, int nq, float* points, int np, float* queries, Pair* candidates_dist) {
   // int max_threads = omp_get_max_threads();
   int max_threads = 64;
 
   #pragma omp parallel for schedule(dynamic) num_threads(max_threads)
   for (int q_id_ = 0; q_id_ < nq; ++q_id_) {
-    uint q_id = q_id_;
+    int q_id = q_id_;
     Pair* cur_candidates_dist = candidates_dist + q_id * n_candidates;
 
     // 计算距离并填充cur_candidates_dist
     // for (int j = 0; j < n_candidates; ++j) {
-    //   uint p_id = candidates[q_id * n_candidates + j];
+    //   int p_id = candidates[q_id * n_candidates + j];
     //   cur_candidates_dist[j].id = p_id;
     //   float dis = 0.0f;
     //   for (int d = 0; d < dim_; ++d) {
@@ -212,7 +212,7 @@ void Graph::parallel_reorder(uint* candidates, uint* results, uint n_candidates,
   }
 }
 
-void Graph::CopyHostToDevice(thrust::host_vector<float> &h_data, thrust::device_vector<float> &d_data, uint n, uint d, uint d_){
+void Graph::CopyHostToDevice(thrust::host_vector<float> &h_data, thrust::device_vector<float> &d_data, int n, int d, int d_){
   d_data.resize(n*d_);
   for(int i=0; i<n; i++){
     thrust::copy(h_data.begin() + i*d, h_data.begin()+ i*d + d_, d_data.begin() + i*d_);

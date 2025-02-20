@@ -48,36 +48,38 @@ int abs(int x){
 }
 
 template<typename IdType, typename FloatType, int WARP_SIZE>
-__global__ void GraphSearchKernel(float* d_data, float* d_query, uint* d_results, uint* d_graph, uint* d_candidates, uint np,
-                      uint offset_shift, uint n_candidates, uint topk, uint search_width, uint* d_entries,
-                      uint* d_hits, uint* d_aabb_pid, uint* d_prefix_sum, uint ALGO){
+__global__ void GraphSearchKernel(float* d_data, float* d_query, int* d_results, int* d_graph, int* d_candidates, int np,
+                      int offset_shift, int n_candidates, int topk, int search_width, int* d_entries,
+                      int* d_hits, int* d_aabb_pid, int* d_prefix_sum, int ALGO){
   
-  uint t_id = threadIdx.x;
-  uint b_id = blockIdx.x;//query_id
-  uint q_id = b_id;
-  uint blockSize = blockDim.x;
-	uint n_warp = blockSize / WARP_SIZE;
+  int t_id = threadIdx.x;
+  int b_id = blockIdx.x;//query_id
+  int q_id = b_id;
+  int blockSize = blockDim.x;
+	int n_warp = blockSize / WARP_SIZE;
   int lane_id = t_id % WARP_SIZE;
   int warp_id = t_id / WARP_SIZE;
 
-	uint aabb_id; //TODO: n_hits=1
-	uint aabb_st;
-	uint aabb_size;
-  uint n_entries;
+	int aabb_id; //TODO: n_hits=1
+	int aabb_st;
+	int aabb_size;
+  int n_entries;
 	if(ALGO==1){
 		aabb_id = d_hits[q_id];
 		aabb_st = d_prefix_sum[aabb_id];
 		aabb_size = d_prefix_sum[aabb_id + 1] - aabb_st;
-		n_entries = aabb_size;
+		n_entries = min(aabb_size, n_candidates);
+        n_entries = aabb_size;
+        // aabb_st = d_hits[q_id]*n_candidates;
+        // n_entries = n_candidates;
 	}
 	else n_entries = n_candidates;
-  // n_entries = n_candidates;
+    // n_entries = 1;
 
-  uint* crt_results = d_results + q_id * topk;
-  uint degree = (1<<offset_shift);
-  uint n_points_per_batch = (search_width << offset_shift);
-  if(t_id == 0 && b_id == 0)printf("n_points_per_batch = %d\n",n_points_per_batch);
-  uint n_compare = n_candidates;
+  int* crt_results = d_results + q_id * topk;
+  int degree = (1<<offset_shift);
+  int n_points_per_batch = (search_width << offset_shift);
+  int n_compare = n_candidates;
 
   if(n_points_per_batch < n_candidates)
     n_compare = n_points_per_batch;
@@ -462,11 +464,11 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, uint* d_results
   #endif
 
 // insert entry points
-  // uint* enter_points = d_entries + q_id * n_entries;
+  // int* enter_points = d_entries + q_id * n_entries;
 
-  uint iteration;
-  uint step_id;
-  uint substep_id;
+  int iteration;
+  int step_id;
+  int substep_id;
   KernelPair<float, int> tmp_neighbor;
 
   //初始化neighbors_array，均匀分配到每个线程
@@ -485,11 +487,11 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, uint* d_results
 					neighbors_array[n_candidates + i].second = iter * n_points_per_batch + i;
 				else if(ALGO == 1){//rt entry
 					// neighbors_array[n_candidates + i].second = enter_points[iter * n_points_per_batch + i];
-					uint unrollt_id = iter * n_points_per_batch + i;
-					uint pos = aabb_st + unrollt_id;
-					// if(pos < d_prefix_sum[aabb_id + 1]) 
+					int unrollt_id = iter * n_points_per_batch + i;
+					int pos = aabb_st + unrollt_id;
+                    // int pos = q_id*100;
 					neighbors_array[n_candidates + i].second = d_aabb_pid[pos];
-					// else neighbors_array[n_candidates + i].second = np;
+                    // neighbors_array[n_candidates + i].second = iter * n_points_per_batch + i;
 				}
 
 				add(neighbors_array[n_candidates + i].second, random_number, data);
@@ -965,7 +967,7 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, uint* d_results
 // graph_search
   //TODO: max_iter
   int max_iter = n_candidates / search_width;
-  // uint max_iter = 0;
+  // int max_iter = 0;
   int flag_all_blocks = 1;
   int iter = 0;
   int crt_flag = 0;
@@ -999,7 +1001,7 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, uint* d_results
 
       //read neighbors
       long long offset = first_position_of_flag << (1LL * offset_shift);
-      uint* neighbors = d_graph + offset;
+      int* neighbors = d_graph + offset;
       for(int i=t_id; i<degree; i+=blockSize){
         int target_point = neighbors[i];
         if(target_point == np || test(target_point, random_number, data)){
@@ -1969,14 +1971,14 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, uint* d_results
 }
 
 template<typename IdType, typename FloatType, int WARP_SIZE>
-__global__ void ReorderKernel(float* d_data, float* d_query, uint* d_results, uint* d_map, uint* d_candidates, uint n_candidates, uint topk){
-	uint q_id = blockIdx.x;
-	uint b_id = blockIdx.x;
-	uint t_id = threadIdx.x;
-	uint lane_id = t_id % WARP_SIZE;
-	uint warp_id = t_id / WARP_SIZE;
-	uint n_warp = blockDim.x / WARP_SIZE;
-	uint blockSize = blockDim.x;
+__global__ void ReorderKernel(float* d_data, float* d_query, int* d_results, int* d_map, int* d_candidates, int n_candidates, int topk){
+	int q_id = blockIdx.x;
+	int b_id = blockIdx.x;
+	int t_id = threadIdx.x;
+	int lane_id = t_id % WARP_SIZE;
+	int warp_id = t_id / WARP_SIZE;
+	int n_warp = blockDim.x / WARP_SIZE;
+	int blockSize = blockDim.x;
 
 	extern __shared__ KernelPair<float, int> shared_memory_[];
   KernelPair<float, int>* neighbors_array = shared_memory_;
@@ -2171,7 +2173,7 @@ __global__ void ReorderKernel(float* d_data, float* d_query, uint* d_results, ui
 	__syncthreads();
 
 	for(int i = warp_id; i < n_candidates; i += n_warp){
-		uint p_id = d_map[neighbors_array[i].second];
+		int p_id = d_map[neighbors_array[i].second];
 		// read point
 			#if DIM > 0
 			float p1 = 0;
@@ -2558,8 +2560,8 @@ __global__ void ReorderKernel(float* d_data, float* d_query, uint* d_results, ui
 	__syncthreads();
 
 	// bitonic sort
-	uint step_id = 1;
-	uint substep_id = 1;
+	int step_id = 1;
+	int substep_id = 1;
 
 	KernelPair<float, int> tmp_neighbor;
 

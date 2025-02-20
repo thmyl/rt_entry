@@ -2,25 +2,25 @@
 #include "entry.h"
 #include "warpselect/WarpSelect.cuh"
 
-__global__ void calcDistance(uint *d_candidates, float *d_candidates_dist, uint *d_n_candidates, uint buffer_size, uint nq, float* d_query, float* d_data, uint *hits, uint *n_hits_per_query, uint *hits_offset, uint max_hits, uint *aabb_pid, uint *prefix_sum, uint n_aabbs){
-  uint t_id = threadIdx.x;
-  uint b_id = blockIdx.x;
-  uint warp_size = 32;
-  uint n_warp = blockDim.x / warp_size;
+__global__ void calcDistance(int *d_candidates, float *d_candidates_dist, int *d_n_candidates, int buffer_size, int nq, float* d_query, float* d_data, int *hits, int *n_hits_per_query, int *hits_offset, int max_hits, int *aabb_pid, int *prefix_sum, int n_aabbs){
+  int t_id = threadIdx.x;
+  int b_id = blockIdx.x;
+  int warp_size = 32;
+  int n_warp = blockDim.x / warp_size;
   if(b_id < nq * max_hits){
-    uint q_id = b_id / max_hits;
-    uint hit_id = b_id % max_hits;
+    int q_id = b_id / max_hits;
+    int hit_id = b_id % max_hits;
     if(hit_id >= n_hits_per_query[q_id]) return;
-    uint aabb_id = hits[q_id * max_hits + hit_id];
+    int aabb_id = hits[q_id * max_hits + hit_id];
 
-    uint lane_id = t_id % warp_size;
-    uint warp_id = t_id / warp_size;
+    int lane_id = t_id % warp_size;
+    int warp_id = t_id / warp_size;
 
-    uint start = prefix_sum[aabb_id];
-    uint end = prefix_sum[aabb_id + 1];
-    uint num = end - start;
+    int start = prefix_sum[aabb_id];
+    int end = prefix_sum[aabb_id + 1];
+    int num = end - start;
     for(int i=warp_id; i<num; i+=n_warp){
-      uint p_id = aabb_pid[start + i];
+      int p_id = aabb_pid[start + i];
       //用32个lane计算距离
 
     // read d_query
@@ -112,7 +112,7 @@ __global__ void calcDistance(uint *d_candidates, float *d_candidates_dist, uint 
 
     // write
       if(lane_id == 0){
-        uint offset = i + hits_offset[q_id * max_hits + hit_id];
+        int offset = i + hits_offset[q_id * max_hits + hit_id];
         if(offset < buffer_size){
           d_candidates_dist[q_id * buffer_size + offset] = dist;
           d_candidates[q_id * buffer_size + offset] = p_id;
@@ -122,36 +122,36 @@ __global__ void calcDistance(uint *d_candidates, float *d_candidates_dist, uint 
   }
 }
 
-__global__ void selectTopk(uint k_, uint *d_entries, float *d_entries_dist, uint *d_candidates, float *d_candidates_dist, uint *d_n_candidates, uint buffer_size, uint nq, uint *hits, uint *n_hits_per_query, uint max_hits, uint *aabb_pid, uint *prefix_sum, uint n_aabbs){
-  uint t_id = threadIdx.x;
-  uint b_id = blockIdx.x;
-  uint warp_size = 32;
-  uint n_warp = blockDim.x / warp_size;
+__global__ void selectTopk(int k_, int *d_entries, float *d_entries_dist, int *d_candidates, float *d_candidates_dist, int *d_n_candidates, int buffer_size, int nq, int *hits, int *n_hits_per_query, int max_hits, int *aabb_pid, int *prefix_sum, int n_aabbs){
+  int t_id = threadIdx.x;
+  int b_id = blockIdx.x;
+  int warp_size = 32;
+  int n_warp = blockDim.x / warp_size;
   if(b_id < nq){
-    uint q_id = b_id;
-    uint num = 0;
+    int q_id = b_id;
+    int num = 0;
     for(int i=0; i<n_hits_per_query[q_id]; i++){
-      uint aabb_id = hits[q_id * max_hits + i];
-      uint start = prefix_sum[aabb_id];
-      uint end = prefix_sum[aabb_id + 1];
+      int aabb_id = hits[q_id * max_hits + i];
+      int start = prefix_sum[aabb_id];
+      int end = prefix_sum[aabb_id + 1];
       num += end - start;
     }
     num = min(buffer_size, num);
     d_n_candidates[q_id] = num;
 
-    uint lane_id = t_id % warp_size;
-    uint warp_id = t_id / warp_size;
+    int lane_id = t_id % warp_size;
+    int warp_id = t_id / warp_size;
 
     //求topk
     constexpr int WARP_SIZE = 32;
 	  constexpr int NumWarpQ = 128;
 	  constexpr int NumThreadQ = 4;
     WarpSelect<float, float, false, Comparator<float>, NumWarpQ, NumThreadQ, WARP_SIZE> heap(MAX, nq, NumWarpQ);
-    uint* crt_candidates = d_candidates + q_id * buffer_size;
+    int* crt_candidates = d_candidates + q_id * buffer_size;
     float* crt_candidates_dist = d_candidates_dist + q_id * buffer_size;
     
     for(int i =0; i < (num + 31) / 32; i++){
-      uint unroll_id = i * 32 + lane_id;
+      int unroll_id = i * 32 + lane_id;
       if(unroll_id < num){
         heap.addThreadQ(crt_candidates_dist[unroll_id], crt_candidates[unroll_id]);
       }
@@ -167,7 +167,7 @@ __global__ void selectTopk(uint k_, uint *d_entries, float *d_entries_dist, uint
   }
 }
 
-__global__ void calc_hits_offset(uint nq, uint max_hits, uint* hits, uint* n_hits_per_query, uint* aabb_pid, uint* prefix_sum, uint* hits_offset){
+__global__ void calc_hits_offset(int nq, int max_hits, int* hits, int* n_hits_per_query, int* aabb_pid, int* prefix_sum, int* hits_offset){
   int tid = blockIdx.x * blockDim.x + threadIdx.x;
   if(tid < nq){
     hits_offset[tid*max_hits] = 0;
@@ -183,16 +183,16 @@ __global__ void calc_hits_offset(uint nq, uint max_hits, uint* hits, uint* n_hit
 void RT_Entry::collect_candidates_onesubspace(
                                          thrust::device_vector<float> &d_pca_points,
                                          thrust::device_vector<float> &d_pca_queries,
-                                         thrust::device_vector<uint> &d_entries,
+                                         thrust::device_vector<int> &d_entries,
                                          thrust::device_vector<float> &d_entries_dist,
-                                         uint n_entries,
-                                         thrust::device_vector<uint> &hits,
-                                         thrust::device_vector<uint> &n_hits_per_query,
-                                         thrust::device_vector<uint> &hits_offset,
-                                         uint &max_hits, 
-                                         thrust::device_vector<uint> &aabb_pid,
-                                         thrust::device_vector<uint> &prefix_sum,
-                                         uint &n_aabbs){
+                                         int n_entries,
+                                         thrust::device_vector<int> &hits,
+                                         thrust::device_vector<int> &n_hits_per_query,
+                                         thrust::device_vector<int> &hits_offset,
+                                         int &max_hits, 
+                                         thrust::device_vector<int> &aabb_pid,
+                                         thrust::device_vector<int> &prefix_sum,
+                                         int &n_aabbs){
   printf("collecting candidates...\n");
   // thrust::fill(d_n_candidates.begin(), d_n_candidates.end(), 0);
   auto *d_candidates_ptr = thrust::raw_pointer_cast(d_candidates.data());
@@ -240,13 +240,13 @@ void RT_Entry::collect_candidates_onesubspace(
 
 }
 
-__global__ void check_candidates_kernel(uint *d_candidates, uint *d_n_candidates, uint nq, uint buffer_size, uint *d_gt, uint gt_k, float *d_recall_1, float *d_recall_10, float *d_recall_100){
-  uint tid = blockIdx.x * blockDim.x + threadIdx.x;
+__global__ void check_candidates_kernel(int *d_candidates, int *d_n_candidates, int nq, int buffer_size, int *d_gt, int gt_k, float *d_recall_1, float *d_recall_10, float *d_recall_100){
+  int tid = blockIdx.x * blockDim.x + threadIdx.x;
   if(tid < nq){
-    uint offset = tid * buffer_size;
-    uint n_candidates = d_n_candidates[tid];
+    int offset = tid * buffer_size;
+    int n_candidates = d_n_candidates[tid];
     for(int i=0; i<gt_k; i++){
-      uint gt = d_gt[tid * gt_k + i];
+      int gt = d_gt[tid * gt_k + i];
       for(int j=0; j<n_candidates; j++){
         if(gt == d_candidates[offset + j]){
           if(i<1)d_recall_1[tid] += 1;
@@ -261,9 +261,9 @@ __global__ void check_candidates_kernel(uint *d_candidates, uint *d_n_candidates
   }
 }
 
-void RT_Entry::check_candidates(thrust::device_vector<uint> &d_gt_){
+void RT_Entry::check_candidates(thrust::device_vector<int> &d_gt_){
   printf("checking candidates...\n");
-  thrust::host_vector<uint> h_n_candidates(nq, 0);
+  thrust::host_vector<int> h_n_candidates(nq, 0);
   thrust::copy(d_n_candidates.begin(), d_n_candidates.end(), h_n_candidates.begin());
   float sum_candidates = 0;
   for(int i=0; i<nq; i++){
@@ -310,9 +310,9 @@ void RT_Entry::check_candidates(thrust::device_vector<uint> &d_gt_){
   outfile.close();
 }
 
-__global__ void subspace_copy_kernel(float *d_dst, float *d_src, uint offset, uint n, uint d){
-  uint b_id = blockIdx.x;
-  uint t_id = threadIdx.x;
+__global__ void subspace_copy_kernel(float *d_dst, float *d_src, int offset, int n, int d){
+  int b_id = blockIdx.x;
+  int t_id = threadIdx.x;
   if(b_id < n){
     if(t_id < 3){
       d_dst[b_id*3 + t_id] = d_src[b_id * d + offset + t_id];
@@ -320,7 +320,7 @@ __global__ void subspace_copy_kernel(float *d_dst, float *d_src, uint offset, ui
   }
 }
 
-void RT_Entry::subspace_copy(thrust::device_vector<float3> &d_dst, thrust::device_vector<float> &d_src, uint offset){
+void RT_Entry::subspace_copy(thrust::device_vector<float3> &d_dst, thrust::device_vector<float> &d_src, int offset){
   auto *d_dst_ptr = thrust::raw_pointer_cast(d_dst.data());
   auto *d_src_ptr = thrust::raw_pointer_cast(d_src.data());
   float* d_dst_ptr_ = reinterpret_cast<float*>(d_dst_ptr);

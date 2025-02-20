@@ -181,7 +181,7 @@ void OptiXRT::Setup(){
   cudaFree(0);
 }
 
-void OptiXRT::BuildAccel(OptixAabb* d_aabbs, uint num){
+void OptiXRT::BuildAccel(OptixAabb* d_aabbs, int num){
   //* switch optix input 
   
   //TODO: choose aabb
@@ -189,7 +189,7 @@ void OptiXRT::BuildAccel(OptixAabb* d_aabbs, uint num){
   std::cout<<"primitive type = aabbs"<<std::endl;
 #endif
   //* translate
-  uint aabbs_num=num;
+  int aabbs_num=num;
 
   CUdeviceptr d_aabb_buffer=reinterpret_cast<CUdeviceptr>(d_aabbs);
   // build_input_buffer_.emplace_back(d_aabb_buffer);
@@ -280,7 +280,7 @@ void OptiXRT::CleanUp(){
 // #endif
 }
 
-void OptiXRT::search(float* d_queries, uint nq, uint offset, uint dim, uint* hits, uint* n_hits_per_query, uint max_hits){
+void OptiXRT::search(float* d_queries, int nq, int offset, int dim, int* hits, int* n_hits_per_query, int max_hits){
   // Timing::startTiming("before_optixSearch1");
   h_params_.handle = gas_handle_;
   h_params_.queries = d_queries;
@@ -316,7 +316,7 @@ void OptiXRT::search(float* d_queries, uint nq, uint offset, uint dim, uint* hit
   // CUDA_CHECK(cudaEventCreate(&launch_start));
   // CUDA_CHECK(cudaEventCreate(&launch_end));
   // CUDA_CHECK(cudaEventRecord(launch_start,cuda_stream_));
-  Timing::startTiming("optixLaunch");
+  // Timing::startTiming("optixLaunch");
   OPTIX_CHECK(optixLaunch(
     optix_pipeline_,
     cuda_stream_,
@@ -326,7 +326,7 @@ void OptiXRT::search(float* d_queries, uint nq, uint offset, uint dim, uint* hit
     nq,
     1,1
   ));
-  Timing::stopTiming();
+  // Timing::stopTiming();
   // CUDA_CHECK(cudaEventRecord(launch_end,cuda_stream_));
   // CUDA_CHECK(cudaEventSynchronize(launch_end));
   // CUDA_CHECK(cudaEventElapsedTime(&search_time_,launch_start,launch_end));

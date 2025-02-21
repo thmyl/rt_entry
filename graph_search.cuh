@@ -50,7 +50,7 @@ int abs(int x){
 template<typename IdType, typename FloatType, int WARP_SIZE>
 __global__ void GraphSearchKernel(float* d_data, float* d_query, int* d_results, int* d_graph, int* d_candidates, int np,
                       int offset_shift, int n_candidates, int topk, int search_width, int* d_entries,
-                      int* d_hits, int* d_aabb_pid, int* d_prefix_sum, int ALGO){
+                      int* d_hits, int* d_aabb_pid, int aabb_size, int ALGO){
   
   int t_id = threadIdx.x;
   int b_id = blockIdx.x;//query_id
@@ -62,19 +62,15 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, int* d_results,
 
 	int aabb_id; //TODO: n_hits=1
 	int aabb_st;
-	int aabb_size;
+	// int aabb_size;
   int n_entries;
 	if(ALGO==1){
 		aabb_id = d_hits[q_id];
-		aabb_st = d_prefix_sum[aabb_id];
-		aabb_size = d_prefix_sum[aabb_id + 1] - aabb_st;
-		n_entries = min(aabb_size, n_candidates);
-        n_entries = aabb_size;
-        // aabb_st = d_hits[q_id]*n_candidates;
-        // n_entries = n_candidates;
+        aabb_st = aabb_id * aabb_size;
+        n_entries = min(aabb_size, n_candidates);
+        // n_entries = aabb_size;
 	}
 	else n_entries = n_candidates;
-    // n_entries = 1;
 
   int* crt_results = d_results + q_id * topk;
   int degree = (1<<offset_shift);
@@ -486,12 +482,9 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, int* d_results,
 				if(ALGO == 0 || ALGO == 2)//random entry
 					neighbors_array[n_candidates + i].second = iter * n_points_per_batch + i;
 				else if(ALGO == 1){//rt entry
-					// neighbors_array[n_candidates + i].second = enter_points[iter * n_points_per_batch + i];
 					int unrollt_id = iter * n_points_per_batch + i;
 					int pos = aabb_st + unrollt_id;
-                    // int pos = q_id*100;
 					neighbors_array[n_candidates + i].second = d_aabb_pid[pos];
-                    // neighbors_array[n_candidates + i].second = iter * n_points_per_batch + i;
 				}
 
 				add(neighbors_array[n_candidates + i].second, random_number, data);

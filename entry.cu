@@ -16,7 +16,7 @@ void RT_Entry::BlockUp(){
     auto &d_aabbs = subspaces_[space].d_aabbs;
     auto &n_aabbs = subspaces_[space].n_aabbs;
     auto &aabb_pid = subspaces_[space].aabb_pid;
-    auto &prefix_sum = subspaces_[space].prefix_sum;
+    auto &aabb_size = subspaces_[space].aabb_size;
 
     computeMinMax(world_bounds, h_points);
     #ifdef DETAIL
@@ -32,9 +32,12 @@ void RT_Entry::BlockUp(){
     d_aabbs.resize(n_aabbs);
     thrust::copy(h_aabbs.begin(), h_aabbs.end(), d_aabbs.begin());
 
-    prefix_sum.resize(n_aabbs + 1);
-    aabb_pid.resize(np);
-    kdtree.computeAabbPid(aabb_pid, prefix_sum, n_aabbs);
+    // prefix_sum.resize(n_aabbs + 1);
+    // aabb_pid.resize(np);
+    // kdtree.computeAabbPid(aabb_pid, prefix_sum, n_aabbs);
+    aabb_size = np * point_ratio;
+    aabb_pid.resize(n_aabbs * aabb_size);
+    kdtree.computeAabbPid(aabb_pid, n_aabbs);
 
     expandAabb(h_aabbs, expand_ratio);
     thrust::copy(h_aabbs.begin(), h_aabbs.end(), d_aabbs.begin());

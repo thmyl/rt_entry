@@ -42,19 +42,19 @@ class RT_Entry{
     void InitRT();
     void CleanUp();
     void Search(thrust::device_vector<float> &d_pca_points, thrust::device_vector<float> &d_pca_queries, thrust::device_vector<int> &d_gt_, thrust::device_vector<int> &d_entries, thrust::device_vector<float> &d_entries_dist, int n_entries);
-    void collect_candidates_onesubspace(
-                                        thrust::device_vector<float> &d_pca_points,
-                                        thrust::device_vector<float> &d_pca_queries,
-                                        thrust::device_vector<int> &d_entries,
-                                        thrust::device_vector<float> &d_entries_dist,
-                                        int n_entries,
-                                        thrust::device_vector<int> &hits,
-                                        thrust::device_vector<int> &n_hits_per_query,
-                                        thrust::device_vector<int> &hits_offset,
-                                        int &max_hits, 
-                                        thrust::device_vector<int> &aabb_pid,
-                                        thrust::device_vector<int> &prefix_sum,
-                                        int &n_aabbs);
+    // void collect_candidates_onesubspace(
+    //                                     thrust::device_vector<float> &d_pca_points,
+    //                                     thrust::device_vector<float> &d_pca_queries,
+    //                                     thrust::device_vector<int> &d_entries,
+    //                                     thrust::device_vector<float> &d_entries_dist,
+    //                                     int n_entries,
+    //                                     thrust::device_vector<int> &hits,
+    //                                     thrust::device_vector<int> &n_hits_per_query,
+    //                                     thrust::device_vector<int> &hits_offset,
+    //                                     int &max_hits, 
+    //                                     thrust::device_vector<int> &aabb_pid,
+    //                                     thrust::device_vector<int> &prefix_sum,
+    //                                     int &n_aabbs);
     void check_candidates(thrust::device_vector<int> &d_gt_);
     void subspace_copy(thrust::device_vector<float3> &d_dst, thrust::device_vector<float> &d_src, int offset);
     void set_size(int _dim_, int _np, int _nq, int _gt_k){
@@ -89,9 +89,10 @@ class RT_Entry{
       OptixAabb world_bounds;
       thrust::host_vector<OptixAabb> h_aabbs;
       thrust::device_vector<OptixAabb> d_aabbs;
-      thrust::device_vector<int> prefix_sum;
+      // thrust::device_vector<int> prefix_sum;
       thrust::device_vector<int> aabb_pid;
       int n_aabbs;
+      int aabb_size;
       
       thrust::device_vector<int> hits;
       thrust::device_vector<int> n_hits_per_query;

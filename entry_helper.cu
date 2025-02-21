@@ -2,7 +2,7 @@
 #include "entry.h"
 #include "warpselect/WarpSelect.cuh"
 
-__global__ void calcDistance(int *d_candidates, float *d_candidates_dist, int *d_n_candidates, int buffer_size, int nq, float* d_query, float* d_data, int *hits, int *n_hits_per_query, int *hits_offset, int max_hits, int *aabb_pid, int *prefix_sum, int n_aabbs){
+/*__global__ void calcDistance(int *d_candidates, float *d_candidates_dist, int *d_n_candidates, int buffer_size, int nq, float* d_query, float* d_data, int *hits, int *n_hits_per_query, int *hits_offset, int max_hits, int *aabb_pid, int *prefix_sum, int n_aabbs){
   int t_id = threadIdx.x;
   int b_id = blockIdx.x;
   int warp_size = 32;
@@ -238,7 +238,7 @@ void RT_Entry::collect_candidates_onesubspace(
     Timing::stopTiming();
   #endif
 
-}
+}*/
 
 __global__ void check_candidates_kernel(int *d_candidates, int *d_n_candidates, int nq, int buffer_size, int *d_gt, int gt_k, float *d_recall_1, float *d_recall_10, float *d_recall_100){
   int tid = blockIdx.x * blockDim.x + threadIdx.x;

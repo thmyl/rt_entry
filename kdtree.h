@@ -23,7 +23,8 @@ public:
   void buildWithStack(int l, int r, int node_id, OptixAabb box_bound, thrust::host_vector<OptixAabb> &aabbs);
   int split(int l, int r, int axis, float xM);
   void add_aabb(int l, int r, OptixAabb box_bound, thrust::host_vector<OptixAabb> &aabbs);
-  void computeAabbPid(thrust::device_vector<int> &aabb_pid, thrust::device_vector<int> &prefix_sum, int n_aabbs);
+  // void computeAabbPid(thrust::device_vector<int> &aabb_pid, thrust::device_vector<int> &prefix_sum, int n_aabbs);
+  void computeAabbPid(thrust::device_vector<int> &aabb_pid, int n_aabbs);
   float findxM(float l, float r, int data_l, int data_r, int axis);
   void tight_box(int l, int r, float *box_min, float *box_max);
 

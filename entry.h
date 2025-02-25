@@ -90,13 +90,12 @@ class RT_Entry{
       thrust::host_vector<OptixAabb> h_aabbs;
       thrust::device_vector<OptixAabb> d_aabbs;
       // thrust::device_vector<int> prefix_sum;
-      thrust::device_vector<int> aabb_pid;
+      thrust::device_vector<int> aabb_entry;
       int n_aabbs;
       int aabb_size;
       
+      thrust::device_vector<int> entries;
       thrust::device_vector<int> hits;
-      thrust::device_vector<int> n_hits_per_query;
-      thrust::device_vector<int> hits_offset;
 
       OptiXRT rt;
     };

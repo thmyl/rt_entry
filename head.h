@@ -24,9 +24,9 @@
 #include "flags.h"
 
 // #define KDTREE
-#define DIM 64
+#define DIM 32
 #define ENTRY_DIM 32 //dimensions used in entry search
-#define GRAPH_DIM 64 //dimensions used in graph search
+#define GRAPH_DIM 32 //dimensions used in graph search
 #define USE_L2_DIST_
 // #define REORDER
 // #define DETAIL //Whether to output detailed information

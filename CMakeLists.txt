@@ -57,7 +57,7 @@ add_executable(test
   matrix.cu
   file_read.cu
   pca.cpp
-  raytracing.cpp
+  raytracing.cu
   kdtree.cpp
   flags.cpp
   graph.cu

@@ -67,12 +67,12 @@ extern "C" __global__ void __intersection__aabb(){
   unsigned int id = optixGetPayload_1();//第i个相交的aabb
   unsigned int primIdx = optixGetPrimitiveIndex();
   unsigned int queryIdx = optixGetPayload_0();
-  params.hits[queryIdx * params.max_hits + id] = primIdx;
-  params.n_hits_per_query[queryIdx] = id+1;
-  if(id+1 >= params.max_hits){
+  params.hits[queryIdx] = primIdx;
+  params.entries[queryIdx] = params.aabb_entry[primIdx];
+  // if(id+1 >= params.max_hits){
     optixReportIntersection( 0, 0 );
-  }
-  else optixSetPayload_1(id+1);
+  // }
+  // else optixSetPayload_1(id+1);
 }
 
 // extern "C" __global__ void __intersection__aabb(){

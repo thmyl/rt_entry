@@ -48,9 +48,8 @@ int abs(int x){
 }
 
 template<typename IdType, typename FloatType, int WARP_SIZE>
-__global__ void GraphSearchKernel(float* d_data, float* d_query, int* d_results, int* d_graph, int* d_candidates, int np,
-                      int offset_shift, int n_candidates, int topk, int search_width, int* d_entries,
-                      int* d_hits, int* d_aabb_pid, int aabb_size, int ALGO){
+__global__ void GraphSearchKernel(float* d_data, float* d_query, int* d_results, int* d_graph, int* d_candidates, int np, int nq,
+                      int offset_shift, int n_candidates, int topk, int search_width, int* d_entries, int ALGO){
   
   int t_id = threadIdx.x;
   int b_id = blockIdx.x;//query_id
@@ -59,18 +58,7 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, int* d_results,
 	int n_warp = blockSize / WARP_SIZE;
   int lane_id = t_id % WARP_SIZE;
   int warp_id = t_id / WARP_SIZE;
-
-	int aabb_id; //TODO: n_hits=1
-	int aabb_st;
-	// int aabb_size;
-  int n_entries;
-	if(ALGO==1){
-		aabb_id = d_hits[q_id];
-        aabb_st = aabb_id * aabb_size;
-        n_entries = min(aabb_size, n_candidates);
-        // n_entries = aabb_size;
-	}
-	else n_entries = n_candidates;
+	int n_entries = 1;
 
   int* crt_results = d_results + q_id * topk;
   int degree = (1<<offset_shift);
@@ -474,7 +462,399 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, int* d_results,
   }
   __syncthreads();
 
-  iteration = (n_entries + n_points_per_batch - 1) / n_points_per_batch;
+  if(ALGO == 1)
+    neighbors_array[0].second = d_entries[q_id];
+  else 
+		neighbors_array[0].second = np/nq*q_id;
+
+  long long p_id = neighbors_array[0].second;
+  if(p_id < np) {
+// read point
+    #if GRAPH_DIM > 0
+    float p1 = 0;
+    if (lane_id < GRAPH_DIM) {
+            p1 = d_data[p_id * DIM + lane_id];
+    }
+    #endif
+    #if GRAPH_DIM > 32
+    float p2 = 0;
+    if (lane_id + 32 < GRAPH_DIM) {
+            p2 = d_data[p_id * DIM + lane_id + 32];
+    }
+    #endif
+    #if GRAPH_DIM > 64
+    float p3 = 0;
+    if (lane_id + 64 < GRAPH_DIM) {
+            p3 = d_data[p_id * DIM + lane_id + 64];
+    }
+    #endif
+    #if GRAPH_DIM > 96
+    float p4 = 0;
+    if (lane_id + 96 < GRAPH_DIM) {
+            p4 = d_data[p_id * DIM + lane_id + 96];
+    }
+    #endif
+    #if GRAPH_DIM > 128
+    float p5 = 0;
+    if (lane_id + 128 < GRAPH_DIM) {
+            p5 = d_data[p_id * DIM + lane_id + 128];
+    }
+    #endif
+    #if GRAPH_DIM > 160
+    float p6 = 0;
+    if (lane_id + 160 < GRAPH_DIM) {
+            p6 = d_data[p_id * DIM + lane_id + 160];
+    }
+    #endif
+    #if GRAPH_DIM > 192
+    float p7 = 0;
+    if (lane_id + 192 < GRAPH_DIM) {
+            p7 = d_data[p_id * DIM + lane_id + 192];
+    }
+    #endif
+    #if GRAPH_DIM > 224
+    float p8 = 0;
+    if (lane_id + 224 < GRAPH_DIM) {
+            p8 = d_data[p_id * DIM + lane_id + 224];
+    }
+    #endif
+    #if GRAPH_DIM > 256
+    float p9 = 0;
+    if (lane_id + 256 < GRAPH_DIM) {
+            p9 = d_data[p_id * DIM + lane_id + 256];
+    }
+    #endif
+    #if GRAPH_DIM > 288
+    float p10 = 0;
+    if (lane_id + 288 < GRAPH_DIM) {
+            p10 = d_data[p_id * DIM + lane_id + 288];
+    }
+    #endif
+    #if GRAPH_DIM > 320
+    float p11 = 0;
+    if (lane_id + 320 < GRAPH_DIM) {
+            p11 = d_data[p_id * DIM + lane_id + 320];
+    }
+    #endif
+    #if GRAPH_DIM > 352
+    float p12 = 0;
+    if (lane_id + 352 < GRAPH_DIM) {
+            p12 = d_data[p_id * DIM + lane_id + 352];
+    }
+    #endif
+    #if GRAPH_DIM > 384
+    float p13 = 0;
+    if (lane_id + 384 < GRAPH_DIM) {
+            p13 = d_data[p_id * DIM + lane_id + 384];
+    }
+    #endif
+    #if GRAPH_DIM > 416
+    float p14 = 0;
+    if (lane_id + 416 < GRAPH_DIM) {
+            p14 = d_data[p_id * DIM + lane_id + 416];
+    }
+    #endif
+    #if GRAPH_DIM > 448
+    float p15 = 0;
+    if (lane_id + 448 < GRAPH_DIM) {
+            p15 = d_data[p_id * DIM + lane_id + 448];
+    }
+    #endif
+    #if GRAPH_DIM > 480
+    float p16 = 0;
+    if (lane_id + 480 < GRAPH_DIM) {
+            p16 = d_data[p_id * DIM + lane_id + 480];
+    }
+    #endif
+    #if GRAPH_DIM > 512
+    float p17 = 0;
+    if (lane_id + 512 < GRAPH_DIM) {
+            p17 = d_data[p_id * DIM + lane_id + 512];
+    }
+    #endif
+    #if GRAPH_DIM > 544
+    float p18 = 0;
+    if (lane_id + 544 < GRAPH_DIM) {
+            p18 = d_data[p_id * DIM + lane_id + 544];
+    }
+    #endif
+    #if GRAPH_DIM > 576
+    float p19 = 0;
+    if (lane_id + 576 < GRAPH_DIM) {
+            p19 = d_data[p_id * DIM + lane_id + 576];
+    }
+    #endif
+    #if GRAPH_DIM > 608
+    float p20 = 0;
+    if (lane_id + 608 < GRAPH_DIM) {
+            p20 = d_data[p_id * DIM + lane_id + 608];
+    }
+    #endif
+    #if GRAPH_DIM > 640
+    float p21 = 0;
+    if (lane_id + 640 < GRAPH_DIM) {
+            p21 = d_data[p_id * DIM + lane_id + 640];
+    }
+    #endif
+    #if GRAPH_DIM > 672
+    float p22 = 0;
+    if (lane_id + 672 < GRAPH_DIM) {
+            p22 = d_data[p_id * DIM + lane_id + 672];
+    }
+    #endif
+    #if GRAPH_DIM > 704
+    float p23 = 0;
+    if (lane_id + 704 < GRAPH_DIM) {
+            p23 = d_data[p_id * DIM + lane_id + 704];
+    }
+    #endif
+    #if GRAPH_DIM > 736
+    float p24 = 0;
+    if (lane_id + 736 < GRAPH_DIM) {
+            p24 = d_data[p_id * DIM + lane_id + 736];
+    }
+    #endif
+    #if GRAPH_DIM > 768
+    float p25 = 0;
+    if (lane_id + 768 < GRAPH_DIM) {
+            p25 = d_data[p_id * DIM + lane_id + 768];
+    }
+    #endif
+    #if GRAPH_DIM > 800
+    float p26 = 0;
+    if (lane_id + 800 < GRAPH_DIM) {
+            p26 = d_data[p_id * DIM + lane_id + 800];
+    }
+    #endif
+    #if GRAPH_DIM > 832
+    float p27 = 0;
+    if (lane_id + 832 < GRAPH_DIM) {
+            p27 = d_data[p_id * DIM + lane_id + 832];
+    }
+    #endif
+    #if GRAPH_DIM > 864
+    float p28 = 0;
+    if (lane_id + 864 < GRAPH_DIM) {
+            p28 = d_data[p_id * DIM + lane_id + 864];
+    }
+    #endif
+    #if GRAPH_DIM > 896
+    float p29 = 0;
+    if (lane_id + 896 < GRAPH_DIM) {
+            p29 = d_data[p_id * DIM + lane_id + 896];
+    }
+    #endif
+    #if GRAPH_DIM > 928
+    float p30 = 0;
+    if (lane_id + 224 < GRAPH_DIM) {
+            p30 = d_data[p_id * DIM + lane_id + 928];
+    }
+    #endif
+
+// compute distance
+    #ifdef USE_L2_DIST_
+    #if GRAPH_DIM > 0
+            float delta1 = (p1 - q1) * (p1 - q1);
+    #endif
+    #if GRAPH_DIM > 32
+            float delta2 = (p2 - q2) * (p2 - q2);
+    #endif
+    #if GRAPH_DIM > 64
+            float delta3 = (p3 - q3) * (p3 - q3);
+    #endif
+    #if GRAPH_DIM > 96
+            float delta4 = (p4 - q4) * (p4 - q4);
+    #endif
+    #if GRAPH_DIM > 128
+            float delta5 = (p5 - q5) * (p5 - q5);
+    #endif
+    #if GRAPH_DIM > 160
+            float delta6 = (p6 - q6) * (p6 - q6);
+    #endif
+    #if GRAPH_DIM > 192
+            float delta7 = (p7 - q7) * (p7 - q7);
+    #endif
+    #if GRAPH_DIM > 224
+            float delta8 = (p8 - q8) * (p8 - q8);
+    #endif
+    #if GRAPH_DIM > 256
+            float delta9 = (p9 - q9) * (p9 - q9);
+    #endif
+    #if GRAPH_DIM > 288
+            float delta10 = (p10 - q10) * (p10 - q10);
+    #endif
+    #if GRAPH_DIM > 320
+            float delta11 = (p11 - q11) * (p11 - q11);
+    #endif
+    #if GRAPH_DIM > 352
+            float delta12 = (p12 - q12) * (p12 - q12);
+    #endif
+    #if GRAPH_DIM > 384
+            float delta13 = (p13 - q13) * (p13 - q13);
+    #endif
+    #if GRAPH_DIM > 416
+            float delta14 = (p14 - q14) * (p14 - q14);
+    #endif
+    #if GRAPH_DIM > 448
+            float delta15 = (p15 - q15) * (p15 - q15);
+    #endif
+    #if GRAPH_DIM > 480
+            float delta16 = (p16 - q16) * (p16 - q16);
+    #endif
+    #if GRAPH_DIM > 512
+            float delta17 = (p17 - q17) * (p17 - q17);
+    #endif
+    #if GRAPH_DIM > 544
+            float delta18 = (p18 - q18) * (p18 - q18);
+    #endif
+    #if GRAPH_DIM > 576
+            float delta19 = (p19 - q19) * (p19 - q19);
+    #endif
+    #if GRAPH_DIM > 608
+            float delta20 = (p20 - q20) * (p20 - q20);
+    #endif
+    #if GRAPH_DIM > 640
+            float delta21 = (p21 - q21) * (p21 - q21);
+    #endif
+    #if GRAPH_DIM > 672
+            float delta22 = (p22 - q22) * (p22 - q22);
+    #endif
+    #if GRAPH_DIM > 704
+            float delta23 = (p23 - q23) * (p23 - q23);
+    #endif
+    #if GRAPH_DIM > 736
+            float delta24 = (p24 - q24) * (p24 - q24);
+    #endif
+    #if GRAPH_DIM > 768
+            float delta25 = (p25 - q25) * (p25 - q25);
+    #endif
+    #if GRAPH_DIM > 800
+            float delta26 = (p26 - q26) * (p26 - q26);
+    #endif
+    #if GRAPH_DIM > 832
+            float delta27 = (p27 - q27) * (p27 - q27);
+    #endif
+    #if GRAPH_DIM > 864
+            float delta28 = (p28 - q28) * (p28 - q28);
+    #endif
+    #if GRAPH_DIM > 896
+            float delta29 = (p29 - q29) * (p29 - q29);
+    #endif
+    #if GRAPH_DIM > 928
+            float delta30 = (p30 - q30) * (p30 - q30);
+    #endif
+    #endif           
+
+// reduce
+    #ifdef USE_L2_DIST_
+            float dist = 0;
+    #if GRAPH_DIM > 0
+            dist += delta1;
+    #endif
+    #if GRAPH_DIM > 32
+            dist += delta2;
+    #endif
+    #if GRAPH_DIM > 64
+            dist += delta3;
+    #endif
+    #if GRAPH_DIM > 96
+            dist += delta4;
+    #endif
+    #if GRAPH_DIM > 128
+            dist += delta5;
+    #endif
+    #if GRAPH_DIM > 160
+            dist += delta6;
+    #endif
+    #if GRAPH_DIM > 192
+            dist += delta7;
+    #endif
+    #if GRAPH_DIM > 224
+            dist += delta8;
+    #endif
+    #if GRAPH_DIM > 256
+            dist += delta9;
+    #endif
+    #if GRAPH_DIM > 288
+            dist += delta10;
+    #endif
+    #if GRAPH_DIM > 320
+            dist += delta11;
+    #endif
+    #if GRAPH_DIM > 352
+            dist += delta12;
+    #endif
+    #if GRAPH_DIM > 384
+            dist += delta13;
+    #endif
+    #if GRAPH_DIM > 416
+            dist += delta14;
+    #endif
+    #if GRAPH_DIM > 448
+            dist += delta15;
+    #endif
+    #if GRAPH_DIM > 480
+            dist += delta16;
+    #endif
+    #if GRAPH_DIM > 512
+            dist += delta17;
+    #endif
+    #if GRAPH_DIM > 544
+            dist += delta18;
+    #endif
+    #if GRAPH_DIM > 576
+            dist += delta19;
+    #endif
+    #if GRAPH_DIM > 608
+            dist += delta20;
+    #endif
+    #if GRAPH_DIM > 640
+            dist += delta21;
+    #endif
+    #if GRAPH_DIM > 672
+            dist += delta22;
+    #endif
+    #if GRAPH_DIM > 704
+            dist += delta23;
+    #endif
+    #if GRAPH_DIM > 736
+            dist += delta24;
+    #endif
+    #if GRAPH_DIM > 768
+            dist += delta25;
+    #endif
+    #if GRAPH_DIM > 800
+            dist += delta26;
+    #endif
+    #if GRAPH_DIM > 832
+            dist += delta27;
+    #endif
+    #if GRAPH_DIM > 864
+            dist += delta28;
+    #endif
+    #if GRAPH_DIM > 896
+            dist += delta29;
+    #endif
+    #if GRAPH_DIM > 928
+            dist += delta30;
+    #endif
+    #endif
+    #ifdef USE_L2_DIST_
+    dist += __shfl_down_sync(FULL_MASK, dist, 16);
+    dist += __shfl_down_sync(FULL_MASK, dist, 8);
+    dist += __shfl_down_sync(FULL_MASK, dist, 4);
+    dist += __shfl_down_sync(FULL_MASK, dist, 2);
+    dist += __shfl_down_sync(FULL_MASK, dist, 1);
+    #endif
+
+// insert
+    if(lane_id == 0){
+        neighbors_array[0].first = dist;
+    }
+		__syncthreads();
+	}
+	
+  /*iteration = (n_entries + n_points_per_batch - 1) / n_points_per_batch;
   for(int iter = 0; iter < iteration; iter++){
 	//add entry points
     for(int i = t_id; i < n_points_per_batch; i+=blockSize){
@@ -954,7 +1334,7 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, int* d_results,
       __syncthreads();
     }
     __syncthreads();
-  }
+  }*/
   __syncthreads();
 
 // graph_search

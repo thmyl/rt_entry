@@ -142,6 +142,7 @@ void Graph::Projection(){
     }
     pca.calc_result(dim_);
     pca.save_result(dim_, pca_base_path.c_str());
+    printf("finish writing PCA file\n");
   }
   else 
     fclose(pca_base_file);
@@ -273,19 +274,15 @@ void Graph::GraphSearch(){
   }
   auto *d_results_ptr = thrust::raw_pointer_cast(d_results.data());
   auto *d_graph_ptr = thrust::raw_pointer_cast(d_graph_.data());
-  auto *d_entries_ptr = thrust::raw_pointer_cast(d_entries.data());
-  auto *d_entries_dist_ptr = thrust::raw_pointer_cast(d_entries_dist.data());
 
-  auto *d_hits = thrust::raw_pointer_cast((rt_entry->subspaces_[0]).hits.data());
-  auto *d_aabb_pid = thrust::raw_pointer_cast((rt_entry->subspaces_[0]).aabb_pid.data());
+  auto *d_entries = thrust::raw_pointer_cast((rt_entry->subspaces_[0]).entries.data());
   int aabb_size = rt_entry->subspaces_[0].aabb_size;
 
   auto *d_candidates_ptr = thrust::raw_pointer_cast(d_candidates.data());
 
   GraphSearchKernel<int, float, WARP_SIZE><<<nq, 64, ((search_width << offset_shift_) + n_candidates) * sizeof(KernelPair<float, int>)>>>
-    (d_points_ptr, d_queries_ptr, d_results_ptr, d_graph_ptr, d_candidates_ptr, np,
-    offset_shift_, n_candidates, topk, search_width, d_entries_ptr,
-    d_hits, d_aabb_pid, aabb_size, ALGO);
+    (d_points_ptr, d_queries_ptr, d_results_ptr, d_graph_ptr, d_candidates_ptr, np, nq,
+    offset_shift_, n_candidates, topk, search_width, d_entries, ALGO);
   cudaDeviceSynchronize();
 
   #ifdef REORDER

@@ -280,43 +280,18 @@ void OptiXRT::CleanUp(){
 // #endif
 }
 
-void OptiXRT::search(float* d_queries, int nq, int offset, int dim, int* hits, int* n_hits_per_query, int max_hits){
+void OptiXRT::search(float* d_queries, int nq, int offset, int dim, int* hits, int* entries, int* aabb_entry){
   // Timing::startTiming("before_optixSearch1");
   h_params_.handle = gas_handle_;
   h_params_.queries = d_queries;
   h_params_.hits = hits;
-  h_params_.n_hits_per_query = n_hits_per_query;
-  h_params_.max_hits = max_hits;
+  h_params_.entries = entries;
+  h_params_.aabb_entry = aabb_entry;
   h_params_.dim = dim;
   h_params_.offset = offset;
-  // Timing::stopTiming();
-
-  // Timing::startTiming("before_optixSearch2");
+  
   CUDA_CHECK(cudaMemcpy(reinterpret_cast<void*>(d_params_ptr_),&h_params_,sizeof(LaunchParams),cudaMemcpyHostToDevice));
-  // Timing::stopTiming();
 
-  // Timing::startTiming("before_optixSearch3");
-  // CUDA_CHECK(cudaMemcpy(reinterpret_cast<void*>(d_params_ptr_),&h_params_,sizeof(LaunchParams),cudaMemcpyHostToDevice));
-  // Timing::stopTiming();
-
-  // Timing::startTiming("before_optixSearch4");
-  // CUDA_CHECK(cudaMemcpy(reinterpret_cast<void*>(d_params_ptr_),&h_params_,sizeof(LaunchParams),cudaMemcpyHostToDevice));
-  // Timing::stopTiming();
-
-  
-  // LaunchParams* h_params_pinned = nullptr; 
-  // cudaHostAlloc(&h_params_pinned, sizeof(LaunchParams), cudaHostAllocDefault); // 复制数据到页锁定内存 
-  // Timing::startTiming("before_optixSearch5");
-  // *h_params_pinned = h_params_; // 执行数据传输 
-  
-  // CUDA_CHECK(cudaMemcpy(d_params_ptr_, h_params_pinned, sizeof(LaunchParams), cudaMemcpyHostToDevice)); // 释放页锁定内存 cudaFreeHost(h_params_pinned);
-  // Timing::stopTiming();
-
-  // cudaEvent_t launch_start,launch_end;
-  // CUDA_CHECK(cudaEventCreate(&launch_start));
-  // CUDA_CHECK(cudaEventCreate(&launch_end));
-  // CUDA_CHECK(cudaEventRecord(launch_start,cuda_stream_));
-  // Timing::startTiming("optixLaunch");
   OPTIX_CHECK(optixLaunch(
     optix_pipeline_,
     cuda_stream_,
@@ -326,12 +301,7 @@ void OptiXRT::search(float* d_queries, int nq, int offset, int dim, int* hits, i
     nq,
     1,1
   ));
-  // Timing::stopTiming();
-  // CUDA_CHECK(cudaEventRecord(launch_end,cuda_stream_));
-  // CUDA_CHECK(cudaEventSynchronize(launch_end));
-  // CUDA_CHECK(cudaEventElapsedTime(&search_time_,launch_start,launch_end));
-  // CUDA_CHECK(cudaEventDestroy(launch_start));
-  // CUDA_CHECK(cudaEventDestroy(launch_end));
-  // printf("RT Search Time = %f ms\n",search_time_);
+
+  CUDA_SYNC_CHECK();
 }
 

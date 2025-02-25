@@ -15,7 +15,7 @@ void RT_Entry::BlockUp(){
     auto &h_aabbs = subspaces_[space].h_aabbs;
     auto &d_aabbs = subspaces_[space].d_aabbs;
     auto &n_aabbs = subspaces_[space].n_aabbs;
-    auto &aabb_pid = subspaces_[space].aabb_pid;
+    auto &aabb_entry = subspaces_[space].aabb_entry;
     auto &aabb_size = subspaces_[space].aabb_size;
 
     computeMinMax(world_bounds, h_points);
@@ -36,8 +36,8 @@ void RT_Entry::BlockUp(){
     // aabb_pid.resize(np);
     // kdtree.computeAabbPid(aabb_pid, prefix_sum, n_aabbs);
     aabb_size = np * point_ratio;
-    aabb_pid.resize(n_aabbs * aabb_size);
-    kdtree.computeAabbPid(aabb_pid, n_aabbs);
+    aabb_entry.resize(n_aabbs);
+    kdtree.computeAabbPid(aabb_entry, n_aabbs);
 
     expandAabb(h_aabbs, expand_ratio);
     thrust::copy(h_aabbs.begin(), h_aabbs.end(), d_aabbs.begin());
@@ -54,9 +54,9 @@ void RT_Entry::InitRT(){
     rt.Setup();
     rt.BuildAccel(d_aabbs_ptr, n_aabbs);
 
-    subspaces_[space].hits.resize(nq * max_hits);
-    subspaces_[space].n_hits_per_query.resize(nq);
-    subspaces_[space].hits_offset.resize(nq * max_hits);
+    subspaces_[space].entries.resize(nq);
+    thrust::fill(subspaces_[space].entries.begin(), subspaces_[space].entries.end(), 0);
+    subspaces_[space].hits.resize(nq);
 
     d_aabbs.resize(0);
   }
@@ -75,9 +75,10 @@ void RT_Entry::Search(thrust::device_vector<float> &d_pca_points, thrust::device
   for(int space = 0; space < n_subspaces; space++){
     auto &rt = subspaces_[space].rt;
     auto &hits = subspaces_[space].hits;
-    auto &n_hits_per_query = subspaces_[space].n_hits_per_query;
+    auto &entries = subspaces_[space].entries;
+    auto &aabb_entry = subspaces_[space].aabb_entry;
     // printf("dim_ = %d\n", dim_);
-    rt.search(thrust::raw_pointer_cast(d_pca_queries.data()), nq, space*3, dim_, thrust::raw_pointer_cast(hits.data()), thrust::raw_pointer_cast(n_hits_per_query.data()), max_hits);
+    rt.search(thrust::raw_pointer_cast(d_pca_queries.data()), nq, space*3, dim_, thrust::raw_pointer_cast(hits.data()), thrust::raw_pointer_cast(entries.data()), thrust::raw_pointer_cast(aabb_entry.data()));
     
     /*thrust::host_vector<int> h_n_hits_per_query = n_hits_per_query;
     float sum = 0;

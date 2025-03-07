@@ -81,22 +81,6 @@ void file_read::read_data(const char *datafile, int &n, int &d,
 
 void file_read::read_hh_file(const char* filename, int& n, int& d,
                              thrust::host_vector<float>& data){
-  // FILE* file = fopen(filename, "rb");
-  // if(file == NULL){
-  //   printf("File open failed\n");
-  //   return;
-  // }
-  // assert(fread(&d, sizeof(d), 1, file) == 1);
-  // long long filelength = 0;
-  // fseek(file, 0, SEEK_END);
-  // filelength = ftell(file);
-  // fseek(file, 0, SEEK_SET);
-  // n = (filelength - 4) / (d*4);
-  // size_t dataSize = size_t(n) * size_t(d);
-  // data.resize(dataSize);
-  // fread(&d, sizeof(d), 1, file);
-  // fread(data.data(), sizeof(float), 1UL*dataSize, file);
-  // fclose(file);
   std::ifstream infile(filename, std::ios::binary);
   if(!infile.is_open()){
     printf("File open failed\n");
@@ -136,26 +120,6 @@ void file_read::read_txt_file(const char *filename, int &n, int &d,
 
 void file_read::read_fvecs_file(const char *filename, int &n, int &d,
                                 thrust::host_vector<float> &data) {
-  // FILE *file = fopen(filename, "rb");
-  // if (file == NULL) {
-  //   printf("File open failed\n");
-  //   return;
-  // }
-
-  // int rtn = fread(&d, sizeof(d), 1, file);
-  // assert(rtn == 1);
-  // long long filelength = 0;
-  // fseek(file, 0, SEEK_END);
-  // filelength = ftell(file);
-  // fseek(file, 0, SEEK_SET);
-  // n = filelength / ((d + 1) * 4);
-
-  // data.resize(n * d);
-  // for (int i = 0; i < n; i++) {
-  //   fread(&d, sizeof(d), 1, file);
-  //   fread(data.data() + i * d, 4, d, file);
-  // }
-  // fclose(file);
 
   std::ifstream infile(filename, std::ios::binary);
   if(!infile.is_open()){
@@ -167,7 +131,9 @@ void file_read::read_fvecs_file(const char *filename, int &n, int &d,
   infile.seekg(0, std::ios::end);
   filelength = infile.tellg();
   n = filelength / ((d+1)*4);
-
+  // #ifdef DETAIL
+    printf("n = %d, d = %d\n", n, d);
+  // #endif
   data.resize(n*d);
   infile.seekg(0, std::ios::beg);
   auto* data_ptr = thrust::raw_pointer_cast(data.data());
@@ -180,18 +146,6 @@ void file_read::read_fvecs_file(const char *filename, int &n, int &d,
 
 void file_read::read_fbin_file(const char *filename, int &n, int &d,
                                thrust::host_vector<float> &data) {
-  // FILE *file = fopen(filename, "rb");
-  // if (file == NULL) {
-  //   printf("File open failed\n");
-  //   return;
-  // }
-  // assert(fread(&n, sizeof(n), 1, file));
-  // // int limit = 10000000; // 最多读取1M
-  // // n = std::min(n, limit);
-  // assert(fread(&d, sizeof(d), 1, file) == 1);
-  // data.resize(n * d);
-  // fread(data.data(), sizeof(float), 1LL * size_t(n) * size_t(d), file);
-  // fclose(file);
 
   std::ifstream infile(filename, std::ios::binary);
   if(!infile.is_open()){
@@ -229,28 +183,6 @@ void file_read::read_hvecs_file(const char* filename, int& n, int& d,
 
 void file_read::read_bvecs_file(const char* filename, int& n, int& d,
                                 thrust::host_vector<float>& data){
-  // FILE* file = fopen(filename, "rb");
-  // if(file == NULL){
-  //   printf("File open failed\n");
-  //   return;
-  // }
-  // assert(fread(&d, sizeof(d), 1, file) == 1);
-  // int filelength = 0;
-  // fseek(file, 0, SEEK_END);
-  // filelength = ftell(file);
-  // fseek(file, 0, SEEK_SET);
-  // n = filelength / (d+4);
-  
-  // data.resize(n*d);
-  // for(int i = 0; i < n; i++){
-  //   fread(&d, sizeof(d), 1, file);
-  //   unsigned char tmp_data[d];
-  //   fread(tmp_data, 1, d, file);
-  //   for(int j=0; j<d; j++){
-  //     data[i*d+j] = (float)tmp_data[j];
-  //   }
-  // }
-  // fclose(file);
 
   std::ifstream infile(filename, std::ios::binary);
   if(!infile.is_open()){
@@ -280,24 +212,6 @@ void file_read::read_bvecs_file(const char* filename, int& n, int& d,
 
 void file_read::read_ivecs_file(const char* filename, int& n, int& d,
                                 thrust::host_vector<int>& data){
-  // FILE* file = fopen(filename, "rb");
-  // if(file == NULL){
-  //   printf("File open failed\n");
-  //   return;
-  // }
-  // assert(fread(&d, sizeof(d), 1, file) == 1);
-  // long long filelength = 0;
-  // fseek(file, 0, SEEK_END);
-  // filelength = ftell(file);
-  // fseek(file, 0, SEEK_SET);
-  // n = filelength / ((d+1)*4);
-  
-  // data.resize(n*d);
-  // for(int i = 0; i < n; i++){
-  //   fread(&d, sizeof(d), 1, file);
-  //   fread(data.data()+i*d, sizeof(int), d, file);
-  // }
-  // fclose(file);
 
   std::ifstream infile(filename, std::ios::binary);
   if(!infile.is_open()){
@@ -321,21 +235,6 @@ void file_read::read_ivecs_file(const char* filename, int& n, int& d,
 }
 
 void file_read::read_graph(const char* filename, const int& n, int& degree, thrust::host_vector<int> &data){
-  // FILE* file = fopen(filename, "rb");
-  // if(file == NULL){
-  //   printf("File open failed\n");
-  //   return;
-  // }
-  // long long filelength = 0;
-  // fseek(file, 0, SEEK_END);
-  // filelength = ftell(file);
-  // fseek(file, 0, SEEK_SET);
-  // degree = filelength / (n*4);
-
-  // size_t dataSize = size_t(n) * size_t(degree);
-  // data.resize(dataSize);
-  // fread(data.data(), sizeof(int), 1UL*dataSize, file);
-  // fclose(file);
 
   std::ifstream infile(filename, std::ios::binary);
   if(!infile.is_open()){

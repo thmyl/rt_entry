@@ -11,20 +11,18 @@ DEFINE_int32(search_width, 1, "search width");
 // DEFINE_string(data_path, "/data/myl/sift1M/sift1M_base.fvecs", "path of datasets");
 // DEFINE_string(query_path, "/data/myl/sift1M/sift1M_query.fvecs", "path of queries");
 // DEFINE_string(gt_path, "/data/myl/sift1M/sift1M_groundtruth.ivecs", "path of the ground truth");
+// DEFINE_string(graph_path, "/data/myl/sift1M/sift_128_64_1M.nsw", "path of the graph");
 // // DEFINE_string(graph_path, "/home/myl/pcsearch/input_file/sift1M_32_16.nsw", "path of the graph");
-// DEFINE_string(graph_path, "/home/myl/pcsearch/input_file/sift1M_64_32.nsw", "path of the graph");
-// // DEFINE_string(graph_path, "/home/myl/pcsearch/input_file/sift1M_degree32.nsw", "path of the graph");
-// // DEFINE_string(graph_path, "/home/myl/pcsearch/input_file/sift1M_last64_64_16.nsw", "path of the graph");
+// // DEFINE_string(graph_path, "/home/myl/pcsearch/input_file/sift1M_64_32.nsw", "path of the graph");
+// // DEFINE_string(graph_path, "/home/myl/graph/index/sift_128_64_1M.nsw", "path of the graph");
 
 /* sift10m */
-DEFINE_string(data_name, "sift10M", "name of datasets");
-DEFINE_string(data_path, "/data/myl/sift10M/sift10M_base.fbin", "path of datasets");
-DEFINE_string(query_path, "/data/myl/sift10M/sift10M_query.bvecs", "path of queries");
-DEFINE_string(gt_path, "/data/myl/sift10M/sift10M_groundtruth.ivecs", "path of the ground truth");
-DEFINE_string(graph_path, "/home/myl/pcsearch/input_file/sift10M_32_16.nsw", "path of the graph");
-// DEFINE_string(graph_path, "/home/myl/pcsearch/input_file/sift10M_degree32.nsw", "path of the graph");
-// DEFINE_string(graph_path, "/home/myl/pcsearch/input_file/sift10M_128_16.nsw", "path of the graph");
-// DEFINE_string(graph_path, "/home/myl/pcsearch/input_file/sift10M_128_8.nsw", "path of the graph");
+// DEFINE_string(data_name, "sift10M", "name of datasets");
+// DEFINE_string(data_path, "/data/myl/sift10M/sift10M_base.fbin", "path of datasets");
+// DEFINE_string(query_path, "/data/myl/sift10M/sift10M_query.bvecs", "path of queries");
+// DEFINE_string(gt_path, "/data/myl/sift10M/sift10M_groundtruth.ivecs", "path of the ground truth");
+// DEFINE_string(graph_path, "/data/myl/sift10M/sift_128_64_10M.nsw", "path of the graph");
+// // DEFINE_string(graph_path, "/home/myl/pcsearch/input_file/sift10M_32_16.nsw", "path of the graph");
 
 /* sift100m */
 // DEFINE_string(data_name, "/data/myl/sift1B/sift100M_index/pca", "name of datasets");
@@ -36,10 +34,19 @@ DEFINE_string(graph_path, "/home/myl/pcsearch/input_file/sift10M_32_16.nsw", "pa
 /* deep1M */
 // DEFINE_string(data_name, "deep1M", "name of datasets");
 // DEFINE_string(data_path, "/data/myl/deep1M/deep1M_base.fvecs", "path of datasets");
-// DEFINE_string(query_path, "/data/myl/deep1M/deep1B_queries.fvecs", "path of queries");
+// DEFINE_string(query_path, "/data/myl/deep1M/deep1M_queries.fvecs", "path of queries");
 // DEFINE_string(gt_path, "/data/myl/deep1M/deep1M_gt.ivecs", "path of the ground truth");
+// DEFINE_string(graph_path, "/data/myl/deep1M/deep_128_64_1M.nsw", "path of the graph");
 // // DEFINE_string(graph_path, "/home/myl/rt_entry/input_file/deep1M_32_16.nsw", "path of the graph");
-// DEFINE_string(graph_path, "/home/myl/rt_entry/input_file/deep1M_64_32.nsw", "path of the graph");
+// // DEFINE_string(graph_path, "/home/myl/rt_entry/input_file/deep1M_64_32.nsw", "path of the graph");
+
+/* gist */
+DEFINE_string(data_name, "gist", "name of datasets");
+DEFINE_string(data_path, "/data/myl/gist/gist_base.fvecs", "path of datasets");
+DEFINE_string(query_path, "/data/myl/gist/gist_query.fvecs", "path of queries");
+DEFINE_string(gt_path, "/data/myl/gist/gist_groundtruth.ivecs", "path of the ground truth");
+// DEFINE_string(graph_path, "/data/myl/gist/gist_128_64_1M.nsw", "path of the graph");
+DEFINE_string(graph_path, "/home/myl/cagra/python/gist_128_64.nsw", "path of the graph");
 
 DEFINE_int32(n_candidates, 64, "candidates size");
 DEFINE_int32(max_hits, 1, "max hits");

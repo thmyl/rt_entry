@@ -87,15 +87,16 @@ void Kdtree::add_aabb(int l, int r, OptixAabb box_bound, thrust::host_vector<Opt
   thrust::copy(h_aabb_pid.begin(), h_aabb_pid.end(), aabb_pid.begin());
 }*/
 
-void Kdtree::computeAabbPid(thrust::device_vector<int> &aabb_pid, int n_aabbs){
-  thrust::host_vector<int> h_aabb_pid(n_aabbs * max_node, n);
+void Kdtree::computeAabbPid(thrust::host_vector<int> &h_aabb_pid, int n_aabbs){
+  // thrust::host_vector<int> h_aabb_pid(n_aabbs * max_node, n);
+  h_aabb_pid.resize(n_aabbs * max_node);
+  thrust::fill(h_aabb_pid.begin(), h_aabb_pid.end(), n);
   std::vector<int> count(n_aabbs, 0);
   for(int i=0; i<n; i++){
     int aabb_id = belong[i];
     h_aabb_pid[aabb_id * max_node + count[aabb_id]] = i;
     count[aabb_id]++;
   }
-  thrust::copy(h_aabb_pid.begin(), h_aabb_pid.end(), aabb_pid.begin());
 }
 
 float Kdtree::findxM(float l, float r, int data_l, int data_r, int axis){

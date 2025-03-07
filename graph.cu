@@ -16,19 +16,19 @@ Graph::~Graph(){
 }
 
 Graph::Graph(int n_subspaces_, int buffer_size_, int n_candidates_, int max_hits_, double expand_ratio_, double point_ratio_,
-						 std::string data_name_, std::string &data_path_, std::string &query_path_, std::string &gt_path_, std::string &graph_path_, int ALGO_, int search_width_, int topk_){
-  rt_entry = new RT_Entry(n_subspaces_, buffer_size_, max_hits_, expand_ratio_, point_ratio_);
+             std::string data_name_, std::string &data_path_, std::string &query_path_, std::string &gt_path_, std::string &graph_path_, int ALGO_, int search_width_, int topk_){
+  rt_entry = new RT_Entry(data_name_, n_subspaces_, buffer_size_, max_hits_, expand_ratio_, point_ratio_, n_candidates_);
   point_ratio = point_ratio_;
   n_hits = max_hits_;
-	datafile = (char*)data_path_.c_str();
-	queryfile = (char*)query_path_.c_str();
-	gtfile = (char*)gt_path_.c_str();
+  datafile = (char*)data_path_.c_str();
+  queryfile = (char*)query_path_.c_str();
+  gtfile = (char*)gt_path_.c_str();
   graphfile = (char*)graph_path_.c_str();
-	data_name = data_name_;
-	rotation_matrix_path = data_name + "/O.fbin";
-	mean_matrix_path = data_name + "/mean.fbin";
-	pca_base_path = data_name + "/pca_base.fbin";
-	
+  data_name = data_name_;
+  rotation_matrix_path = data_name + "/O.fbin";
+  mean_matrix_path = data_name + "/mean.fbin";
+  pca_base_path = data_name + "/pca_base.fbin";
+  
   // n_entries = n_candidates_;
   n_candidates = n_candidates_;
   topk = topk_;
@@ -41,18 +41,18 @@ Graph::Graph(int n_subspaces_, int buffer_size_, int n_candidates_, int max_hits
     printf("n_candidates = %d\n", n_candidates);
   #endif
 
-	cublasStatus_t status = cublasCreate(&handle_);
-	if (status != CUBLAS_STATUS_SUCCESS) {
-		std::cerr << "!!!! CUBLAS initialization error\n";
-		return;
-	}
+  cublasStatus_t status = cublasCreate(&handle_);
+  if (status != CUBLAS_STATUS_SUCCESS) {
+    std::cerr << "!!!! CUBLAS initialization error\n";
+    return;
+  }
 }
 
 void Graph::Init_entry(){
-	rt_entry->BlockUp();
-	rt_entry->InitRT();
+  rt_entry->BlockUp();
+  rt_entry->InitRT();
   // d_entries.resize(nq * n_entries);
-	// d_entries_dist.resize(nq * n_entries);
+  // d_entries_dist.resize(nq * n_entries);
 }
 
 void Graph::Input(){
@@ -80,7 +80,7 @@ void Graph::Input(){
   d_gt_.resize(h_gt_.size());
   thrust::copy(h_gt_.begin(), h_gt_.end(), d_gt_.begin());
 
-	rt_entry->set_size(DIM, np, nq, gt_k);
+  rt_entry->set_size(DIM, np, nq, gt_k);
   d_results.resize(nq * topk);
   h_results.resize(nq * topk);
   n_entries = n_candidates;
@@ -124,7 +124,7 @@ void Graph::RB_Graph(){
 }
 
 void Graph::Projection(){
-	FILE *pca_base_file = fopen(pca_base_path.c_str(), "rb");
+  FILE *pca_base_file = fopen(pca_base_path.c_str(), "rb");
   FILE *rotation_matrix_file = fopen(rotation_matrix_path.c_str(), "rb");
   if(pca_base_file == NULL){
     PCA pca(h_points_.data(), np, dim_);
@@ -132,7 +132,7 @@ void Graph::Projection(){
       printf("computing PCA matrix...\n");
       pca.calc_eigenvalues();//计算mean和rotation
       pca.save_mean_rotation(mean_matrix_path.c_str(), rotation_matrix_path.c_str());
-			int n_subspaces = rt_entry->get_n_subspaces();
+      int n_subspaces = rt_entry->get_n_subspaces();
       printf("the first %d ratio = %f\n", n_subspaces*3, pca.Ratio(n_subspaces*3));
     }
     else {
@@ -220,7 +220,7 @@ void Graph::Projection(){
 }
 
 void Graph::Search(){
-	Timing::startTiming("search");
+  Timing::startTiming("search");
 
   //----- pca projection -----
   if(ALGO == 1 || ALGO == 2){
@@ -247,8 +247,8 @@ void Graph::Search(){
     GraphSearch();
     Timing::stopTiming();
 
-	Timing::stopTiming(2);
-	// if(ALGO == 1) check_entries(d_gt_);
+  Timing::stopTiming(2);
+  // if(ALGO == 1) check_entries(d_gt_);
   #ifdef REORDER
     thrust::copy(h_results.begin(), h_results.end(), d_results.begin());
   #endif
@@ -273,11 +273,9 @@ void Graph::GraphSearch(){
   }
   auto *d_results_ptr = thrust::raw_pointer_cast(d_results.data());
   auto *d_graph_ptr = thrust::raw_pointer_cast(d_graph_.data());
-  auto *d_entries_ptr = thrust::raw_pointer_cast(d_entries.data());
-  auto *d_entries_dist_ptr = thrust::raw_pointer_cast(d_entries_dist.data());
 
   auto *d_hits = thrust::raw_pointer_cast((rt_entry->subspaces_[0]).hits.data());
-  auto *d_aabb_pid = thrust::raw_pointer_cast((rt_entry->subspaces_[0]).aabb_pid.data());
+  auto *d_entries_ptr = thrust::raw_pointer_cast(rt_entry->subspaces_[0].aabb_entries.data());
   int aabb_size = rt_entry->subspaces_[0].aabb_size;
 
   auto *d_candidates_ptr = thrust::raw_pointer_cast(d_candidates.data());
@@ -285,7 +283,7 @@ void Graph::GraphSearch(){
   GraphSearchKernel<int, float, WARP_SIZE><<<nq, 64, ((search_width << offset_shift_) + n_candidates) * sizeof(KernelPair<float, int>)>>>
     (d_points_ptr, d_queries_ptr, d_results_ptr, d_graph_ptr, d_candidates_ptr, np,
     offset_shift_, n_candidates, topk, search_width, d_entries_ptr,
-    d_hits, d_aabb_pid, aabb_size, ALGO);
+    d_hits, ALGO);
   cudaDeviceSynchronize();
 
   #ifdef REORDER
@@ -302,6 +300,6 @@ void Graph::GraphSearch(){
 }
 
 void Graph::CleanUp(){
-	if(ALGO == 1) rt_entry->CleanUp();
-	cublasDestroy(handle_);
+  if(ALGO == 1) rt_entry->CleanUp();
+  cublasDestroy(handle_);
 }

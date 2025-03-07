@@ -8,11 +8,9 @@
 // ------------------------------------------------------------------
 struct LaunchParams{
   OptixTraversableHandle handle;
-  int max_hits;
   int dim;
   int offset;
   int* hits;
-  int* n_hits_per_query;
   float* queries;
 };
 
@@ -83,7 +81,7 @@ public:
   void SetDevice(int device_id);
   void Setup();
   void BuildAccel(OptixAabb*, int);
-  void search(float* d_queries, int nq, int offset, int dim, int* hits, int* n_hits_per_query, int max_hits);
+  void search(float* d_queries, int nq, int offset, int dim, int* hits);
   void CleanUp();
   // void PrintInfo();
 };

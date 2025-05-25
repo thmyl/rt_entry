@@ -11,7 +11,7 @@ class Graph{
 public:
 	Graph(){}
 	Graph(int n_subspaces_, int buffer_size_, int n_candidates_, int max_hits_, double expand_ratio_, double point_ratio_,
-				std::string data_name_, std::string &data_path_, std::string &query_path_, std::string &gt_path_, std::string &graph_path_, int ALGO_, int search_width_, int topk_);
+				std::string data_name_, std::string &data_path_, std::string &query_path_, std::string &gt_path_, std::string &graph_path_, int ALGO_, int search_width_, int topk_, int max_iter_);
 	~Graph();
 	void Init_entry();
 	void Search();
@@ -78,4 +78,5 @@ private:
 	int 							   offset_shift_;
 	float 							 point_ratio;
 	int 								 n_hits;
+	int 								 max_iter;
 };

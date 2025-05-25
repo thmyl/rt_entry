@@ -51,6 +51,12 @@ void RT_Entry::BlockUp(){
       read_aabbs(aabb_file.c_str(), n_aabbs, h_aabbs, aabb_size, h_aabb_pid);
     }
 
+    //写入文件
+    std::ofstream outfile;
+    outfile.open(OUTFILE, std::ios_base::app);
+    outfile <<  "n_aabbs: " << n_aabbs << "\n" << std::flush;
+    outfile.close();
+
     h_aabb_entries.resize(n_aabbs * n_candidates);
     aabb_entries.resize(n_aabbs * n_candidates);
     for(int i=0; i<n_aabbs; i++){
@@ -83,6 +89,7 @@ void RT_Entry::InitRT(){
     thrust::fill(subspaces_[space].hits.begin(), subspaces_[space].hits.end(), 0);
 
     d_aabbs.resize(0);
+    d_aabbs.shrink_to_fit();
   }
   // preheat_cublas(nq, dim_, dim_);
   // d_candidates.resize(nq * buffer_size);

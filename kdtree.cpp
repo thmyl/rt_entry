@@ -1,5 +1,6 @@
 #include "kdtree.h"
 
+
 Kdtree::Kdtree(float3* _data, int _n, int _max_node, OptixAabb world_bound, thrust::host_vector<OptixAabb> &aabbs){
   max_node = _max_node;
   printf("max_node = %d\n", max_node);
@@ -104,7 +105,7 @@ float Kdtree::findxM(float l, float r, int data_l, int data_r, int axis){
   float mid;
   int _n = data_r - data_l;
   int cnt = 0;
-  float _eps = std::max((r-l)/1000, 0.01f);
+  float _eps = std::max((r-l)/1000, 0.00001f);
   // if(_n > 10*max_node) return (l+r)/2.0;
   while(r-l > _eps){
     mid = (r+l)/2.0;
@@ -178,6 +179,10 @@ void Kdtree::buildWithStack(int l, int r, int node_id, OptixAabb box_bound, thru
       // float xM = (box_min[axis] + box_max[axis]) / 2;
       float xM = findxM(box_min[axis], box_max[axis], current_l, current_r, axis);
       int median = split(current_l, current_r, axis, xM);
+      if(median == current_l || median == current_r){
+        printf("split failed\n");
+        exit(0);
+      }
 
       OptixAabb left_bound = current_box_bound;
       OptixAabb right_bound = current_box_bound;

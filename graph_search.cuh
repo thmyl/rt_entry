@@ -56,7 +56,7 @@ int random_entry(int l,int r, uint &seed){
 template<typename IdType, typename FloatType, int WARP_SIZE>
 __global__ void GraphSearchKernel(float* d_data, float* d_query, int* d_results, int* d_graph, int* d_candidates, int np,
                       int offset_shift, int n_candidates, int topk, int search_width, int* d_entries,
-                      int* d_hits, int ALGO){
+                      int* d_hits, int max_iter, int ALGO){
   
   int t_id = threadIdx.x;
   int b_id = blockIdx.x;//query_id
@@ -66,7 +66,8 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, int* d_results,
   int lane_id = t_id % WARP_SIZE;
   int warp_id = t_id / WARP_SIZE;
   uint random_entry_seed = b_id*blockSize + t_id;
-  int max_iter = n_candidates / search_width / 4;
+//   int max_iter = 10;
+//   int max_iter = n_candidates / search_width;
 
   int entries_st;
   int n_entries = n_candidates;

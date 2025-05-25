@@ -213,8 +213,8 @@ void Graph::parallel_reorder(int* candidates, int* results, int n_candidates, in
 }
 
 void Graph::CopyHostToDevice(thrust::host_vector<float> &h_data, thrust::device_vector<float> &d_data, int n, int d, int d_){
-  d_data.resize(n*d_);
+  d_data.resize(1LL*n*d_);
   for(int i=0; i<n; i++){
-    thrust::copy(h_data.begin() + i*d, h_data.begin()+ i*d + d_, d_data.begin() + i*d_);
+    thrust::copy(h_data.begin() + 1LL*i*d, h_data.begin()+ 1LL*i*d + d_, d_data.begin() + 1LL*i*d_);
   }
 }

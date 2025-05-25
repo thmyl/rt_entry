@@ -1,10 +1,13 @@
 cmake_minimum_required(VERSION 3.20)
 
 # set(CMAKE_CUDA_COMPILER /usr/local/cuda/bin/nvcc)
+set(CMAKE_CUDA_COMPILER "/usr/local/cuda-12.3/bin/nvcc")
 project(rt_filter C CXX CUDA)
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
+# set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -I/usr/include")
+
 
 # set(CUDA_TOOLKIT_ROOT_DIR /usr/local/cuda-11.1)
 
@@ -49,6 +52,7 @@ cuda_compile_and_embed(embedded_ptx_code devicePrograms.cu)
 # add_executable(test ${SOURCES})
 add_executable(test
   ${embedded_ptx_code}
+  kdtree.cpp
   Timing.cpp
   main.cpp
   aabb.cu
@@ -58,7 +62,6 @@ add_executable(test
   file_read.cu
   pca.cpp
   raytracing.cpp
-  kdtree.cpp
   flags.cpp
   graph.cu
   graph_helper.cu

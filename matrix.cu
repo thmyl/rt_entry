@@ -3,6 +3,8 @@
 #include <sys/time.h>
 #include <cuda_profiler_api.h>
 
+extern void check_gpu_memory();
+
 __global__ void substraction_kernel(float* A, float* B, uint nq, uint dim_){
   uint tid = blockIdx.x * blockDim.x + threadIdx.x;
   if(tid < nq){
@@ -134,21 +136,23 @@ void preheat_cublas(uint M_, uint N_, uint K_){
   cudaFree(A);
   cudaFree(B);
   cudaFree(C);
+  cublasDestroy(handle);
 }
 
 __global__ void repeatVector(float* result, float* vec, uint N_, uint D_){
   uint tid = blockIdx.x * blockDim.x + threadIdx.x;
   if(tid < N_){
-    if(tid == 0) printf("dim = %d\n", D_);
+    // if(tid == 0) printf("dim = %d\n", D_);
     for(int i = 0; i < D_; i++){
       result[tid*D_ + i] = vec[i];
     }
   }
 }
 
-void replicateVector(thrust::device_vector<float> &d_result, thrust::device_vector<float> &d_vec, uint N_, uint D_){
-  auto* vec_ptr = thrust::raw_pointer_cast(d_vec.data());
-  auto* result_ptr = thrust::raw_pointer_cast(d_result.data());
+// void replicateVector(thrust::device_vector<float> &d_result, thrust::device_vector<float> &d_vec, uint N_, uint D_){
+//   auto* vec_ptr = thrust::raw_pointer_cast(d_vec.data());
+//   auto* result_ptr = thrust::raw_pointer_cast(d_result.data());
+void replicateVector(float* result_ptr, float* vec_ptr, uint N_, uint D_){
   repeatVector<<<(N_ + 255)/256, 256>>>(result_ptr, vec_ptr, N_, D_);
   CUDA_SYNC_CHECK();
 }

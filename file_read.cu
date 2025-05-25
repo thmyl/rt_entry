@@ -134,12 +134,12 @@ void file_read::read_fvecs_file(const char *filename, int &n, int &d,
   // #ifdef DETAIL
     printf("n = %d, d = %d\n", n, d);
   // #endif
-  data.resize(n*d);
+  data.resize(1LL*n*d);
   infile.seekg(0, std::ios::beg);
   auto* data_ptr = thrust::raw_pointer_cast(data.data());
   for(int i=0; i<n; i++){
     infile.seekg(4, std::ios::cur);
-    infile.read((char*)(data_ptr+i*d), 4*d);
+    infile.read((char*)(data_ptr+1LL*i*d), 4*d);
   }
   infile.close();
 }
@@ -246,6 +246,7 @@ void file_read::read_graph(const char* filename, const int& n, int& degree, thru
   filelength = infile.tellg();
   infile.seekg(0, std::ios::beg);
   degree = filelength / (1LL*n*4);
+  printf("degree = %d\n", degree);
 
   data.resize(1LL*n*degree);
   auto* data_ptr = thrust::raw_pointer_cast(data.data());

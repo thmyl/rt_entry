@@ -14,12 +14,27 @@ __global__ void mapIdKernel(int *d_unique, int unique_size, int *d_map_id){
 Graph::~Graph(){
   // rt_entry->CleanUp();
 }
+extern void check_gpu_memory();
+// void check_gpu_memory() {
+//   size_t free_memory, total_memory;
+//   cudaMemGetInfo(&free_memory, &total_memory);
+  
+//   std::cout << "Free memory: " << free_memory / 1024 / 1024 << " MB" << std::endl;
+//   std::cout << "Total memory: " << total_memory / 1024 / 1024 << " MB" << std::endl;
+//   std::cout << "Used memory: " << (total_memory - free_memory) / 1024 / 1024 << " MB" << std::endl;
+
+//   std::ofstream outfile;
+//   outfile.open(OUTFILE, std::ios_base::app);
+//   outfile <<  "Used memory: " << (total_memory - free_memory) / 1024 / 1024 << " MB\n" << std::flush;
+//   outfile.close();
+// }
 
 Graph::Graph(int n_subspaces_, int buffer_size_, int n_candidates_, int max_hits_, double expand_ratio_, double point_ratio_,
-             std::string data_name_, std::string &data_path_, std::string &query_path_, std::string &gt_path_, std::string &graph_path_, int ALGO_, int search_width_, int topk_){
+             std::string data_name_, std::string &data_path_, std::string &query_path_, std::string &gt_path_, std::string &graph_path_, int ALGO_, int search_width_, int topk_, int max_iter_){
   rt_entry = new RT_Entry(data_name_, n_subspaces_, buffer_size_, max_hits_, expand_ratio_, point_ratio_, n_candidates_);
   point_ratio = point_ratio_;
   n_hits = max_hits_;
+  max_iter = max_iter_;
   datafile = (char*)data_path_.c_str();
   queryfile = (char*)query_path_.c_str();
   gtfile = (char*)gt_path_.c_str();
@@ -162,7 +177,8 @@ void Graph::Projection(){
   CopyHostToDevice(h_pca_points, d_pca_points, np, dim_, DIM);
   // printf("reading PCA DIM file...\n");
   // thrust::host_vector<float> h_pca_points_DIM;
-  // std::string pca_base_DIM_path = data_name + "/pca_base_32.fbin";
+  // // std::string pca_base_DIM_path = data_name + "/pca_base_partly.fbin";
+  // std::string pca_base_DIM_path = data_name + "/pca_base.fbin";
   // file_read::read_data(pca_base_DIM_path.c_str(), t_n, t_d, h_pca_points_DIM);
   // assert(t_n == np && t_d == DIM);
   // d_pca_points.resize(h_pca_points_DIM.size());
@@ -178,6 +194,7 @@ void Graph::Projection(){
   // d_rotation.resize(h_rotation.size());
   // thrust::copy(h_rotation.begin(), h_rotation.end(), d_rotation.begin());
   CopyHostToDevice(h_rotation, d_rotation, dim_, dim_, DIM);
+
   
   thrust::host_vector<float> h_mean;
   file_read::read_data(mean_matrix_path.c_str(), t_n, t_d, h_mean);
@@ -185,6 +202,7 @@ void Graph::Projection(){
   thrust::device_vector<float> d_mean;
   d_mean.resize(h_mean.size());
   thrust::copy(h_mean.begin(), h_mean.end(), d_mean.begin());
+
   
   //mr = mean * rotation
   thrust::device_vector<float> d_mr_row;
@@ -197,11 +215,25 @@ void Graph::Projection(){
     return;
   }
   matrixMultiply(handle, d_mean, d_rotation, d_mr_row, t_n, DIM, dim_, alpha, beta);
+  
+
   cublasDestroy(handle);
   // Timing::startTiming("replicateVector");
   d_pca_queries.resize(nq * DIM);
-  replicateVector(d_pca_queries, d_mr_row, nq, DIM);
+
+
+  auto* vec_ptr = thrust::raw_pointer_cast(d_mr_row.data());
+  auto* result_ptr = thrust::raw_pointer_cast(d_pca_queries.data());
+
+  replicateVector(result_ptr, vec_ptr, nq, DIM);
+
+
+  d_mr_row.resize(0);
+  thrust::device_vector<float>().swap(d_mr_row);
+  d_mean.resize(0);
+  thrust::device_vector<float>().swap(d_mean);
   // Timing::stopTiming();
+
 
   if(ALGO==1){
     #ifdef DETAIL
@@ -233,7 +265,11 @@ void Graph::Search(){
       Timing::stopTiming(2);
     #endif
     d_queries_.resize(0);
+    // d_queries_.shrink_to_fit();
+    thrust::device_vector<float>().swap(d_queries_);
     d_rotation.resize(0);
+    // d_rotation.shrink_to_fit();
+    thrust::device_vector<float>().swap(d_rotation);
   }
 
   if(ALGO == 1){
@@ -252,6 +288,7 @@ void Graph::Search(){
   #ifdef REORDER
     thrust::copy(h_results.begin(), h_results.end(), d_results.begin());
   #endif
+  cublasDestroy(handle_);
   check_results(d_gt_);
 }
 
@@ -283,7 +320,7 @@ void Graph::GraphSearch(){
   GraphSearchKernel<int, float, WARP_SIZE><<<nq, 64, ((search_width << offset_shift_) + n_candidates) * sizeof(KernelPair<float, int>)>>>
     (d_points_ptr, d_queries_ptr, d_results_ptr, d_graph_ptr, d_candidates_ptr, np,
     offset_shift_, n_candidates, topk, search_width, d_entries_ptr,
-    d_hits, ALGO);
+    d_hits, max_iter, ALGO);
   cudaDeviceSynchronize();
 
   #ifdef REORDER
@@ -301,5 +338,5 @@ void Graph::GraphSearch(){
 
 void Graph::CleanUp(){
   if(ALGO == 1) rt_entry->CleanUp();
-  cublasDestroy(handle_);
+  // cublasDestroy(handle_);
 }

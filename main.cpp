@@ -54,6 +54,7 @@ int main(int argc, char **argv){
     std::cout<<"expand_ratio = "<<FLAGS_expand_ratio<<std::endl;
     std::cout<<"point_ratio = "<<FLAGS_point_ratio<<std::endl;
     std::cout<<"topk = "<<FLAGS_topk<<std::endl;
+    std::cout<<"max_iter = "<<FLAGS_max_iter<<std::endl;
   #endif
 
   std::ofstream outfile;
@@ -64,6 +65,8 @@ int main(int argc, char **argv){
     reorder = 1;
   #endif
   outfile <<  "\n---------- n_candidates = " << FLAGS_n_candidates << "\t" 
+                        << "point_ratio = " << FLAGS_point_ratio << "\t" 
+                        << "max_iter = " << FLAGS_max_iter << "\t" 
                         << "graph_path = " << FLAGS_graph_path << "\t" 
                         << "DIM = " << DIM << "\t" 
                         << "REORDER = " << reorder <<" ----------\n\n" << std::flush;
@@ -73,11 +76,11 @@ int main(int argc, char **argv){
   char* queryfile = (char*)FLAGS_query_path.c_str();
   char* gtfile = (char*)FLAGS_gt_path.c_str();
 
-  SetDevice(2);
+  SetDevice(1);
   omp_set_num_threads(128);
 
   Graph graph(FLAGS_n_subspaces, FLAGS_buffer_size, FLAGS_n_candidates, FLAGS_max_hits, FLAGS_expand_ratio, FLAGS_point_ratio,
-              FLAGS_data_name, FLAGS_data_path, FLAGS_query_path, FLAGS_gt_path, FLAGS_graph_path, FLAGS_ALGO, FLAGS_search_width, FLAGS_topk);
+              FLAGS_data_name, FLAGS_data_path, FLAGS_query_path, FLAGS_gt_path, FLAGS_graph_path, FLAGS_ALGO, FLAGS_search_width, FLAGS_topk, FLAGS_max_iter);
   graph.Input();
   graph.RB_Graph();
   if(FLAGS_ALGO!=0) {

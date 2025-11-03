@@ -42,17 +42,17 @@ int main(){
   // ofstream trainset_file("/data/myl/deep1M/deep1M_trainset.fbin", ios::binary);
   // ofstream traingt_file("/data/myl/deep1M/deep1M_traingt.ivecs", ios::binary);
 
-  // ifstream dataset_file("/home/myl/pcsearch/bin/gist/pca_base.fbin", ios::binary);
-  // ofstream trainset_file("/data/myl/gist/gist_trainset.fbin", ios::binary);
-  // ofstream traingt_file("/data/myl/gist/gist_traingt.ivecs", ios::binary);
+  ifstream dataset_file("/home/myl/pcsearch/bin/gist/pca_base.fbin", ios::binary);
+  ofstream trainset_file("/data/myl/gist/gist_trainset.fbin", ios::binary);
+  ofstream traingt_file("/data/myl/gist/gist_traingt.ivecs", ios::binary);
 
-  ifstream dataset_file("/home/myl/pcsearch/bin/COCO-I2I/pca_base.fbin", ios::binary);
-  ofstream trainset_file("/data/myl/COCO-I2I/COCO-I2I_trainset.fbin", ios::binary);
-  ofstream traingt_file("/data/myl/COCO-I2I/COCO-I2I_traingt.ivecs", ios::binary);
+  // ifstream dataset_file("/home/myl/pcsearch/bin/COCO-I2I/pca_base.fbin", ios::binary);
+  // ofstream trainset_file("/data/myl/COCO-I2I/COCO-I2I_trainset.fbin", ios::binary);
+  // ofstream traingt_file("/data/myl/COCO-I2I/COCO-I2I_traingt.ivecs", ios::binary);
   
   float* dataset;
   int n, d;
-  int t = 100;
+  int t = 4616;
   int k = 100;
   read_fbin(dataset_file, dataset, n, d);
 

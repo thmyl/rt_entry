@@ -3,6 +3,7 @@
 #include "head.h"
 #define SIZE 512
 #define num_hash 3
+#define max_hash_iteration 4
 
 __device__
 void set_bit(uint32_t x,uint32_t* data){
@@ -48,7 +49,7 @@ int _abs(int x){
 }
 
 __device__
-int random_entry(int l,int r, uint &seed){
+int random_entry(int l,int r, uint seed){
   seed = seed * 1103515245 + 12345;
   return l + (seed) % (r - l);
 }
@@ -70,7 +71,8 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, int* d_results,
 //   int max_iter = n_candidates / search_width;
 
   int entries_st;
-  int n_entries = n_candidates;
+//   int n_entries = n_candidates;
+  int n_entries = search_width * (1 << offset_shift);
   if(ALGO==1)
     entries_st = d_hits[q_id] * n_candidates;
 
@@ -483,7 +485,8 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, int* d_results,
       int unrollt_id = iter * n_points_per_batch + i;
       if(unrollt_id < n_entries){
         if(ALGO == 0 || ALGO == 2)//random entry
-          neighbors_array[n_candidates + i].second = random_entry(0, np, random_entry_seed);
+          neighbors_array[n_candidates + i].second = random_entry(0, np, unrollt_id);
+            // neighbors_array[n_candidates + i].second = unrollt_id;
         else if(ALGO == 1)//rt entry
           neighbors_array[n_candidates + i].second = d_entries[entries_st + unrollt_id];
 
@@ -1515,7 +1518,7 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, int* d_results,
       }
     }
 
-    if(hash_iteration == 4){
+    if(hash_iteration == max_hash_iteration){
       for(int i=t_id; i<SIZE; i+=blockSize)
         data[i] = 0;
       __syncthreads();

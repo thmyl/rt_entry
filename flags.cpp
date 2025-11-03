@@ -93,6 +93,14 @@ DEFINE_string(graph_path, "/data/myl/sift1M/index/sift1M_64_32_cagra.nsw", "path
 // DEFINE_string(gt_path, "/data/myl/COCO-I2I/COCO-I2I_groundtruth.ivecs", "path of the ground truth");
 // DEFINE_string(graph_path, "/data/myl/COCO-I2I/index/COCO-I2I_32_16_cagra.nsw", "path of the graph");
 
+/* clustered_1M */
+// DEFINE_string(data_name, "clustered_1M", "name of datasets");
+// DEFINE_string(data_path, "/data/myl/clustered_data/clustered_1M/clustered_1M.fbin", "path of datasets");
+// DEFINE_string(query_path, "/data/myl/clustered_data/clustered_1M/clustered_1M_query.fbin", "path of queries");
+// DEFINE_string(gt_path, "/data/myl/clustered_data/clustered_1M/clustered_1M_gt.ivecs", "path of the ground truth");
+// // DEFINE_string(graph_path, "/home/myl/rt_entry/input_file/deep1M_32_16.nsw", "path of the graph");
+// DEFINE_string(graph_path, "/data/myl/clustered_data/clustered_1M/clustered_1M_64_32_cagra.nsw", "path of the graph");
+
 DEFINE_int32(n_candidates, 128, "candidates size");
 DEFINE_int32(max_hits, 1, "max hits");
 DEFINE_double(expand_ratio, 0.2, "expand ratio");

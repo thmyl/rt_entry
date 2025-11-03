@@ -128,7 +128,7 @@ int main(){
   float* trainset;
   int* traingt;
   int n, d;
-  int t=100, k=10, gt_k;
+  int t=4616, k=10, gt_k;
   int nc;
   printf("input nc: ");
   scanf("%d", &nc);

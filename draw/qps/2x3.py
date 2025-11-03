@@ -9,10 +9,11 @@ from sift10M import naive_width4_x as naive_width4_x_s10, naive_width4_y as naiv
 from COCO_I2I import naive_width4_x as naive_width4_x_co, naive_width4_y as naive_width4_y_co, naive_rt_width4_x as naive_rt_width4_x_co, naive_rt_width4_y as naive_rt_width4_y_co, pca64_width4_x as pca64_width4_x_co, pca64_width4_y as pca64_width4_y_co, pca64_rt_width4_x as pca64_rt_width4_x_co, pca64_rt_width4_y as pca64_rt_width4_y_co, ggnn_x as ggnn_x_co, ggnn_y as ggnn_y_co, ganns_x as ganns_x_co, ganns_y as ganns_y_co
 
 plt.rcParams['font.family'] = 'Times New Roman'
+plt.rcParams['mathtext.fontset'] = 'cm'
 
 # 数据集名称
-datasets = ['DEEP-1M', 'DEEP-10M', 'GIST', 'SIFT-1M', 'SIFT-10M', 'COCO-I2I']
-methods = ['PCSearch', 'PCSearch+RT', 'GAGRA', 'CAGRA+RT', 'GGNN', 'GANNS']
+datasets = ['DEEP1M', 'DEEP10M', 'GIST', 'SIFT1M', 'SIFT10M', 'COCO-I2I']
+methods = ['PARS', 'PARS+RT', 'GAGRA', 'CAGRA+RT', 'GGNN', 'GANNS']
 colors = ['#1F77B4', '#FF7F0E', '#2CA02C', '#D62728', '#9467BD', '#8C564B']
 markers = ['^', 'v', 'o', 's', 'D', '*']
 
@@ -75,8 +76,8 @@ all_groups = [
 # colors = ['#38b000', '#9fa167', '#ba181b', '#fe9000', '#6a605c', '#0a2472']
 
 # 创建 2 行 3 列的子图布局
-fig, axs = plt.subplots(2, 3, figsize=(20, 10))
-plt.rcParams.update({'font.size': 30})  # 所有文字统一为16号字体
+fig, axs = plt.subplots(2, 3, figsize=(20, 8))
+plt.rcParams.update({'font.size': 25})  # 所有文字统一为16号字体
 sz = 25
 
 # 绘制每组数据
@@ -95,6 +96,8 @@ for i, (x_data, y_data) in enumerate(all_groups[:6]):
     # axs[row, col].set_xlim(0.75, 1)
     # axs[row, col].set_xticks([0.75, 0.80, 0.85, 0.90, 0.95, 1.0])
     axs[row, col].set_xlabel('Recall', fontsize=sz)
+    axs[row, col].set_xlim(0.74, 1)
+
 
     # y
     # 主刻度
@@ -133,6 +136,7 @@ for i, (x_data, y_data) in enumerate(all_groups[6:12]):
     # axs[row, col].set_xlim(0.75, 1)
     # axs[row, col].set_xticks([0.75, 0.80, 0.85, 0.90, 0.95, 1.0])
     axs[row, col].set_xlabel('Recall', fontsize=sz)
+    axs[row, col].set_xlim(0.72, 1)
 
     # y
     # 主刻度
@@ -171,6 +175,7 @@ for i, (x_data, y_data) in enumerate(all_groups[12:18]):
     # axs[row, col].set_xlim(0.75, 1)
     # axs[row, col].set_xticks([0.75, 0.80, 0.85, 0.90, 0.95, 1.0])
     axs[row, col].set_xlabel('Recall', fontsize=sz)
+    axs[row, col].set_xlim(0.59, 1)
 
     # y
     # 主刻度
@@ -210,6 +215,7 @@ for i, (x_data, y_data) in enumerate(all_groups[18:24]):
     # axs[row, col].set_xlim(0.75, 1)
     # axs[row, col].set_xticks([0.75, 0.80, 0.85, 0.90, 0.95, 1.0])
     axs[row, col].set_xlabel('Recall', fontsize=sz)
+    axs[row, col].set_xlim(0.72, 1)
 
     # y
     # 主刻度
@@ -248,6 +254,7 @@ for i, (x_data, y_data) in enumerate(all_groups[24:30]):
     # axs[row, col].set_xlim(0.75, 1)
     # axs[row, col].set_xticks([0.75, 0.80, 0.85, 0.90, 0.95, 1.0])
     axs[row, col].set_xlabel('Recall', fontsize=sz)
+    axs[row, col].set_xlim(0.55, 1)
 
     # y
     # 主刻度
@@ -286,6 +293,7 @@ for i, (x_data, y_data) in enumerate(all_groups[30:36]):
     # axs[row, col].set_xlim(0.75, 1)
     # axs[row, col].set_xticks([0.75, 0.80, 0.85, 0.90, 0.95, 1.0])
     axs[row, col].set_xlabel('Recall', fontsize=sz)
+    axs[row, col].set_xlim(0.55, 1)
 
     # y
     # 主刻度
@@ -313,7 +321,7 @@ for i, (x_data, y_data) in enumerate(all_groups[30:36]):
 
 # 调整布局
 plt.tight_layout()
-fig.legend(methods, loc='upper center', bbox_to_anchor=(0.5, 1.05), ncol=6, frameon=False, fontsize=sz-5)
+fig.legend(methods, loc='upper center', bbox_to_anchor=(0.5, 1.05), ncol=6, frameon=False, fontsize=sz-2)
 plt.show()
 plt.savefig("./img/2x3.png", format="png", bbox_inches="tight")
 print("图像已保存到文件：./img/2x3.png")

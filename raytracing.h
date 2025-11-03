@@ -12,6 +12,7 @@ struct LaunchParams{
   int offset;
   int* hits;
   float* queries;
+  OptixAabb* aabbs;
 };
 
 // ------------------------------------------------------------------
@@ -81,7 +82,7 @@ public:
   void SetDevice(int device_id);
   void Setup();
   void BuildAccel(OptixAabb*, int);
-  void search(float* d_queries, int nq, int offset, int dim, int* hits);
+  void search(float* d_queries, OptixAabb* d_aabbs, int nq, int offset, int dim, int* hits);
   void CleanUp();
   // void PrintInfo();
 };

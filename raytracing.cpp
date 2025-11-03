@@ -280,13 +280,14 @@ void OptiXRT::CleanUp(){
 // #endif
 }
 
-void OptiXRT::search(float* d_queries, int nq, int offset, int dim, int* hits){
+void OptiXRT::search(float* d_queries, OptixAabb* d_aabbs, int nq, int offset, int dim, int* hits){
   // Timing::startTiming("before_optixSearch1");
   h_params_.handle = gas_handle_;
   h_params_.queries = d_queries;
   h_params_.hits = hits;
   h_params_.dim = dim;
   h_params_.offset = offset;
+  h_params_.aabbs = d_aabbs;
   // Timing::stopTiming();
 
   // Timing::startTiming("before_optixSearch2");

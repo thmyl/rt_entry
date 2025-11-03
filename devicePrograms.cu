@@ -63,15 +63,32 @@ extern "C" __global__ void __closesthit__ch(){
 
 }
 
+extern "C" __device__ bool intersection_test(){
+  unsigned int primIdx = optixGetPrimitiveIndex();
+  const float3 ray_orig = optixGetWorldRayOrigin();
+  OptixAabb aabb = params.aabbs[primIdx];
+  return (ray_orig.x >= aabb.minX && ray_orig.x <= aabb.maxX) &&
+           (ray_orig.y >= aabb.minY && ray_orig.y <= aabb.maxY) &&
+           (ray_orig.z >= aabb.minZ && ray_orig.z <= aabb.maxZ);
+}
+
 extern "C" __global__ void __intersection__aabb(){
-  // unsigned int id = optixGetPayload_1();//第i个相交的aabb
+  /*// unsigned int id = optixGetPayload_1();//第i个相交的aabb
   unsigned int primIdx = optixGetPrimitiveIndex();
   unsigned int queryIdx = optixGetPayload_0();
   params.hits[queryIdx] = primIdx;
   // if(id+1 >= params.max_hits){
     optixReportIntersection( 0, 0 );
   // }
-  // else optixSetPayload_1(id+1);
+  // else optixSetPayload_1(id+1);*/
+
+  bool intersected = intersection_test();
+  if(intersected){
+    unsigned int primIdx = optixGetPrimitiveIndex();
+    unsigned int queryIdx = optixGetPayload_0();
+    params.hits[queryIdx] = primIdx;
+    optixReportIntersection( 0, 0 );
+  }
 }
 
 // extern "C" __global__ void __intersection__aabb(){

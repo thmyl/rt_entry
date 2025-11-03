@@ -2,9 +2,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.patches as mpatches
 plt.rcParams['font.family'] = 'Times New Roman'
+plt.rcParams['mathtext.fontset'] = 'cm'
 
 # 方法标签
-methods = ['PCSearch', 'PCSearch+RT', 'CAGRA', 'CAGRA+RT', 'GGNN', 'GANNS']
+methods = ['PARS', 'PARS+RT', 'CAGRA', 'CAGRA+RT', 'GGNN', 'GANNS']
 
 # 六个数据集的显存占用（MB）
 
@@ -35,7 +36,7 @@ yticklabels_list = [
     # ['4000', '5000', '6000', '7000'],  # deep10M
     # ['0', '2000', '4000', '6000']   # gist
 
-    ['7.0', '8.0', '9.0', '10'],         # deep1M
+    ['7', '8', '9', '10'],         # deep1M
     ['4', '5', '6', '7'],  # deep10M
     ['0', '2', '4'],   # gist
     ['7', '8', '9', '10', '11'],         # sift1M
@@ -44,10 +45,11 @@ yticklabels_list = [
     ['5', '6', '7'], # COCO_I2I
 ]
 
-ylabel_test = [r'$\times$1e2', r'$\times$1e3', r'$\times$1e4', r'$\times$1e2', r'$\times$1e3', r'$\times$1e2']
+# ylabel_test = [r'$\times$1e2', r'$\times$1e3', r'$\times$1e4', r'$\times$1e2', r'$\times$1e3', r'$\times$1e2']
+ylabel_test = [r'$\times 10^2$', r'$\times 10^3$', r'$\times 10^4$', r'$\times 10^2$', r'$\times 10^3$', r'$\times 10^2$']
 
 datasets = [deep1M, deep10M, gist, sift1M, sift10M, COCO_I2I]
-dataset_labels = ['DEEP-1M', 'DEEP-10M', 'GIST', 'SIFT-1M', 'SIFT-10M', 'COCO-I2I']
+dataset_labels = ['DEEP1M', 'DEEP10M', 'GIST', 'SIFT1M', 'SIFT10M', 'COCO-I2I']
 
 # 参数设置
 num_methods = len(methods)
@@ -90,14 +92,14 @@ for i in range(num_datasets):
     
     # 设置子图的属性
     axes[i].set_title(dataset_labels[i], fontsize=sz)
-    axes[i].set_xticks(x)
-    axes[i].set_xticklabels(range(1, 7), rotation=0, ha='center', fontsize=sz)
+    axes[i].set_xticks([])
+    # axes[i].set_xticklabels(range(1, 7), rotation=0, ha='center', fontsize=sz)
     # axes[i].set_xticklabels(methods, rotation=-60, ha='left', fontsize=12)
     axes[i].set_yticks(yticks_list[i])
     axes[i].set_yticklabels(yticklabels_list[i], fontsize=sz)
     axes[i].set_ylim(bottom=yticks_list[i][0])  # 设置y轴下限为第一个刻度
-    axes[i].text(0, 1.07, ylabel_test[i], transform=axes[i].transAxes,
-                 ha='center', va='bottom', fontsize=sz-5, rotation=0)
+    axes[i].text(0, 1.05, ylabel_test[i], transform=axes[i].transAxes,
+                 ha='center', va='bottom', fontsize=sz, rotation=0)
     # axes[i].set_yscale("log", base=10)
     if i == 0:  # 只在第一个子图显示纵轴标签
         axes[i].set_ylabel("Memory Usage (MB)", fontsize=sz)
@@ -112,7 +114,7 @@ plt.subplots_adjust(left=0.05, right=0.98, top=0.72, bottom=0.1, wspace=0.2)
 
 legend_handles = [mpatches.Patch(facecolor=colors[i], edgecolor='black',
                                   hatch=hatch[i], label=methods[i]) for i in range(num_methods)]
-fig.legend(handles=legend_handles, loc='upper center', bbox_to_anchor=(0.5, 1.05),
+fig.legend(handles=legend_handles, loc='upper center', bbox_to_anchor=(0.5, 1.03),
            ncol=6, fontsize=sz, frameon=False)
 # 保存图像
 plt.savefig("memory_usage.png", format="png", bbox_inches="tight")

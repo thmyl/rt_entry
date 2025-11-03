@@ -177,8 +177,8 @@ void Graph::Projection(){
   CopyHostToDevice(h_pca_points, d_pca_points, np, dim_, DIM);
   // printf("reading PCA DIM file...\n");
   // thrust::host_vector<float> h_pca_points_DIM;
-  // // std::string pca_base_DIM_path = data_name + "/pca_base_partly.fbin";
-  // std::string pca_base_DIM_path = data_name + "/pca_base.fbin";
+  // std::string pca_base_DIM_path = data_name + "/pca_base_partly.fbin";
+  // // std::string pca_base_DIM_path = data_name + "/pca_base.fbin";
   // file_read::read_data(pca_base_DIM_path.c_str(), t_n, t_d, h_pca_points_DIM);
   // assert(t_n == np && t_d == DIM);
   // d_pca_points.resize(h_pca_points_DIM.size());
@@ -276,12 +276,12 @@ void Graph::Search(){
   //----- rt search -----
     Timing::startTiming("search_entry");
     rt_entry->Search(d_pca_points, d_pca_queries, d_gt_, d_entries, d_entries_dist, n_entries);
-    Timing::stopTiming();
+    Timing::stopTiming(2);
   }
   //----- TODO: graph search -----
     Timing::startTiming("graph search");
     GraphSearch();
-    Timing::stopTiming();
+    Timing::stopTiming(2);
 
   Timing::stopTiming(2);
   // if(ALGO == 1) check_entries(d_gt_);

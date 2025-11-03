@@ -2,9 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 plt.rcParams['font.family'] = 'Times New Roman'
+plt.rcParams['mathtext.fontset'] = 'cm'
 
 # 数据集名称
-datasets = ['SIFT1M', 'crawl']
+datasets = ['SIFT1M', 'Crawl']
 # colors = ['#1F77B4', '#FF7F0E', '#2CA02C', '#D62728', '#9467BD', '#8C564B']
 colors = [ '#EE822F', '#F2BA02','#4874CB', '#75BD42']
 markers = ['^', 'v', 'o', 's', 'D', '*']
@@ -55,8 +56,8 @@ all_groups = [
 ]
 
 legend_labels = [
-    [r"$d'=96$", r"$d'=64$", r"$d'=32$"],
-    [r"$d'=192$", r"$d'=128$", r"$d'=96$"],
+    [r"$d=96$", r"$d=64$", r"$d=32$"],
+    [r"$d=192$", r"$d=128$", r"$d=96$"],
 ]
 
 
@@ -67,7 +68,7 @@ fig, axs = plt.subplots(row_sz, col_sz, figsize=(20, 7))
 plt.rcParams.update({'font.size': 30})  # 所有文字统一为16号字体
 sz = 40
 line_w=3
-marker_sz=8
+marker_sz=12
 
 # 绘制每组数据
 
@@ -88,7 +89,7 @@ for i, (x_data, y_data) in enumerate(all_groups[:3]):
     axs[col].tick_params(axis='both', labelsize=sz-5)  # ✅ 添加这行，控制坐标刻度大小
 
     axs[col].set_title(datasets[subplot_id], fontsize=sz)
-    axs[col].set_ylabel('log$_{10}$(QPS)', fontsize=sz)
+    axs[col].set_ylabel('lg(QPS)', fontsize=sz)
     axs[col].grid(True, linestyle='--')
     legend = axs[col].legend(framealpha=1.0) #背景不透明
     legend.get_frame().set_facecolor('white')

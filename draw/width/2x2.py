@@ -2,10 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 plt.rcParams['font.family'] = 'Times New Roman'
+plt.rcParams['mathtext.fontset'] = 'cm'
 
 # 数据集名称
-datasets = ['SIFT-1M (PCSearch)', 'COCO-I2I (PCSearch)', 'SIFT-1M (PCSearch+RT)', 'COCO-I2I (PCSearch+RT)']
-width = ['w=1', 'w=2', 'w=4', 'w=8']
+datasets = ['SIFT1M (PARS)', 'COCO-I2I (PARS)', 'SIFT1M (PARS+RT)', 'COCO-I2I (PARS+RT)']
+width = [r'$w=1$', r'$w=2$', r'$w=4$', r'$w=8$']
 # colors = ['#1F77B4', '#FF7F0E', '#2CA02C', '#D62728', '#9467BD', '#8C564B']
 colors = [ '#EE822F', '#F2BA02','#4874CB', '#75BD42']
 markers = ['^', 'v', 'o', 's', 'D', '*']
@@ -81,10 +82,10 @@ all_groups = [
 
 # 创建 2 行 2 列的子图布局
 fig, axs = plt.subplots(2, 2, figsize=(20, 13))
-plt.rcParams.update({'font.size': 30})  # 所有文字统一为16号字体
-sz = 40
-line_w=3
-marker_sz=8
+plt.rcParams.update({'font.size': 35})  # 所有文字统一为16号字体
+sz = 45
+line_w=4
+marker_sz=14
 
 # 绘制每组数据
 
@@ -107,9 +108,9 @@ for i, (x_data, y_data) in enumerate(all_groups[:4]):
     # 主刻度
     main_qps = [1e6, 5e6]
     main_qps_log = np.log10(main_qps)
-    main_labels = [r'$1\times10^6$', r'$5\times10^6$']
+    main_labels = ['1e6', '5e6']
     # 副刻度
-    minor_qps = [2e6, 3e6, 4e6, 7e6]
+    minor_qps = [9e5, 2e6, 3e6, 4e6, 7e6]
     minor_qps_log = np.log10(minor_qps)
 
     axs[row, col].set_yticks(main_qps_log)  # 主刻度
@@ -145,7 +146,7 @@ for i, (x_data, y_data) in enumerate(all_groups[4:8]):
     # 主刻度
     main_qps = [5e6, 1e7]
     main_qps_log = np.log10(main_qps)
-    main_labels = [r'$5\times10^6$', r'$1\times10^7$']
+    main_labels = ['5e6', '1e7']
     # 副刻度
     minor_qps = [3e6, 4e6, 6e6, 7e6, 8e6, 9e6]
     minor_qps_log = np.log10(minor_qps)
@@ -185,9 +186,9 @@ for i, (x_data, y_data) in enumerate(all_groups[8:12]):
     # 主刻度
     main_qps = [1e6, 5e6]
     main_qps_log = np.log10(main_qps)
-    main_labels = [r'$1\times10^6$', r'$5\times10^6$']
+    main_labels = ['1e6', '5e6']
     # 副刻度
-    minor_qps = [2e6, 3e6, 4e6]
+    minor_qps = [9e5, 2e6, 3e6, 4e6]
     minor_qps_log = np.log10(minor_qps)
 
     axs[row, col].set_yticks(main_qps_log)  # 主刻度
@@ -224,7 +225,7 @@ for i, (x_data, y_data) in enumerate(all_groups[12:16]):
     # 主刻度
     main_qps = [5e6, 1e7]
     main_qps_log = np.log10(main_qps)
-    main_labels = [r'$5\times10^6$', r'$1\times10^7$']
+    main_labels = ['5e6', '1e7']
     # 副刻度
     minor_qps = [3e6, 4e6, 6e6, 7e6, 8e6, 9e6]
     minor_qps_log = np.log10(minor_qps)
@@ -247,7 +248,7 @@ for i, (x_data, y_data) in enumerate(all_groups[12:16]):
 
 # 调整布局
 plt.tight_layout()
-fig.legend(width, loc='upper center', bbox_to_anchor=(0.5, 1.05), ncol=6, frameon=False, fontsize=sz-5)
+fig.legend(width, loc='upper center', bbox_to_anchor=(0.5, 1.07), ncol=6, frameon=False, fontsize=sz)
 plt.show()
 plt.savefig("./img/2x2.png", format="png", bbox_inches="tight")
 print("图像已保存到文件：./img/2x2.png")

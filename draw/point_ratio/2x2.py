@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 plt.rcParams['font.family'] = 'Times New Roman'
 
 # 数据集名称
-datasets = ['COCO-I2I', 'crawl', 'DEEP1M', 'DEEP10M']
+datasets = ['COCO-I2I', 'Crawl', 'DEEP1M', 'DEEP10M']
 # colors = ['#1F77B4', '#FF7F0E', '#2CA02C', '#D62728', '#9467BD', '#8C564B']
 colors = [ '#EE822F', '#F2BA02','#4874CB', '#75BD42']
 markers = ['^', 'v', 'o', 's', 'D', '*']

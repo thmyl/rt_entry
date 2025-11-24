@@ -3091,3 +3091,29 @@ time graph search: 57.9978 ms
 time search: 91.1665 ms
 recall@10 = 0.90161 ms
 Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 4.63255 ms
+time build_query_batches: 0.50576 ms
+time pca projection: 0.092579 ms
+time rt search: 0.050198 ms
+time search_entry: 0.07323 ms
+time graph search: 49.0679 ms
+time search: 54.6603 ms
+recall@10 = 0.89087 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 31.6225 ms
+time build_query_batches: 0.897639 ms
+time pca projection: 0.098744 ms
+time rt search: 0.053366 ms
+time search_entry: 0.078432 ms
+time graph search: 57.8778 ms
+time search: 90.867 ms
+recall@10 = 0.90177 ms
+Used memory: 1502 MB

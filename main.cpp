@@ -2,6 +2,7 @@
 #include <cstdio>
 #include "graph.h"
 #include "matrix.h"
+#include "cache/page_cache.h"
 
 void SetDevice(int device_id=0){
     int device_count=0;
@@ -48,13 +49,18 @@ int main(int argc, char **argv){
     std::cout<<"data_path = "<<FLAGS_data_path<<std::endl;
     std::cout<<"query_path = "<<FLAGS_query_path<<std::endl;
     std::cout<<"gt_path = "<<FLAGS_gt_path<<std::endl;
+    std::cout<<"centroids_path = "<<FLAGS_centroids_path<<std::endl;
     std::cout<<"graph_path = "<<FLAGS_graph_path<<std::endl;
+    std::cout<<"t = "<<FLAGS_t<<std::endl;
     std::cout<<"n_candidates = "<<FLAGS_n_candidates<<std::endl;
     std::cout<<"max_hits = "<<FLAGS_max_hits<<std::endl;
     std::cout<<"expand_ratio = "<<FLAGS_expand_ratio<<std::endl;
     std::cout<<"point_ratio = "<<FLAGS_point_ratio<<std::endl;
     std::cout<<"topk = "<<FLAGS_topk<<std::endl;
     std::cout<<"max_iter = "<<FLAGS_max_iter<<std::endl;
+    std::cout<<"n_cluster = "<<FLAGS_n_cluster<<std::endl;
+    std::cout<<"page_size = "<<FLAGS_page_size<<std::endl;
+    std::cout<<"n_page = "<<FLAGS_n_page<<std::endl;
   #endif
 
   std::ofstream outfile;
@@ -80,7 +86,9 @@ int main(int argc, char **argv){
   omp_set_num_threads(128);
 
   Graph graph(FLAGS_n_subspaces, FLAGS_buffer_size, FLAGS_n_candidates, FLAGS_max_hits, FLAGS_expand_ratio, FLAGS_point_ratio,
-              FLAGS_data_name, FLAGS_data_path, FLAGS_query_path, FLAGS_gt_path, FLAGS_graph_path, FLAGS_ALGO, FLAGS_search_width, FLAGS_topk, FLAGS_max_iter);
+              FLAGS_data_name, FLAGS_data_path, FLAGS_query_path, FLAGS_gt_path, FLAGS_centroids_path, FLAGS_graph_path,
+              FLAGS_ALGO, FLAGS_search_width, FLAGS_topk, FLAGS_max_iter, FLAGS_t,
+              FLAGS_n_cluster, FLAGS_page_size, FLAGS_n_page);
   graph.Input();
   graph.RB_Graph();
   if(FLAGS_ALGO!=0) {

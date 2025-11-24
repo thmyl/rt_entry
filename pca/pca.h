@@ -26,15 +26,20 @@ public:
   void read_mean_rotation(const char *mean_path, const char *rotation_path);
   void calc_result(uint pj_dim);
   void save_result(uint pj_dim, const char *pca_base_path);
+  void save_linear_params(const char *linear_params_path);
+  void read_linear_params(const char *linear_params_path);
 
   void computeCov(Eigen::MatrixXd &, Eigen::MatrixXd &);
   void computeEig(Eigen::MatrixXd &, Eigen::MatrixXd &, Eigen::MatrixXd &);
   double Ratio(uint);
+  void linear(float* data, float* query, int* groundtruth, int np, int nq, int test_nq, int topk, int gt_k, int D, int delta_d);
 
   Eigen::MatrixXd B, C, B_res;
   Eigen::MatrixXd vec, val;
   Eigen::RowVectorXd meanvecRow;
   uint nb, dim; // dim投影前维度
+  // linear model parameters
+  std::vector<float> w, b;
 }; // end of class PCA
 
 void subtraction(float* A, float* B, uint nq, uint dim_);//A的每一行减B

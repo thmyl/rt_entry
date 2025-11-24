@@ -104,17 +104,16 @@ void PCA::read_mean_rotation(const char *mean_path, const char *rotation_path){
 	}
 	fclose(mean_file);
 // read rotation file
-	vec.resize(dim, dim);
+	uint dim2;
 	fread(&dim, sizeof(uint), 1, rotation_file);
-	fread(&dim, sizeof(uint), 1, rotation_file);
+	fread(&dim2, sizeof(uint), 1, rotation_file);
+	vec.resize(dim, dim2);
 	for(int i=0; i<dim; i++){
-		uint d;
-		for(int j=0; j<d; j++){
+		for(int j=0; j<dim2; j++){
 			float tmp;
 			fread(&tmp, sizeof(float), 1, rotation_file);
 			vec(i,j) = tmp;
 		}
-		// fread(vec.col(i).data(), sizeof(float), d, rotation_file);
 	}
 	fclose(rotation_file);
 }
@@ -136,4 +135,88 @@ void PCA::save_result(uint pj_dim, const char *pca_base_path){
 		}
 	}
 	fclose(pca_base_file);
+}
+
+void PCA::save_linear_params(const char *linear_params_path){
+	FILE *linear_file = fopen(linear_params_path, "wb");
+	if (linear_file == nullptr) {
+		perror("Failed to open linear params file for writing");
+		return;
+	}
+	uint model_count = w.size();
+	fwrite(&model_count, sizeof(uint), 1, linear_file);
+	for(int i=0; i<model_count; i++){
+		fwrite(&w[i], sizeof(float), 1, linear_file);
+		fwrite(&b[i], sizeof(float), 1, linear_file);
+	}
+	fclose(linear_file);
+}
+
+void PCA::read_linear_params(const char *linear_params_path){
+	FILE *linear_file = fopen(linear_params_path, "rb");
+	if (linear_file == nullptr) {
+		perror("Failed to open linear params file for reading");
+		return;
+	}
+	uint model_count;
+	fread(&model_count, sizeof(uint), 1, linear_file);
+	w.resize(model_count);
+	b.resize(model_count);
+	for(int i=0; i<model_count; i++){
+		fread(&w[i], sizeof(float), 1, linear_file);
+		fread(&b[i], sizeof(float), 1, linear_file);
+	}
+	fclose(linear_file);
+}
+
+float naive_l2_dist_calc(float* p, float* q, int D){
+	float dis = 0;
+	for(int i=0; i<D; i++){
+		dis += (p[i] - q[i]) * (p[i] - q[i]);
+	}
+	return dis;
+}
+
+// 传入的数据都是pca映射后的数据
+void PCA::linear(float* data, float* query, int* groundtruth, int np, int nq, int test_nq, int topk, int gt_k, int D, int delta_d){
+    std::vector<float> Dis, thresh;
+    std::vector<std::vector<float> > Dis_;
+    int model_count = D / delta_d;
+    if (D % delta_d) model_count++;
+    Dis_.resize(model_count);
+	int count_bound = std::min(test_nq, nq);
+	for(int i=0; i<count_bound; i++){
+		float *q = query + i*D;
+		int *gt = groundtruth + i*gt_k;
+		float *p = data + gt[topk-1]*D;
+		float thresh_dis = naive_l2_dist_calc(p, q, D);
+		for(int j=0; j<topk; j++){
+			p = data + gt[j]*D;
+			float dis_ = 0;
+			float dis = naive_l2_dist_calc(p, q, D);
+			unsigned dis_count = 0;
+			for(int k=0; k<D; k+=delta_d){
+				if(k+delta_d > D) dis_ += naive_l2_dist_calc(q+k, p+k, D%delta_d);
+				else dis_ += naive_l2_dist_calc(q+k, p+k, delta_d);
+				Dis_[dis_count].push_back(dis_);
+				dis_count++;
+			}
+			Dis.push_back(dis);
+			thresh.push_back(thresh_dis);
+		}
+	}
+	w.resize(model_count);
+	b.resize(model_count);
+	Eigen::VectorXf Y = Eigen::Map<Eigen::VectorXf, Eigen::Unaligned>(Dis.data(), Dis.size());
+	float y_mean = Y.mean();
+	for(int i=0; i<model_count; i++){
+		Eigen::VectorXf X = Eigen::Map<Eigen::VectorXf, Eigen::Unaligned>(Dis_[i].data(), Dis_[i].size());
+		float x_mean = X.mean();
+		Eigen::VectorXf X_centered = X.array() - x_mean;
+		Eigen::VectorXf Y_centered = Y.array() - y_mean;
+		float w_i = (X_centered.cwiseProduct(Y_centered).sum()) / (X_centered.cwiseProduct(X_centered).sum());
+		float b_i = y_mean - w_i * x_mean;
+		w[i] = w_i;
+		b[i] = b_i;
+	}
 }

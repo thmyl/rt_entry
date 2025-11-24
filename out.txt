@@ -1,0 +1,3093 @@
+
+---------- n_candidates = 16	point_ratio = 3.2e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 32818
+time pca projection: 0.124048 ms
+time rt search: 0.069897 ms
+time search_entry: 0.125824 ms
+time graph search: 1.7878 ms
+time search: 2.52469 ms
+recall@10 = 0.80458 ms
+Used memory: 4229 MB
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.112922 ms
+time rt search: 0.069563 ms
+time search_entry: 0.228829 ms
+time graph search: 8.13016 ms
+time search: 8.93391 ms
+recall@10 = 0.99071 ms
+Used memory: 4245 MB
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 2.42184 ms
+time rt search: 0.06181 ms
+time search_entry: 0.115891 ms
+time graph search: 26.5191 ms
+time search: 29.446 ms
+recall@10 = 0.99073 ms
+Used memory: 26657 MB
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.091577 ms
+time rt search: 0.099799 ms
+time search_entry: 0.202073 ms
+time graph search: 6.58012 ms
+time search: 7.34986 ms
+recall@10 = 0.99068 ms
+Used memory: 26657 MB
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.078095 ms
+time rt search: 0.066681 ms
+time search_entry: 0.115611 ms
+time graph search: 268.159 ms
+time search: 268.828 ms
+recall@10 = 0.99068 ms
+Used memory: 866 MB
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.07072 ms
+time rt search: 0.059793 ms
+time search_entry: 0.168809 ms
+time graph search: 7.00958 ms
+time search: 7.62749 ms
+recall@10 = 0.99071 ms
+Used memory: 14009 MB
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.391985 ms
+time rt search: 0.054716 ms
+time search_entry: 0.176304 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.503723 ms
+time rt search: 0.0528 ms
+time search_entry: 0.150231 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 1.03201 ms
+time rt search: 0.054161 ms
+time search_entry: 0.108392 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.386435 ms
+time rt search: 0.054228 ms
+time search_entry: 0.180511 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.454529 ms
+time rt search: 0.055279 ms
+time search_entry: 0.145319 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 1.1141 ms
+time rt search: 0.059251 ms
+time search_entry: 0.101461 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.412134 ms
+time rt search: 0.077691 ms
+time search_entry: 0.163371 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.391881 ms
+time rt search: 0.060525 ms
+time search_entry: 0.153827 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.391477 ms
+time rt search: 0.05317 ms
+time search_entry: 0.147612 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.401581 ms
+time rt search: 0.053087 ms
+time search_entry: 0.14167 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.411815 ms
+time rt search: 0.053676 ms
+time search_entry: 0.097972 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.400572 ms
+time rt search: 0.050892 ms
+time search_entry: 0.171098 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.394397 ms
+time rt search: 0.054796 ms
+time search_entry: 0.215631 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.388278 ms
+time rt search: 0.053807 ms
+time search_entry: 0.092883 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.394414 ms
+time rt search: 0.054731 ms
+time search_entry: 0.139475 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.419284 ms
+time rt search: 0.056437 ms
+time search_entry: 0.166067 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.389321 ms
+time rt search: 0.053672 ms
+time search_entry: 0.158255 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.380667 ms
+time rt search: 0.053997 ms
+time search_entry: 0.140117 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.387249 ms
+time rt search: 0.055723 ms
+time search_entry: 0.1362 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.481118 ms
+time rt search: 0.102355 ms
+time search_entry: 0.154552 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.478748 ms
+time rt search: 0.063974 ms
+time search_entry: 0.154467 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.564153 ms
+time rt search: 0.059244 ms
+time search_entry: 0.161573 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.392537 ms
+time rt search: 0.059672 ms
+time search_entry: 0.628473 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.395724 ms
+time rt search: 0.052729 ms
+time search_entry: 0.13111 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.396001 ms
+time rt search: 0.056955 ms
+time search_entry: 0.156036 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.833397 ms
+time rt search: 0.095668 ms
+time search_entry: 0.150325 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 1.2626 ms
+time rt search: 0.054071 ms
+time search_entry: 0.221605 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.379052 ms
+time rt search: 0.051741 ms
+time search_entry: 0.138657 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.392613 ms
+time rt search: 0.056442 ms
+time search_entry: 0.106337 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.374852 ms
+time rt search: 0.053102 ms
+time search_entry: 0.091175 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.385587 ms
+time rt search: 0.05367 ms
+time search_entry: 0.165215 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.727419 ms
+time rt search: 0.056869 ms
+time search_entry: 0.097516 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.653802 ms
+time rt search: 0.073831 ms
+time search_entry: 0.131419 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.877602 ms
+time rt search: 0.061087 ms
+time search_entry: 0.163127 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.469517 ms
+time rt search: 0.053746 ms
+time search_entry: 0.154928 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.681771 ms
+time rt search: 0.053121 ms
+time search_entry: 0.085057 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.391251 ms
+time rt search: 0.054841 ms
+time search_entry: 0.155709 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 17328.3 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 16077.6 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.521284 ms
+time rt search: 0.053577 ms
+time search_entry: 0.137361 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.374907 ms
+time rt search: 0.055719 ms
+time search_entry: 0.131427 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 14931.8 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 15565.4 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 15472.3 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 17281.7 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 16234.8 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 15280.5 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 16944.1 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 16466.5 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 3.87459 ms
+time rt search: 0.5128 ms
+time search_entry: 0.559631 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.434156 ms
+time rt search: 0.079822 ms
+time search_entry: 0.117105 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.397738 ms
+time rt search: 0.052313 ms
+time search_entry: 0.112811 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.390649 ms
+time rt search: 0.055131 ms
+time search_entry: 0.095259 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.395042 ms
+time rt search: 0.065131 ms
+time search_entry: 0.129057 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.394419 ms
+time rt search: 0.053642 ms
+time search_entry: 0.086176 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.404627 ms
+time rt search: 0.057378 ms
+time search_entry: 0.101484 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 1.27641 ms
+time rt search: 0.055239 ms
+time search_entry: 0.090097 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.420483 ms
+time rt search: 0.061545 ms
+time search_entry: 0.116894 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.573154 ms
+time rt search: 0.053833 ms
+time search_entry: 0.093067 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.378603 ms
+time rt search: 0.056483 ms
+time search_entry: 0.112574 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 1.01987 ms
+time rt search: 0.053147 ms
+time search_entry: 0.088197 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.400458 ms
+time rt search: 0.052279 ms
+time search_entry: 0.131598 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.386397 ms
+time rt search: 0.054437 ms
+time search_entry: 0.099393 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 3.16743 ms
+time rt search: 0.498709 ms
+time search_entry: 0.541839 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.380716 ms
+time rt search: 0.055839 ms
+time search_entry: 0.088562 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.408149 ms
+time rt search: 0.055675 ms
+time search_entry: 0.093198 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.760266 ms
+time rt search: 0.11001 ms
+time search_entry: 0.152969 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 1.08982 ms
+time rt search: 0.05364 ms
+time search_entry: 0.134893 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 3.14239 ms
+time rt search: 0.480788 ms
+time search_entry: 0.524693 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.390439 ms
+time rt search: 0.05489 ms
+time search_entry: 0.089682 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.393363 ms
+time rt search: 0.060433 ms
+time search_entry: 0.139208 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.386689 ms
+time rt search: 0.052853 ms
+time search_entry: 0.137592 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.891397 ms
+time rt search: 0.059635 ms
+time search_entry: 0.117852 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.392771 ms
+time rt search: 0.05455 ms
+time search_entry: 0.087226 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.803353 ms
+time rt search: 0.054453 ms
+time search_entry: 0.187299 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.411101 ms
+time rt search: 0.053709 ms
+time search_entry: 0.085835 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.985272 ms
+time rt search: 0.052416 ms
+time search_entry: 0.088323 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.398523 ms
+time rt search: 0.060219 ms
+time search_entry: 0.143078 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 3.21044 ms
+time rt search: 0.520199 ms
+time search_entry: 0.571546 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.379508 ms
+time rt search: 0.062002 ms
+time search_entry: 0.09632 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.41195 ms
+time rt search: 0.05379 ms
+time search_entry: 0.155433 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.390122 ms
+time rt search: 0.058892 ms
+time search_entry: 0.093013 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.623733 ms
+time rt search: 0.056704 ms
+time search_entry: 0.090861 ms
+time graph search: 952.088 ms
+time search: 961.726 ms
+recall@10 = 0 ms
+Used memory: 24681 MB
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.945621 ms
+time rt search: 0.061195 ms
+time search_entry: 0.144755 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.815064 ms
+time rt search: 0.060491 ms
+time search_entry: 0.100105 ms
+time graph search: 2252.88 ms
+time search: 2262.49 ms
+recall@10 = 0.00118 ms
+Used memory: 24681 MB
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.392379 ms
+time rt search: 0.055862 ms
+time search_entry: 0.192636 ms
+time graph search: 2330.72 ms
+time search: 2340.58 ms
+recall@10 = 0.00118 ms
+Used memory: 24407 MB
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.462977 ms
+time rt search: 0.072096 ms
+time search_entry: 0.111005 ms
+time graph search: 2872.39 ms
+time search: 2887.98 ms
+recall@10 = 0.99073 ms
+Used memory: 24409 MB
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 8192
+time pca projection: 0.405252 ms
+time rt search: 0.052352 ms
+time search_entry: 0.133852 ms
+time graph search: 4655.91 ms
+time search: 4666.16 ms
+recall@10 = 0.99092 ms
+Used memory: 24409 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.459062 ms
+time rt search: 0.056167 ms
+time search_entry: 0.092397 ms
+time graph search: 2045.57 ms
+time search: 2055.17 ms
+recall@10 = 0.97793 ms
+Used memory: 24413 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 50	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.384967 ms
+time rt search: 0.054875 ms
+time search_entry: 0.153037 ms
+time graph search: 1840.47 ms
+time search: 1850.08 ms
+recall@10 = 0.96045 ms
+Used memory: 24413 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 50	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 64	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.414356 ms
+time rt search: 0.050804 ms
+time search_entry: 0.105037 ms
+time graph search: 2622.52 ms
+time search: 2632.58 ms
+recall@10 = 0.96045 ms
+Used memory: 24413 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 50	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.350579 ms
+time rt search: 0.063239 ms
+time search_entry: 0.113302 ms
+time graph search: 3188.18 ms
+time search: 3198.89 ms
+recall@10 = 0.86285 ms
+Used memory: 24347 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.792154 ms
+time rt search: 0.070634 ms
+time search_entry: 0.107375 ms
+time graph search: 3255.65 ms
+time search: 3266.01 ms
+recall@10 = 0.87365 ms
+Used memory: 24347 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.286735 ms
+time rt search: 0.060371 ms
+time search_entry: 0.101495 ms
+time graph search: 2254.92 ms
+time search: 2265.76 ms
+recall@10 = 0.87239 ms
+Used memory: 24347 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.313173 ms
+time rt search: 0.053471 ms
+time search_entry: 0.086965 ms
+time graph search: 1265.49 ms
+time search: 1277.13 ms
+recall@10 = 0.87239 ms
+Used memory: 24531 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.820939 ms
+time rt search: 0.070644 ms
+time search_entry: 0.111681 ms
+time graph search: 3095.72 ms
+time search: 3114.84 ms
+recall@10 = 0.88069 ms
+Used memory: 24531 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.326419 ms
+time rt search: 0.098742 ms
+time search_entry: 0.143058 ms
+time graph search: 2949.22 ms
+time search: 2967.48 ms
+recall@10 = 0.8818 ms
+Used memory: 24531 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.345701 ms
+time rt search: 0.055512 ms
+time search_entry: 0.093648 ms
+time graph search: 1167.35 ms
+time search: 1179.06 ms
+recall@10 = 0.87307 ms
+Used memory: 24531 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.289888 ms
+time rt search: 0.053832 ms
+time search_entry: 0.147715 ms
+time graph search: 3429.91 ms
+time search: 3443.37 ms
+recall@10 = 0.88834 ms
+Used memory: 24531 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.149413 ms
+time rt search: 0.057232 ms
+time search_entry: 0.125097 ms
+time graph search: 2153.24 ms
+time search: 2167.08 ms
+recall@10 = 0.88829 ms
+Used memory: 7491 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.152265 ms
+time rt search: 0.057703 ms
+time search_entry: 0.134441 ms
+time graph search: 2147.58 ms
+time search: 2161.95 ms
+recall@10 = 0.88829 ms
+Used memory: 7491 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.19138 ms
+time rt search: 0.076592 ms
+time search_entry: 0.124004 ms
+time graph search: 2141.99 ms
+time search: 2163.76 ms
+recall@10 = 0.88828 ms
+Used memory: 7491 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.211171 ms
+time rt search: 0.092465 ms
+time search_entry: 0.137928 ms
+time graph search: 2149.8 ms
+time search: 2175.11 ms
+recall@10 = 0.88829 ms
+Used memory: 7491 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.224015 ms
+time rt search: 0.091168 ms
+time search_entry: 0.13536 ms
+time graph search: 208.324 ms
+time search: 226.361 ms
+recall@10 = 0.87477 ms
+Used memory: 8955 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.176757 ms
+time rt search: 0.071903 ms
+time search_entry: 0.118445 ms
+time graph search: 212.896 ms
+time search: 226.555 ms
+recall@10 = 0.87477 ms
+Used memory: 25435 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.150859 ms
+time rt search: 0.056317 ms
+time search_entry: 0.099814 ms
+time graph search: 290.034 ms
+time search: 301.883 ms
+recall@10 = 0.88829 ms
+Used memory: 25435 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.175862 ms
+time rt search: 0.06695 ms
+time search_entry: 0.102801 ms
+time graph search: 294.634 ms
+time search: 307.674 ms
+recall@10 = 0.88829 ms
+Used memory: 25435 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.192761 ms
+time rt search: 0.073514 ms
+time search_entry: 0.119472 ms
+time graph search: 373.166 ms
+time search: 406.91 ms
+recall@10 = 0.90267 ms
+Used memory: 25435 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.155179 ms
+time rt search: 0.056912 ms
+time search_entry: 0.089632 ms
+time graph search: 486.682 ms
+time search: 525.05 ms
+recall@10 = 0.9245 ms
+Used memory: 25435 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.165843 ms
+time rt search: 0.065168 ms
+time search_entry: 0.106093 ms
+time graph search: 487.323 ms
+time search: 530.286 ms
+recall@10 = 0.9245 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.194878 ms
+time rt search: 0.072553 ms
+time search_entry: 0.114554 ms
+time graph search: 719.916 ms
+time search: 821.949 ms
+recall@10 = 0.98197 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.145359 ms
+time rt search: 0.058385 ms
+time search_entry: 0.100376 ms
+time graph search: 139.802 ms
+time search: 147.064 ms
+recall@10 = 0.87202 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.189038 ms
+time rt search: 0.077089 ms
+time search_entry: 0.119824 ms
+time graph search: 188.408 ms
+time search: 201.818 ms
+recall@10 = 0.87266 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.171537 ms
+time rt search: 0.074921 ms
+time search_entry: 0.143358 ms
+time graph search: 209.455 ms
+time search: 223.534 ms
+recall@10 = 0.87477 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.180323 ms
+time rt search: 0.068861 ms
+time search_entry: 0.112235 ms
+time graph search: 234.066 ms
+time search: 248.85 ms
+recall@10 = 0.87834 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.143918 ms
+time rt search: 0.054691 ms
+time search_entry: 0.124518 ms
+time graph search: 253.675 ms
+time search: 263.456 ms
+recall@10 = 0.8818 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.168181 ms
+time rt search: 0.069021 ms
+time search_entry: 0.1277 ms
+time graph search: 264.567 ms
+time search: 274.732 ms
+recall@10 = 0.88365 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.191127 ms
+time rt search: 0.078902 ms
+time search_entry: 0.126022 ms
+time graph search: 282.802 ms
+time search: 321.004 ms
+recall@10 = 0.88601 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.170626 ms
+time rt search: 0.059526 ms
+time search_entry: 0.09564 ms
+time graph search: 290.487 ms
+time search: 302.327 ms
+recall@10 = 0.88829 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.184874 ms
+time rt search: 0.070953 ms
+time search_entry: 0.141592 ms
+time graph search: 301.419 ms
+time search: 314.564 ms
+recall@10 = 0.89035 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.155115 ms
+time rt search: 0.069167 ms
+time search_entry: 0.155917 ms
+time graph search: 312.326 ms
+time search: 326.139 ms
+recall@10 = 0.89186 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.162793 ms
+time rt search: 0.063521 ms
+time search_entry: 0.107073 ms
+time graph search: 323.115 ms
+time search: 337.899 ms
+recall@10 = 0.89361 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.158253 ms
+time rt search: 0.065617 ms
+time search_entry: 0.110827 ms
+time graph search: 329.971 ms
+time search: 345.687 ms
+recall@10 = 0.89493 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.155859 ms
+time rt search: 0.058896 ms
+time search_entry: 0.160742 ms
+time graph search: 341.295 ms
+time search: 357.617 ms
+recall@10 = 0.896 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.244817 ms
+time rt search: 0.10984 ms
+time search_entry: 0.156162 ms
+time graph search: 345.361 ms
+time search: 366.304 ms
+recall@10 = 0.89759 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.223767 ms
+time rt search: 0.098422 ms
+time search_entry: 0.138373 ms
+time graph search: 351.696 ms
+time search: 373.68 ms
+recall@10 = 0.8987 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.146601 ms
+time rt search: 0.056685 ms
+time search_entry: 0.089347 ms
+time graph search: 357.943 ms
+time search: 377.892 ms
+recall@10 = 0.89947 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.176117 ms
+time rt search: 0.061123 ms
+time search_entry: 0.129034 ms
+time graph search: 361.266 ms
+time search: 383.27 ms
+recall@10 = 0.89988 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.152562 ms
+time rt search: 0.057536 ms
+time search_entry: 0.097168 ms
+time graph search: 368.908 ms
+time search: 390.62 ms
+recall@10 = 0.90078 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.156219 ms
+time rt search: 0.056195 ms
+time search_entry: 0.098577 ms
+time graph search: 366.841 ms
+time search: 388.829 ms
+recall@10 = 0.90186 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.19415 ms
+time rt search: 0.063568 ms
+time search_entry: 0.108701 ms
+time graph search: 372.407 ms
+time search: 396.725 ms
+recall@10 = 0.90267 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.19194 ms
+time rt search: 0.069402 ms
+time search_entry: 0.110958 ms
+time graph search: 375.61 ms
+time search: 400.072 ms
+recall@10 = 0.90376 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.180394 ms
+time rt search: 0.060454 ms
+time search_entry: 0.136168 ms
+time graph search: 382.986 ms
+time search: 408.696 ms
+recall@10 = 0.90525 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.162571 ms
+time rt search: 0.062499 ms
+time search_entry: 0.134835 ms
+time graph search: 390.082 ms
+time search: 415.978 ms
+recall@10 = 0.90684 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.291542 ms
+time rt search: 0.127123 ms
+time search_entry: 0.167435 ms
+time graph search: 394.472 ms
+time search: 440.346 ms
+recall@10 = 0.9083 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.193376 ms
+time rt search: 0.06405 ms
+time search_entry: 0.104891 ms
+time graph search: 406.241 ms
+time search: 433.851 ms
+recall@10 = 0.90882 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.181766 ms
+time rt search: 0.063897 ms
+time search_entry: 0.138574 ms
+time graph search: 404.536 ms
+time search: 433.332 ms
+recall@10 = 0.90956 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.161295 ms
+time rt search: 0.061417 ms
+time search_entry: 0.139139 ms
+time graph search: 411.366 ms
+time search: 440.632 ms
+recall@10 = 0.91091 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.179917 ms
+time rt search: 0.064145 ms
+time search_entry: 0.141303 ms
+time graph search: 416.798 ms
+time search: 447.248 ms
+recall@10 = 0.91144 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.156038 ms
+time rt search: 0.059378 ms
+time search_entry: 0.095144 ms
+time graph search: 420.767 ms
+time search: 452.585 ms
+recall@10 = 0.91253 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.174442 ms
+time rt search: 0.073087 ms
+time search_entry: 0.109535 ms
+time graph search: 426.303 ms
+time search: 459.246 ms
+recall@10 = 0.91338 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.164566 ms
+time rt search: 0.085922 ms
+time search_entry: 0.13872 ms
+time graph search: 434.041 ms
+time search: 466.973 ms
+recall@10 = 0.91388 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.189919 ms
+time rt search: 0.0883 ms
+time search_entry: 0.155254 ms
+time graph search: 447.26 ms
+time search: 483.065 ms
+recall@10 = 0.91484 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.190479 ms
+time rt search: 0.063402 ms
+time search_entry: 0.105628 ms
+time graph search: 447.343 ms
+time search: 483.271 ms
+recall@10 = 0.91542 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.165962 ms
+time rt search: 0.065773 ms
+time search_entry: 0.100229 ms
+time graph search: 451.491 ms
+time search: 488.604 ms
+recall@10 = 0.91671 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.167305 ms
+time rt search: 0.065054 ms
+time search_entry: 0.100954 ms
+time graph search: 458.18 ms
+time search: 495.839 ms
+recall@10 = 0.91808 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.183741 ms
+time rt search: 0.077994 ms
+time search_entry: 0.12309 ms
+time graph search: 463.695 ms
+time search: 502.695 ms
+recall@10 = 0.91907 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.202319 ms
+time rt search: 0.078747 ms
+time search_entry: 0.118057 ms
+time graph search: 468.051 ms
+time search: 520.923 ms
+recall@10 = 0.92034 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.160571 ms
+time rt search: 0.05953 ms
+time search_entry: 0.09852 ms
+time graph search: 478.253 ms
+time search: 519.919 ms
+recall@10 = 0.92197 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.203497 ms
+time rt search: 0.089339 ms
+time search_entry: 0.129729 ms
+time graph search: 484.577 ms
+time search: 526.075 ms
+recall@10 = 0.92325 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.209372 ms
+time rt search: 0.069859 ms
+time search_entry: 0.108928 ms
+time graph search: 487.165 ms
+time search: 528.925 ms
+recall@10 = 0.9245 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.169128 ms
+time rt search: 0.065131 ms
+time search_entry: 0.098602 ms
+time graph search: 491.996 ms
+time search: 534.125 ms
+recall@10 = 0.92576 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.194445 ms
+time rt search: 0.096236 ms
+time search_entry: 0.129728 ms
+time graph search: 496.858 ms
+time search: 545.267 ms
+recall@10 = 0.92723 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.176793 ms
+time rt search: 0.072634 ms
+time search_entry: 0.108641 ms
+time graph search: 500.331 ms
+time search: 545.693 ms
+recall@10 = 0.9283 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.236654 ms
+time rt search: 0.095032 ms
+time search_entry: 0.133476 ms
+time graph search: 508.41 ms
+time search: 559.61 ms
+recall@10 = 0.93022 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.166105 ms
+time rt search: 0.065143 ms
+time search_entry: 0.102617 ms
+time graph search: 513.219 ms
+time search: 559.044 ms
+recall@10 = 0.93182 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.164672 ms
+time rt search: 0.059829 ms
+time search_entry: 0.096529 ms
+time graph search: 516.171 ms
+time search: 563.565 ms
+recall@10 = 0.93313 ms
+Used memory: 7859 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.155749 ms
+time rt search: 0.06098 ms
+time search_entry: 0.15186 ms
+time graph search: 520.341 ms
+time search: 564.175 ms
+recall@10 = 0.93415 ms
+Used memory: 7859 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.149766 ms
+time rt search: 0.053618 ms
+time search_entry: 0.106399 ms
+time graph search: 523.49 ms
+time search: 568.774 ms
+recall@10 = 0.93515 ms
+Used memory: 7859 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.169242 ms
+time rt search: 0.088422 ms
+time search_entry: 0.162052 ms
+time graph search: 527.298 ms
+time search: 573.557 ms
+recall@10 = 0.93593 ms
+Used memory: 7859 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.14377 ms
+time rt search: 0.054559 ms
+time search_entry: 0.127099 ms
+time graph search: 533.595 ms
+time search: 580.783 ms
+recall@10 = 0.93753 ms
+Used memory: 7859 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.154237 ms
+time rt search: 0.057349 ms
+time search_entry: 0.20581 ms
+time graph search: 536.97 ms
+time search: 585.327 ms
+recall@10 = 0.93868 ms
+Used memory: 7859 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.147116 ms
+time rt search: 0.054222 ms
+time search_entry: 0.084057 ms
+time graph search: 541.175 ms
+time search: 590.437 ms
+recall@10 = 0.93973 ms
+Used memory: 7859 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.157964 ms
+time rt search: 0.05743 ms
+time search_entry: 0.135837 ms
+time graph search: 545.115 ms
+time search: 595.095 ms
+recall@10 = 0.94071 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.163123 ms
+time rt search: 0.058914 ms
+time search_entry: 0.0901 ms
+time graph search: 546.827 ms
+time search: 600.641 ms
+recall@10 = 0.94187 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.186007 ms
+time rt search: 0.063619 ms
+time search_entry: 0.103087 ms
+time graph search: 553.741 ms
+time search: 609.326 ms
+recall@10 = 0.94289 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.183842 ms
+time rt search: 0.06911 ms
+time search_entry: 0.411907 ms
+time graph search: 560.279 ms
+time search: 617.252 ms
+recall@10 = 0.94392 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.194935 ms
+time rt search: 0.077937 ms
+time search_entry: 0.112806 ms
+time graph search: 564.83 ms
+time search: 621.356 ms
+recall@10 = 0.94464 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.200086 ms
+time rt search: 0.081351 ms
+time search_entry: 0.12034 ms
+time graph search: 567.725 ms
+time search: 626.207 ms
+recall@10 = 0.94591 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.202055 ms
+time rt search: 0.104261 ms
+time search_entry: 0.156562 ms
+time graph search: 573.203 ms
+time search: 631.914 ms
+recall@10 = 0.94727 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.185006 ms
+time rt search: 0.061214 ms
+time search_entry: 0.108215 ms
+time graph search: 575.957 ms
+time search: 635.213 ms
+recall@10 = 0.94862 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.188387 ms
+time rt search: 0.064576 ms
+time search_entry: 0.122089 ms
+time graph search: 579.462 ms
+time search: 639.986 ms
+recall@10 = 0.94968 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.22609 ms
+time rt search: 0.090846 ms
+time search_entry: 0.144071 ms
+time graph search: 590.438 ms
+time search: 672.594 ms
+recall@10 = 0.95072 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.174441 ms
+time rt search: 0.069786 ms
+time search_entry: 0.107517 ms
+time graph search: 592.372 ms
+time search: 653.889 ms
+recall@10 = 0.95205 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.187889 ms
+time rt search: 0.060648 ms
+time search_entry: 0.100605 ms
+time graph search: 597.821 ms
+time search: 661.216 ms
+recall@10 = 0.95312 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.208662 ms
+time rt search: 0.099407 ms
+time search_entry: 0.134486 ms
+time graph search: 600.61 ms
+time search: 668.898 ms
+recall@10 = 0.95428 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.174111 ms
+time rt search: 0.068046 ms
+time search_entry: 0.111008 ms
+time graph search: 603.777 ms
+time search: 668.67 ms
+recall@10 = 0.9551 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.204057 ms
+time rt search: 0.091638 ms
+time search_entry: 0.128258 ms
+time graph search: 610.899 ms
+time search: 670.523 ms
+recall@10 = 0.9559 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.184585 ms
+time rt search: 0.060994 ms
+time search_entry: 0.098183 ms
+time graph search: 617.757 ms
+time search: 686.811 ms
+recall@10 = 0.95711 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.226617 ms
+time rt search: 0.085443 ms
+time search_entry: 0.128649 ms
+time graph search: 622.857 ms
+time search: 710.365 ms
+recall@10 = 0.95834 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.200836 ms
+time rt search: 0.097773 ms
+time search_entry: 0.135322 ms
+time graph search: 627.323 ms
+time search: 700.916 ms
+recall@10 = 0.95912 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.228359 ms
+time rt search: 0.104881 ms
+time search_entry: 0.139184 ms
+time graph search: 630.983 ms
+time search: 704.31 ms
+recall@10 = 0.96003 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.166697 ms
+time rt search: 0.064591 ms
+time search_entry: 0.102504 ms
+time graph search: 636.295 ms
+time search: 706.035 ms
+recall@10 = 0.96097 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.254614 ms
+time rt search: 0.103949 ms
+time search_entry: 0.145561 ms
+time graph search: 636.899 ms
+time search: 710.808 ms
+recall@10 = 0.96155 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.214265 ms
+time rt search: 0.100443 ms
+time search_entry: 0.134705 ms
+time graph search: 642.673 ms
+time search: 717.287 ms
+recall@10 = 0.96226 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.198193 ms
+time rt search: 0.068835 ms
+time search_entry: 0.107369 ms
+time graph search: 650.559 ms
+time search: 720.209 ms
+recall@10 = 0.96303 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.207861 ms
+time rt search: 0.071891 ms
+time search_entry: 0.110118 ms
+time graph search: 657.727 ms
+time search: 728.14 ms
+recall@10 = 0.96383 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.214537 ms
+time rt search: 0.100144 ms
+time search_entry: 0.133691 ms
+time graph search: 657.43 ms
+time search: 732.56 ms
+recall@10 = 0.96418 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.200628 ms
+time rt search: 0.067051 ms
+time search_entry: 0.107092 ms
+time graph search: 665.289 ms
+time search: 737.101 ms
+recall@10 = 0.96491 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.189184 ms
+time rt search: 0.062118 ms
+time search_entry: 0.099168 ms
+time graph search: 668.283 ms
+time search: 739.767 ms
+recall@10 = 0.96554 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.269829 ms
+time rt search: 0.097796 ms
+time search_entry: 0.142268 ms
+time graph search: 667.543 ms
+time search: 767.681 ms
+recall@10 = 0.96614 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.166766 ms
+time rt search: 0.069947 ms
+time search_entry: 0.145036 ms
+time graph search: 675.833 ms
+time search: 747.625 ms
+recall@10 = 0.96653 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.190689 ms
+time rt search: 0.065171 ms
+time search_entry: 0.100869 ms
+time graph search: 673.389 ms
+time search: 746.949 ms
+recall@10 = 0.96691 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.239719 ms
+time rt search: 0.100112 ms
+time search_entry: 0.143547 ms
+time graph search: 678.689 ms
+time search: 756.715 ms
+recall@10 = 0.96727 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.267488 ms
+time rt search: 0.099082 ms
+time search_entry: 0.13865 ms
+time graph search: 690.48 ms
+time search: 788.728 ms
+recall@10 = 0.9678 ms
+Used memory: 1504 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.178417 ms
+time rt search: 0.074756 ms
+time search_entry: 0.114822 ms
+time graph search: 685.811 ms
+time search: 758.683 ms
+recall@10 = 0.96867 ms
+Used memory: 1504 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.283095 ms
+time rt search: 0.1181 ms
+time search_entry: 0.158172 ms
+time graph search: 689.092 ms
+time search: 802.658 ms
+recall@10 = 0.96923 ms
+Used memory: 1504 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.3154 ms
+time rt search: 0.112971 ms
+time search_entry: 0.15306 ms
+time graph search: 701.344 ms
+time search: 777.61 ms
+recall@10 = 0.96976 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.24805 ms
+time rt search: 0.102416 ms
+time search_entry: 0.136329 ms
+time graph search: 691.492 ms
+time search: 787.35 ms
+recall@10 = 0.97026 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.181803 ms
+time rt search: 0.065767 ms
+time search_entry: 0.107371 ms
+time graph search: 692.09 ms
+time search: 768.778 ms
+recall@10 = 0.9708 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.219179 ms
+time rt search: 0.072407 ms
+time search_entry: 0.116214 ms
+time graph search: 697.587 ms
+time search: 772.234 ms
+recall@10 = 0.97124 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.256857 ms
+time rt search: 0.123629 ms
+time search_entry: 0.165539 ms
+time graph search: 704.411 ms
+time search: 802.353 ms
+recall@10 = 0.97172 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.161498 ms
+time rt search: 0.060202 ms
+time search_entry: 0.125329 ms
+time graph search: 700.622 ms
+time search: 776.068 ms
+recall@10 = 0.97241 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.274674 ms
+time rt search: 0.106185 ms
+time search_entry: 0.170749 ms
+time graph search: 705.664 ms
+time search: 788.584 ms
+recall@10 = 0.97329 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.185356 ms
+time rt search: 0.067725 ms
+time search_entry: 0.107058 ms
+time graph search: 708.815 ms
+time search: 784.917 ms
+recall@10 = 0.97488 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.222226 ms
+time rt search: 0.090892 ms
+time search_entry: 0.130657 ms
+time graph search: 714.574 ms
+time search: 813.011 ms
+recall@10 = 0.97584 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.197642 ms
+time rt search: 0.069229 ms
+time search_entry: 0.110857 ms
+time graph search: 717.001 ms
+time search: 794.122 ms
+recall@10 = 0.97776 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.216934 ms
+time rt search: 0.087205 ms
+time search_entry: 0.130536 ms
+time graph search: 729.732 ms
+time search: 829.312 ms
+recall@10 = 0.97858 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.208771 ms
+time rt search: 0.100015 ms
+time search_entry: 0.132889 ms
+time graph search: 722.026 ms
+time search: 803.992 ms
+recall@10 = 0.97979 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.180119 ms
+time rt search: 0.066882 ms
+time search_entry: 0.098833 ms
+time graph search: 719.207 ms
+time search: 795.518 ms
+recall@10 = 0.98098 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.222667 ms
+time rt search: 0.087478 ms
+time search_entry: 0.130944 ms
+time graph search: 719.341 ms
+time search: 828.775 ms
+recall@10 = 0.98197 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.241776 ms
+time rt search: 0.087691 ms
+time search_entry: 0.131782 ms
+time graph search: 720.129 ms
+time search: 828.079 ms
+recall@10 = 0.98197 ms
+Used memory: 7861 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.469732 ms
+time rt search: 0.070093 ms
+time search_entry: 0.10754 ms
+time graph search: 87.9581 ms
+time search: 88.9477 ms
+recall@10 = 0.87303 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time pca projection: 0.4274 ms
+time rt search: 0.067025 ms
+time search_entry: 0.109562 ms
+time graph search: 86.1753 ms
+time search: 87.0644 ms
+recall@10 = 0.87303 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 6.02243 ms
+time build_query_batches: 0.265161 ms
+time pca projection: 0.142057 ms
+time rt search: 0.056939 ms
+time search_entry: 0.086157 ms
+time graph search: 142.565 ms
+time search: 149.433 ms
+recall@10 = 0.87202 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 9.17443 ms
+time build_query_batches: 0.380636 ms
+time pca projection: 0.18219 ms
+time rt search: 0.069429 ms
+time search_entry: 0.111718 ms
+time graph search: 775.658 ms
+time search: 785.966 ms
+recall@10 = 0.87205 ms
+Used memory: 8197 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 6.57852 ms
+time build_query_batches: 0.279045 ms
+time pca projection: 0.184358 ms
+time rt search: 0.082985 ms
+time search_entry: 0.113152 ms
+time graph search: 139.906 ms
+time search: 147.422 ms
+recall@10 = 0.87202 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 12.1425 ms
+time build_query_batches: 1.25408 ms
+time pca projection: 0.159161 ms
+time rt search: 0.061029 ms
+time search_entry: 0.091635 ms
+time graph search: 316.758 ms
+time search: 330.795 ms
+recall@10 = 0.89186 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 11.1608 ms
+time build_query_batches: 0.580022 ms
+time pca projection: 0.138574 ms
+time rt search: 0.053861 ms
+time search_entry: 0.080863 ms
+time graph search: 85.6015 ms
+time search: 97.8945 ms
+recall@10 = 0.89176 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 11.6617 ms
+time build_query_batches: 0.502231 ms
+time pca projection: 0.136623 ms
+time rt search: 0.052212 ms
+time search_entry: 0.081179 ms
+time graph search: 56.8818 ms
+time search: 69.5741 ms
+recall@10 = 0.8918 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 14.9335 ms
+time build_query_batches: 0.432334 ms
+time pca projection: 0.143028 ms
+time rt search: 0.052671 ms
+time search_entry: 0.081302 ms
+time graph search: 45.0147 ms
+time search: 60.9471 ms
+recall@10 = 0.89181 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 6.19917 ms
+time build_query_batches: 0.138029 ms
+time pca projection: 0.133713 ms
+time rt search: 0.051049 ms
+time search_entry: 0.07806 ms
+time graph search: 26.8143 ms
+time search: 33.6478 ms
+recall@10 = 0.87187 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.90546 ms
+time build_query_batches: 0.119062 ms
+time pca projection: 0.135949 ms
+time rt search: 0.052351 ms
+time search_entry: 0.08182 ms
+time graph search: 20.6396 ms
+time search: 27.2021 ms
+recall@10 = 0.873 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.51004 ms
+time build_query_batches: 0.125474 ms
+time pca projection: 0.137275 ms
+time rt search: 0.053023 ms
+time search_entry: 0.083734 ms
+time graph search: 20.5557 ms
+time search: 26.7239 ms
+recall@10 = 0.87296 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.80736 ms
+time build_query_batches: 0.122851 ms
+time pca projection: 0.14132 ms
+time rt search: 0.051758 ms
+time search_entry: 0.124559 ms
+time graph search: 20.4525 ms
+time search: 27.044 ms
+recall@10 = 0.87288 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.13836 ms
+time build_query_batches: 0.13175 ms
+time pca projection: 0.136886 ms
+time rt search: 0.049878 ms
+time search_entry: 0.084626 ms
+time graph search: 20.5022 ms
+time search: 26.3386 ms
+recall@10 = 0.87286 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.91836 ms
+time build_query_batches: 0.128976 ms
+time pca projection: 0.101316 ms
+time rt search: 0.053403 ms
+time search_entry: 0.089325 ms
+time graph search: 20.7157 ms
+time search: 27.3822 ms
+recall@10 = 0.87305 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.80927 ms
+time build_query_batches: 0.119259 ms
+time pca projection: 0.10038 ms
+time rt search: 0.053569 ms
+time search_entry: 0.088922 ms
+time graph search: 20.8304 ms
+time search: 27.3078 ms
+recall@10 = 0.87305 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.27957 ms
+time build_query_batches: 0.126951 ms
+time pca projection: 0.100095 ms
+time rt search: 0.055007 ms
+time search_entry: 0.093792 ms
+time graph search: 20.6371 ms
+time search: 26.6336 ms
+recall@10 = 0.87299 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.20284 ms
+time build_query_batches: 0.120318 ms
+time pca projection: 0.100196 ms
+time rt search: 0.053985 ms
+time search_entry: 0.092475 ms
+time graph search: 2.91036 ms
+time search: 8.82535 ms
+recall@10 = 0.87292 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.63991 ms
+time build_query_batches: 0.154584 ms
+time pca projection: 0.12121 ms
+time rt search: 0.058004 ms
+time search_entry: 0.097987 ms
+time graph search: 20.4058 ms
+time search: 26.8881 ms
+recall@10 = 0.87301 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 6.05356 ms
+time build_query_batches: 0.119301 ms
+time pca projection: 0.106362 ms
+time rt search: 0.06465 ms
+time search_entry: 0.102188 ms
+time graph search: 2.56202 ms
+time search: 9.31712 ms
+recall@10 = 0 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 6.11897 ms
+time build_query_batches: 0.119031 ms
+time pca projection: 0.101796 ms
+time rt search: 0.056895 ms
+time search_entry: 0.091292 ms
+time graph search: 20.4881 ms
+time search: 27.378 ms
+recall@10 = 0.87299 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.46116 ms
+time build_query_batches: 0.129645 ms
+time pca projection: 0.104753 ms
+time rt search: 0.055851 ms
+time search_entry: 0.096032 ms
+time graph search: 20.3117 ms
+time search: 26.5752 ms
+recall@10 = 0.87291 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.30439 ms
+time build_query_batches: 0.124594 ms
+time pca projection: 0.103177 ms
+time rt search: 0.057408 ms
+time search_entry: 0.093904 ms
+time graph search: 2.65279 ms
+time search: 8.65426 ms
+recall@10 = 0 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 6.23637 ms
+time build_query_batches: 0.128787 ms
+time pca projection: 0.107354 ms
+time rt search: 0.055207 ms
+time search_entry: 0.093931 ms
+time graph search: 2.98973 ms
+time search: 9.90713 ms
+recall@10 = 0.87304 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.4069 ms
+time build_query_batches: 0.124182 ms
+time pca projection: 0.101359 ms
+time rt search: 0.052608 ms
+time search_entry: 0.089121 ms
+time graph search: 20.381 ms
+time search: 26.5482 ms
+recall@10 = 0.87296 ms
+Used memory: 7857 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.48873 ms
+time build_query_batches: 0.119213 ms
+time pca projection: 0.10081 ms
+time rt search: 0.051866 ms
+time search_entry: 0.077933 ms
+time graph search: 20.6725 ms
+time search: 26.7796 ms
+recall@10 = 0.87289 ms
+Used memory: 1500 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.40222 ms
+time build_query_batches: 0.119018 ms
+time pca projection: 0.095127 ms
+time rt search: 0.051946 ms
+time search_entry: 0.077723 ms
+time graph search: 16.5872 ms
+time search: 22.5734 ms
+recall@10 = 0 ms
+Used memory: 1500 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 6.05468 ms
+time build_query_batches: 0.119044 ms
+time pca projection: 0.099441 ms
+time rt search: 0.054841 ms
+time search_entry: 0.081077 ms
+time graph search: 16.5764 ms
+time search: 23.2763 ms
+recall@10 = 0 ms
+Used memory: 1500 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.93981 ms
+time build_query_batches: 0.11839 ms
+time pca projection: 0.099745 ms
+time rt search: 0.054309 ms
+time search_entry: 0.080099 ms
+time graph search: 3.01112 ms
+time search: 9.54716 ms
+recall@10 = 0.87299 ms
+Used memory: 1500 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.72176 ms
+time build_query_batches: 0.124947 ms
+time pca projection: 0.096123 ms
+time rt search: 0.04948 ms
+time search_entry: 0.074016 ms
+time graph search: 20.5776 ms
+time search: 26.9144 ms
+recall@10 = 0.87284 ms
+Used memory: 1500 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.19691 ms
+time build_query_batches: 0.119192 ms
+time pca projection: 0.102275 ms
+time rt search: 0.054822 ms
+time search_entry: 0.082101 ms
+time graph search: 16.5409 ms
+time search: 22.3224 ms
+recall@10 = 0 ms
+Used memory: 1500 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 6.41221 ms
+time build_query_batches: 0.119174 ms
+time pca projection: 0.100039 ms
+time rt search: 0.052498 ms
+time search_entry: 0.076929 ms
+time graph search: 0.030173 ms
+time search: 6.99318 ms
+recall@10 = 0 ms
+Used memory: 1500 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.09587 ms
+time build_query_batches: 0.118205 ms
+time pca projection: 0.096714 ms
+time rt search: 0.054444 ms
+time search_entry: 0.082423 ms
+time graph search: 3.00902 ms
+time search: 8.69628 ms
+recall@10 = 0.87294 ms
+Used memory: 1500 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.82099 ms
+time build_query_batches: 0.119352 ms
+time pca projection: 0.099263 ms
+time rt search: 0.052856 ms
+time search_entry: 0.079076 ms
+time graph search: 20.5407 ms
+time search: 27.0415 ms
+recall@10 = 0.873 ms
+Used memory: 1500 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.3615 ms
+time build_query_batches: 0.141015 ms
+time pca projection: 0.103569 ms
+time rt search: 0.056755 ms
+time search_entry: 0.083512 ms
+time graph search: 15.1671 ms
+time search: 21.2214 ms
+recall@10 = 0.87291 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.08513 ms
+time build_query_batches: 0.119524 ms
+time pca projection: 0.104411 ms
+time rt search: 0.052806 ms
+time search_entry: 0.078562 ms
+time graph search: 15.2986 ms
+time search: 21.034 ms
+recall@10 = 0.87278 ms
+Used memory: 1504 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.45536 ms
+time build_query_batches: 0.126322 ms
+time pca projection: 0.107296 ms
+time rt search: 0.054841 ms
+time search_entry: 0.079516 ms
+time graph search: 15.1036 ms
+time search: 21.1714 ms
+recall@10 = 0.87288 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.54434 ms
+time build_query_batches: 0.118949 ms
+time pca projection: 0.100597 ms
+time rt search: 0.054854 ms
+time search_entry: 0.080582 ms
+time graph search: 16.2374 ms
+time search: 22.3753 ms
+recall@10 = 0.87291 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.39292 ms
+time build_query_batches: 0.12906 ms
+time pca projection: 0.098332 ms
+time rt search: 0.051127 ms
+time search_entry: 0.126441 ms
+time graph search: 15.02 ms
+time search: 21.1078 ms
+recall@10 = 0.87286 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.91936 ms
+time build_query_batches: 0.143706 ms
+time pca projection: 0.101713 ms
+time rt search: 0.05174 ms
+time search_entry: 0.079466 ms
+time graph search: 15.3813 ms
+time search: 21.9623 ms
+recall@10 = 0.87282 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.96922 ms
+time build_query_batches: 0.158959 ms
+time pca projection: 0.100521 ms
+time rt search: 0.053215 ms
+time search_entry: 0.076552 ms
+time graph search: 20.4081 ms
+time search: 27.0414 ms
+recall@10 = 0.87289 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 6.00708 ms
+time build_query_batches: 0.141252 ms
+time pca projection: 0.097757 ms
+time rt search: 0.052655 ms
+time search_entry: 0.075886 ms
+time graph search: 15.5199 ms
+time search: 22.1122 ms
+recall@10 = 0.87289 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.19717 ms
+time build_query_batches: 0.137745 ms
+time pca projection: 0.101237 ms
+time rt search: 0.055019 ms
+time search_entry: 0.079873 ms
+time graph search: 15.5552 ms
+time search: 21.3874 ms
+recall@10 = 0.8729 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.47691 ms
+time build_query_batches: 0.149562 ms
+time pca projection: 0.10004 ms
+time rt search: 0.054326 ms
+time search_entry: 0.079651 ms
+time graph search: 15.3645 ms
+time search: 21.5583 ms
+recall@10 = 0.8729 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.7399 ms
+time build_query_batches: 0.155581 ms
+time pca projection: 0.119094 ms
+time rt search: 0.057841 ms
+time search_entry: 0.084673 ms
+time graph search: 15.5505 ms
+time search: 21.9811 ms
+recall@10 = 0.87293 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.64998 ms
+time build_query_batches: 0.146508 ms
+time pca projection: 0.102953 ms
+time rt search: 0.056544 ms
+time search_entry: 0.087339 ms
+time graph search: 8.95123 ms
+time search: 18.963 ms
+recall@10 = 0.87285 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.33767 ms
+time build_query_batches: 0.144069 ms
+time pca projection: 0.106469 ms
+time rt search: 0.053491 ms
+time search_entry: 0.079196 ms
+time graph search: 15.4266 ms
+time search: 21.4401 ms
+recall@10 = 0.87292 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.73662 ms
+time build_query_batches: 0.139782 ms
+time pca projection: 0.104974 ms
+time rt search: 0.053473 ms
+time search_entry: 0.078283 ms
+time graph search: 15.4247 ms
+time search: 21.8106 ms
+recall@10 = 0.8729 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.29254 ms
+time build_query_batches: 0.138984 ms
+time pca projection: 0.098573 ms
+time rt search: 0.05115 ms
+time search_entry: 0.077009 ms
+time graph search: 15.5306 ms
+time search: 21.4479 ms
+recall@10 = 0.87295 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 651.198 ms
+time build_query_batches: 0.048522 ms
+time pca projection: 0.110362 ms
+time rt search: 0.052337 ms
+time search_entry: 0.079145 ms
+time graph search: 7.83336 ms
+time search: 659.586 ms
+recall@10 = 0.87274 ms
+Used memory: 1506 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 693.201 ms
+time build_query_batches: 0.050876 ms
+time pca projection: 0.129094 ms
+time rt search: 0.066944 ms
+time search_entry: 0.097694 ms
+time graph search: 7.87046 ms
+time search: 701.818 ms
+recall@10 = 0.87287 ms
+Used memory: 1506 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 654.597 ms
+time build_query_batches: 0.048105 ms
+time pca projection: 0.118811 ms
+time rt search: 0.050772 ms
+time search_entry: 0.077017 ms
+time graph search: 7.83851 ms
+time search: 662.981 ms
+recall@10 = 0.87293 ms
+Used memory: 1506 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 654.599 ms
+time build_query_batches: 0.048349 ms
+time pca projection: 0.107152 ms
+time rt search: 0.0495 ms
+time search_entry: 0.076734 ms
+time graph search: 7.82244 ms
+time search: 663.014 ms
+recall@10 = 0.87293 ms
+Used memory: 1506 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.90347 ms
+time build_query_batches: 0.141533 ms
+time pca projection: 0.091046 ms
+time rt search: 0.057625 ms
+time search_entry: 0.084662 ms
+time graph search: 15.5731 ms
+time search: 22.0961 ms
+recall@10 = 0.87294 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.42749 ms
+time build_query_batches: 0.140118 ms
+time pca projection: 0.104859 ms
+time rt search: 0.05495 ms
+time search_entry: 0.080027 ms
+time graph search: 15.5364 ms
+time search: 21.6362 ms
+recall@10 = 0.87291 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 6.09743 ms
+time build_query_batches: 0.140089 ms
+time pca projection: 0.098836 ms
+time rt search: 0.053506 ms
+time search_entry: 0.077672 ms
+time graph search: 15.4138 ms
+time search: 22.1728 ms
+recall@10 = 0.87288 ms
+Used memory: 7859 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 6.59682 ms
+time build_query_batches: 0.335488 ms
+time pca projection: 0.099802 ms
+time rt search: 0.051395 ms
+time search_entry: 0.083238 ms
+time graph search: 18.1743 ms
+time search: 25.6234 ms
+recall@10 = 0.87287 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.51421 ms
+time build_query_batches: 0.140835 ms
+time pca projection: 0.098594 ms
+time rt search: 0.050452 ms
+time search_entry: 0.081656 ms
+time graph search: 15.4535 ms
+time search: 21.5723 ms
+recall@10 = 0.87284 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.73081 ms
+time build_query_batches: 0.155664 ms
+time pca projection: 0.10696 ms
+time rt search: 0.056562 ms
+time search_entry: 0.083799 ms
+time graph search: 15.4975 ms
+time search: 21.8609 ms
+recall@10 = 0.87289 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.42413 ms
+time build_query_batches: 0.151244 ms
+time pca projection: 0.098189 ms
+time rt search: 0.049522 ms
+time search_entry: 0.0768 ms
+time graph search: 15.4183 ms
+time search: 21.5012 ms
+recall@10 = 0.87289 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 337.278 ms
+time build_query_batches: 0.139231 ms
+time pca projection: 0.135482 ms
+time rt search: 0.077545 ms
+time search_entry: 0.10589 ms
+time graph search: 16.1059 ms
+time search: 354.164 ms
+recall@10 = 0.87219 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 2.28505 ms
+time build_query_batches: 0.173248 ms
+time pca projection: 0.109123 ms
+time rt search: 0.080268 ms
+time search_entry: 0.111138 ms
+time graph search: 16.204 ms
+time search: 19.2646 ms
+recall@10 = 0.87217 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 2.58806 ms
+time build_query_batches: 0.134724 ms
+time pca projection: 0.089803 ms
+time rt search: 0.050453 ms
+time search_entry: 0.077894 ms
+time graph search: 15.7669 ms
+time search: 19.0462 ms
+recall@10 = 0.87203 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 0.581511 ms
+time build_query_batches: 0.135817 ms
+time pca projection: 0.098179 ms
+time rt search: 0.061076 ms
+time search_entry: 0.091144 ms
+time graph search: 15.7328 ms
+time search: 17.0002 ms
+recall@10 = 0.87225 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 0.748489 ms
+time build_query_batches: 0.196235 ms
+time pca projection: 0.119016 ms
+time rt search: 0.069279 ms
+time search_entry: 0.104886 ms
+time graph search: 15.7243 ms
+time search: 17.3175 ms
+recall@10 = 0.87199 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 0.68227 ms
+time build_query_batches: 0.19792 ms
+time pca projection: 0.11561 ms
+time rt search: 0.065282 ms
+time search_entry: 0.099649 ms
+time graph search: 15.7233 ms
+time search: 17.2403 ms
+recall@10 = 0.87211 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 5.61371 ms
+time build_query_batches: 0.437397 ms
+time pca projection: 0.11116 ms
+time rt search: 0.065951 ms
+time search_entry: 0.095629 ms
+time graph search: 18.1883 ms
+time search: 24.7659 ms
+recall@10 = 0.87238 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 2.62715 ms
+time build_query_batches: 0.471023 ms
+time pca projection: 0.111802 ms
+time rt search: 0.065614 ms
+time search_entry: 0.098393 ms
+time graph search: 18.1744 ms
+time search: 21.8619 ms
+recall@10 = 0.87245 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 0.68521 ms
+time build_query_batches: 0.207395 ms
+time pca projection: 0.087989 ms
+time rt search: 0.05352 ms
+time search_entry: 0.078809 ms
+time graph search: 15.5802 ms
+time search: 17.0262 ms
+recall@10 = 0.87227 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 4.66834 ms
+time build_query_batches: 0.7023 ms
+time pca projection: 0.096792 ms
+time rt search: 0.052432 ms
+time search_entry: 0.077905 ms
+time graph search: 22.8049 ms
+time search: 28.6546 ms
+recall@10 = 0.87135 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 1.73332 ms
+time build_query_batches: 0.336276 ms
+time pca projection: 0.099656 ms
+time rt search: 0.052406 ms
+time search_entry: 0.077215 ms
+time graph search: 18.2348 ms
+time search: 20.7747 ms
+recall@10 = 0.87234 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 446.196 ms
+time build_query_batches: 0.325032 ms
+time pca projection: 0.128586 ms
+time rt search: 0.076393 ms
+time search_entry: 0.103341 ms
+time graph search: 34.0716 ms
+time search: 481.178 ms
+recall@10 = 0.87359 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 0.761792 ms
+time build_query_batches: 0.360745 ms
+time pca projection: 0.096293 ms
+time rt search: 0.053032 ms
+time search_entry: 0.07867 ms
+time graph search: 34.0215 ms
+time search: 35.6286 ms
+recall@10 = 0.87394 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 6.45625 ms
+time build_query_batches: 0.510885 ms
+time pca projection: 0.096397 ms
+time rt search: 0.04957 ms
+time search_entry: 0.074647 ms
+time graph search: 53.6854 ms
+time search: 61.1235 ms
+recall@10 = 0.89051 ms
+Used memory: 1502 MB
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+
+---------- n_candidates = 64	point_ratio = 6.4e-05	max_iter = 100	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+n_aabbs: 16388
+time compute_query_cluster_top: 31.7961 ms
+time build_query_batches: 0.897679 ms
+time pca projection: 0.094885 ms
+time rt search: 0.054761 ms
+time search_entry: 0.079755 ms
+time graph search: 57.9978 ms
+time search: 91.1665 ms
+recall@10 = 0.90161 ms
+Used memory: 1502 MB

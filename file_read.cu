@@ -1,4 +1,5 @@
 #include "file_read.h"
+#include "graph.h"
 #include <cassert>
 #include <cstdio>
 #include <cstring>
@@ -11,6 +12,33 @@ static const char *get_last_m_chars(const char *str, int m) {
   } else {
     return str + len - m; // 返回后m位的起始位置
   }
+}
+
+void file_read::read_centroids(const char* datafile, ClusterData& cluster_data, int np, int dim){
+  printf("np = %d, dim = %d\n", np, dim);
+  std::ifstream infile(datafile, std::ios::binary);
+  if(!infile.is_open()){
+    std::cerr << "Failed to open file: " << datafile << std::endl;
+    exit(1);
+  }
+  infile.read(reinterpret_cast<char*>(&cluster_data.K), sizeof(int));
+  std::cout << "Cluster number: " << cluster_data.K << std::endl;
+  cluster_data.labels.resize(np);
+  infile.read(reinterpret_cast<char*>(cluster_data.labels.data()), np * sizeof(int));
+  cluster_data.centroids.resize(static_cast<size_t>(cluster_data.K) * dim);
+  cluster_data.cluster_points.resize(cluster_data.K);
+  for(int i = 0; i < cluster_data.K; i++){
+    infile.read(reinterpret_cast<char*>(cluster_data.centroids.data() + static_cast<size_t>(i) * dim),
+                dim * sizeof(float));
+  }
+  for(int i=0; i<cluster_data.K; i++){
+    int cluster_size;
+    infile.read(reinterpret_cast<char*>(&cluster_size), sizeof(int));
+    cluster_data.cluster_points[i].resize(cluster_size);
+    infile.read(reinterpret_cast<char*>(cluster_data.cluster_points[i].data()), cluster_size * sizeof(int));
+  }
+  infile.close();
+  std::cout << "Centroids read successfully" << std::endl;
 }
 
 void file_read::read_data(const char *datafile, int &n, int &d,

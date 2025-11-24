@@ -1,6 +1,7 @@
 #include "warpselect/structure_on_device.cuh"
 #include <cuda_runtime.h>
 #include "head.h"
+#include "cache/page_cache.h"
 #define SIZE 512
 #define num_hash 3
 #define max_hash_iteration 4
@@ -54,14 +55,100 @@ int random_entry(int l,int r, uint seed){
   return l + (seed) % (r - l);
 }
 
+__device__ inline bool is_cluster_in_top(const int* top_clusters,
+                                         int cluster_top_t,
+                                         int cluster_id) {
+    if (!top_clusters || cluster_top_t <= 0 || cluster_id < 0) {
+        return false;
+    }
+    for (int i = 0; i < cluster_top_t; ++i) {
+        if (top_clusters[i] == cluster_id) {
+            return true;
+        }
+    }
+    return false;
+}
+
+__device__ inline float finalize_distance(float base_dist,
+                                          int point_id,
+                                          int query_id,
+                                          const int* query_top_clusters,
+                                          int cluster_top_t,
+                                          const PointInfo* point_infos,
+                                          const int* cluster_to_page,
+                                          const float* cache_data,
+                                          int page_size,
+                                          int dim_partial,
+                                          int dim_total,
+                                          const float* query_full,
+                                          const float* linear_w,
+                                          const float* linear_b,
+                                          int linear_dim) {
+    int cluster_id = -1;
+    int global_page = -1;
+    int offset = 0;
+    if (point_infos) {
+        const PointInfo& info = point_infos[point_id];
+        cluster_id = info.belong;
+        global_page = info.global_page_id;
+        offset = info.offset;
+    }
+
+    bool in_top = false;
+    if (cluster_top_t > 0 && query_top_clusters) {
+        const int* top_list = query_top_clusters + static_cast<size_t>(query_id) * cluster_top_t;
+        in_top = is_cluster_in_top(top_list, cluster_top_t, cluster_id);
+    }
+
+    if (in_top && cache_data && cluster_to_page && dim_partial > 0 && query_full && global_page >= 0) {
+        const volatile int* cluster_map = reinterpret_cast<const volatile int*>(cluster_to_page);
+        int cache_page = cluster_map[global_page];
+        while (cache_page == -1) { //缺页，等待读入
+            cache_page = cluster_map[global_page];
+            // printf("rolling\n");
+        }
+        long long page_base = (static_cast<long long>(cache_page) * page_size + offset) * dim_partial;
+        const float* page_ptr = cache_data + page_base;
+        const float* query_tail = query_full + static_cast<long long>(query_id) * dim_total + DIM;
+        for (int j = 0; j < dim_partial; ++j) {
+            float diff = query_tail[j] - page_ptr[j];
+            base_dist += diff * diff;
+        }
+        return base_dist;
+    }
+
+    if (linear_dim > 0 && linear_w && linear_b) {
+        int idx = (linear_dim < DIM ? linear_dim : DIM);
+        if (idx >= 0) {
+            base_dist = linear_w[idx] * base_dist + linear_b[idx];
+            if (base_dist < 0.0f) {
+                base_dist = 0.0f;
+            }
+        }
+    }
+    return base_dist;
+}
+
 template<typename IdType, typename FloatType, int WARP_SIZE>
-__global__ void GraphSearchKernel(float* d_data, float* d_query, int* d_results, int* d_graph, int* d_candidates, int np,
+__global__ void GraphSearchKernel(float* d_data, const float* query_full, int* d_results, int* d_graph, int* d_candidates, int np,
+                      int query_base,
                       int offset_shift, int n_candidates, int topk, int search_width, int* d_entries,
-                      int* d_hits, int max_iter, int ALGO){
+                      int* d_hits, int max_iter, int ALGO,
+                      const PointInfo* point_infos,
+                      const int* cluster_to_page,
+                      const float* cache_data,
+                      int page_size,
+                      int dim_partial,
+                      int dim_total,
+                      const int* query_top_clusters,
+                      int cluster_top_t,
+                      const float* linear_w,
+                      const float* linear_b,
+                      int linear_dim){
   
   int t_id = threadIdx.x;
-  int b_id = blockIdx.x;//query_id
-  int q_id = b_id;
+  int b_id = blockIdx.x;//query batch index
+  int q_id = query_base + b_id;
   int blockSize = blockDim.x;
   int n_warp = blockSize / WARP_SIZE;
   int lane_id = t_id % WARP_SIZE;
@@ -73,7 +160,7 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, int* d_results,
   int entries_st;
 //   int n_entries = n_candidates;
   int n_entries = search_width * (1 << offset_shift);
-  if(ALGO==1)
+  if(ALGO==1 && d_hits)
     entries_st = d_hits[q_id] * n_candidates;
 
   int* crt_results = d_results + q_id * topk;
@@ -99,369 +186,186 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, int* d_results,
   };
 
 // read d_query
-  #ifdef REORDER
-    #if DIM > 0
+    #if FULL_DIM > 0
         float q1 = 0;
-        if (lane_id < DIM) {
-            q1 = d_query[b_id * DIM + lane_id];
+        if (lane_id < FULL_DIM) {
+            q1 = query_full[q_id * FULL_DIM + lane_id];
         }
     #endif
-    #if DIM > 32
+    #if FULL_DIM > 32
         float q2 = 0;
-        if (lane_id + 32 < DIM) {
-            q2 = d_query[b_id * DIM + lane_id + 32];
+        if (lane_id + 32 < FULL_DIM) {
+            q2 = query_full[q_id * FULL_DIM + lane_id + 32];
         }
     #endif
-    #if DIM > 64
+    #if FULL_DIM > 64
         float q3 = 0;
-        if (lane_id + 64 < DIM) {
-            q3 = d_query[b_id * DIM + lane_id + 64];
+        if (lane_id + 64 < FULL_DIM) {
+            q3 = query_full[q_id * FULL_DIM + lane_id + 64];
         }
     #endif
-    #if DIM > 96
+    #if FULL_DIM > 96
         float q4 = 0;
-        if (lane_id + 96 < DIM) {
-            q4 = d_query[b_id * DIM + lane_id + 96];
+        if (lane_id + 96 < FULL_DIM) {
+            q4 = query_full[q_id * FULL_DIM + lane_id + 96];
         }
     #endif
-    #if DIM > 128
+    #if FULL_DIM > 128
         float q5 = 0;
-        if (lane_id + 128 < DIM) {
-            q5 = d_query[b_id * DIM + lane_id + 128];
+        if (lane_id + 128 < FULL_DIM) {
+            q5 = query_full[q_id * FULL_DIM + lane_id + 128];
         }
     #endif
-    #if DIM > 160
+    #if FULL_DIM > 160
         float q6 = 0;
-        if (lane_id + 160 < DIM) {
-            q6 = d_query[b_id * DIM + lane_id + 160];
+        if (lane_id + 160 < FULL_DIM) {
+            q6 = query_full[q_id * FULL_DIM + lane_id + 160];
         }
     #endif
-    #if DIM > 192
+    #if FULL_DIM > 192
         float q7 = 0;
-        if (lane_id + 192 < DIM) {
-            q7 = d_query[b_id * DIM + lane_id + 192];
+        if (lane_id + 192 < FULL_DIM) {
+            q7 = query_full[q_id * FULL_DIM + lane_id + 192];
         }
     #endif
-    #if DIM > 224
+    #if FULL_DIM > 224
         float q8 = 0;
-        if (lane_id + 224 < DIM) {
-            q8 = d_query[b_id * DIM + lane_id + 224];
+        if (lane_id + 224 < FULL_DIM) {
+            q8 = query_full[q_id * FULL_DIM + lane_id + 224];
         }
     #endif
-    #if DIM > 256
+    #if FULL_DIM > 256
         float q9 = 0;
-        if (lane_id + 256 < DIM) {
-            q9 = d_query[b_id * DIM + lane_id + 256];
+        if (lane_id + 256 < FULL_DIM) {
+            q9 = query_full[q_id * FULL_DIM + lane_id + 256];
         }
     #endif
-    #if DIM > 288
+    #if FULL_DIM > 288
         float q10 = 0;
-        if (lane_id + 288 < DIM) {
-            q10 = d_query[b_id * DIM + lane_id + 288];
+        if (lane_id + 288 < FULL_DIM) {
+            q10 = query_full[q_id * FULL_DIM + lane_id + 288];
         }
     #endif
-    #if DIM > 320
+    #if FULL_DIM > 320
         float q11 = 0;
-        if (lane_id + 320 < DIM) {
-            q11 = d_query[b_id * DIM + lane_id + 320];
+        if (lane_id + 320 < FULL_DIM) {
+            q11 = query_full[q_id * FULL_DIM + lane_id + 320];
         }
     #endif
-    #if DIM > 352
+    #if FULL_DIM > 352
         float q12 = 0;
-        if (lane_id + 352 < DIM) {
-            q12 = d_query[b_id * DIM + lane_id + 352];
+        if (lane_id + 352 < FULL_DIM) {
+            q12 = query_full[q_id * FULL_DIM + lane_id + 352];
         }
     #endif
-    #if DIM > 384
+    #if FULL_DIM > 384
         float q13 = 0;
-        if (lane_id + 384 < DIM) {
-            q13 = d_query[b_id * DIM + lane_id + 384];
+        if (lane_id + 384 < FULL_DIM) {
+            q13 = query_full[q_id * FULL_DIM + lane_id + 384];
         }
     #endif
-    #if DIM > 416
+    #if FULL_DIM > 416
         float q14 = 0;
-        if (lane_id + 416 < DIM) {
-            q14 = d_query[b_id * DIM + lane_id + 416];
+        if (lane_id + 416 < FULL_DIM) {
+            q14 = query_full[q_id * FULL_DIM + lane_id + 416];
         }
     #endif
-    #if DIM > 448
+    #if FULL_DIM > 448
         float q15 = 0;
-        if (lane_id + 448 < DIM) {
-            q15 = d_query[b_id * DIM + lane_id + 448];
+        if (lane_id + 448 < FULL_DIM) {
+            q15 = query_full[q_id * FULL_DIM + lane_id + 448];
         }
     #endif
-    #if DIM > 480
+    #if FULL_DIM > 480
         float q16 = 0;
-        if (lane_id + 480 < DIM) {
-            q16 = d_query[b_id * DIM + lane_id + 480];
+        if (lane_id + 480 < FULL_DIM) {
+            q16 = query_full[q_id * FULL_DIM + lane_id + 480];
         }
     #endif
-    #if DIM > 512
+    #if FULL_DIM > 512
         float q17 = 0;
-        if (lane_id + 512 < DIM) {
-            q17 = d_query[b_id * DIM + lane_id + 512];
+        if (lane_id + 512 < FULL_DIM) {
+            q17 = query_full[q_id * FULL_DIM + lane_id + 512];
         }
     #endif
-    #if DIM > 544
+    #if FULL_DIM > 544
         float q18 = 0;
-        if (lane_id + 544 < DIM) {
-            q18 = d_query[b_id * DIM + lane_id + 544];
+        if (lane_id + 544 < FULL_DIM) {
+            q18 = query_full[q_id * FULL_DIM + lane_id + 544];
         }
     #endif
-    #if DIM > 576
+    #if FULL_DIM > 576
         float q19 = 0;
-        if (lane_id + 576 < DIM) {
-            q19 = d_query[b_id * DIM + lane_id + 576];
+        if (lane_id + 576 < FULL_DIM) {
+            q19 = query_full[q_id * FULL_DIM + lane_id + 576];
         }
     #endif
-    #if DIM > 608
+    #if FULL_DIM > 608
         float q20 = 0;
-        if (lane_id + 608 < DIM) {
-            q20 = d_query[b_id * DIM + lane_id + 608];
+        if (lane_id + 608 < FULL_DIM) {
+            q20 = query_full[q_id * FULL_DIM + lane_id + 608];
         }
     #endif
-    #if DIM > 640
+    #if FULL_DIM > 640
         float q21 = 0;
-        if (lane_id + 640 < DIM) {
-            q21 = d_query[b_id * DIM + lane_id + 640];
+        if (lane_id + 640 < FULL_DIM) {
+            q21 = query_full[q_id * FULL_DIM + lane_id + 640];
         }
     #endif
-    #if DIM > 672
+    #if FULL_DIM > 672
         float q22 = 0;
-        if (lane_id + 672 < DIM) {
-            q22 = d_query[b_id * DIM + lane_id + 672];
+        if (lane_id + 672 < FULL_DIM) {
+            q22 = query_full[q_id * FULL_DIM + lane_id + 672];
         }
     #endif
-    #if DIM > 704
+    #if FULL_DIM > 704
         float q23 = 0;
-        if (lane_id + 704 < DIM) {
-            q23 = d_query[b_id * DIM + lane_id + 704];
+        if (lane_id + 704 < FULL_DIM) {
+            q23 = query_full[q_id * FULL_DIM + lane_id + 704];
         }
     #endif
-    #if DIM > 736
+    #if FULL_DIM > 736
         float q24 = 0;
-        if (lane_id + 736 < DIM) {
-            q24 = d_query[b_id * DIM + lane_id + 736];
+        if (lane_id + 736 < FULL_DIM) {
+            q24 = query_full[q_id * FULL_DIM + lane_id + 736];
         }
     #endif
-    #if DIM > 768
+    #if FULL_DIM > 768
         float q25 = 0;
-        if (lane_id + 768 < DIM) {
-            q25 = d_query[b_id * DIM + lane_id + 768];
+        if (lane_id + 768 < FULL_DIM) {
+            q25 = query_full[q_id * FULL_DIM + lane_id + 768];
         }
     #endif
-    #if DIM > 800
+    #if FULL_DIM > 800
         float q26 = 0;
-        if (lane_id + 800 < DIM) {
-            q26 = d_query[b_id * DIM + lane_id + 800];
+        if (lane_id + 800 < FULL_DIM) {
+            q26 = query_full[q_id * FULL_DIM + lane_id + 800];
         }
     #endif
-    #if DIM > 832
+    #if FULL_DIM > 832
         float q27 = 0;
-        if (lane_id + 832 < DIM) {
-            q27 = d_query[b_id * DIM + lane_id + 832];
+        if (lane_id + 832 < FULL_DIM) {
+            q27 = query_full[q_id * FULL_DIM + lane_id + 832];
         }
     #endif
-    #if DIM > 864
+    #if FULL_DIM > 864
         float q28 = 0;
-        if (lane_id + 864 < DIM) {
-            q28 = d_query[b_id * DIM + lane_id + 864];
+        if (lane_id + 864 < FULL_DIM) {
+            q28 = query_full[q_id * FULL_DIM + lane_id + 864];
         }
     #endif
-    #if DIM > 896
+    #if FULL_DIM > 896
         float q29 = 0;
-        if (lane_id + 896 < DIM) {
-            q29 = d_query[b_id * DIM + lane_id + 896];
+        if (lane_id + 896 < FULL_DIM) {
+            q29 = query_full[q_id * FULL_DIM + lane_id + 896];
         }
     #endif
-    #if DIM > 928
+    #if FULL_DIM > 928
         float q30 = 0;
-        if (lane_id + 224 < DIM) {
-            q30 = d_query[b_id * DIM + lane_id + 928];
+        if (lane_id + 224 < FULL_DIM) {
+            q30 = query_full[q_id * FULL_DIM + lane_id + 928];
         }
     #endif
-  #else
-    #if GRAPH_DIM > 0
-        float q1 = 0;
-        if (lane_id < GRAPH_DIM) {
-            q1 = d_query[b_id * DIM + lane_id];
-        }
-    #endif
-    #if GRAPH_DIM > 32
-        float q2 = 0;
-        if (lane_id + 32 < GRAPH_DIM) {
-            q2 = d_query[b_id * DIM + lane_id + 32];
-        }
-    #endif
-    #if GRAPH_DIM > 64
-        float q3 = 0;
-        if (lane_id + 64 < GRAPH_DIM) {
-            q3 = d_query[b_id * DIM + lane_id + 64];
-        }
-    #endif
-    #if GRAPH_DIM > 96
-        float q4 = 0;
-        if (lane_id + 96 < GRAPH_DIM) {
-            q4 = d_query[b_id * DIM + lane_id + 96];
-        }
-    #endif
-    #if GRAPH_DIM > 128
-        float q5 = 0;
-        if (lane_id + 128 < GRAPH_DIM) {
-            q5 = d_query[b_id * DIM + lane_id + 128];
-        }
-    #endif
-    #if GRAPH_DIM > 160
-        float q6 = 0;
-        if (lane_id + 160 < GRAPH_DIM) {
-            q6 = d_query[b_id * DIM + lane_id + 160];
-        }
-    #endif
-    #if GRAPH_DIM > 192
-        float q7 = 0;
-        if (lane_id + 192 < GRAPH_DIM) {
-            q7 = d_query[b_id * DIM + lane_id + 192];
-        }
-    #endif
-    #if GRAPH_DIM > 224
-        float q8 = 0;
-        if (lane_id + 224 < GRAPH_DIM) {
-            q8 = d_query[b_id * DIM + lane_id + 224];
-        }
-    #endif
-    #if GRAPH_DIM > 256
-        float q9 = 0;
-        if (lane_id + 256 < GRAPH_DIM) {
-            q9 = d_query[b_id * DIM + lane_id + 256];
-        }
-    #endif
-    #if GRAPH_DIM > 288
-        float q10 = 0;
-        if (lane_id + 288 < GRAPH_DIM) {
-            q10 = d_query[b_id * DIM + lane_id + 288];
-        }
-    #endif
-    #if GRAPH_DIM > 320
-        float q11 = 0;
-        if (lane_id + 320 < GRAPH_DIM) {
-            q11 = d_query[b_id * DIM + lane_id + 320];
-        }
-    #endif
-    #if GRAPH_DIM > 352
-        float q12 = 0;
-        if (lane_id + 352 < GRAPH_DIM) {
-            q12 = d_query[b_id * DIM + lane_id + 352];
-        }
-    #endif
-    #if GRAPH_DIM > 384
-        float q13 = 0;
-        if (lane_id + 384 < GRAPH_DIM) {
-            q13 = d_query[b_id * DIM + lane_id + 384];
-        }
-    #endif
-    #if GRAPH_DIM > 416
-        float q14 = 0;
-        if (lane_id + 416 < GRAPH_DIM) {
-            q14 = d_query[b_id * DIM + lane_id + 416];
-        }
-    #endif
-    #if GRAPH_DIM > 448
-        float q15 = 0;
-        if (lane_id + 448 < GRAPH_DIM) {
-            q15 = d_query[b_id * DIM + lane_id + 448];
-        }
-    #endif
-    #if GRAPH_DIM > 480
-        float q16 = 0;
-        if (lane_id + 480 < GRAPH_DIM) {
-            q16 = d_query[b_id * DIM + lane_id + 480];
-        }
-    #endif
-    #if GRAPH_DIM > 512
-        float q17 = 0;
-        if (lane_id + 512 < GRAPH_DIM) {
-            q17 = d_query[b_id * DIM + lane_id + 512];
-        }
-    #endif
-    #if GRAPH_DIM > 544
-        float q18 = 0;
-        if (lane_id + 544 < GRAPH_DIM) {
-            q18 = d_query[b_id * DIM + lane_id + 544];
-        }
-    #endif
-    #if GRAPH_DIM > 576
-        float q19 = 0;
-        if (lane_id + 576 < GRAPH_DIM) {
-            q19 = d_query[b_id * DIM + lane_id + 576];
-        }
-    #endif
-    #if GRAPH_DIM > 608
-        float q20 = 0;
-        if (lane_id + 608 < GRAPH_DIM) {
-            q20 = d_query[b_id * DIM + lane_id + 608];
-        }
-    #endif
-    #if GRAPH_DIM > 640
-        float q21 = 0;
-        if (lane_id + 640 < GRAPH_DIM) {
-            q21 = d_query[b_id * DIM + lane_id + 640];
-        }
-    #endif
-    #if GRAPH_DIM > 672
-        float q22 = 0;
-        if (lane_id + 672 < GRAPH_DIM) {
-            q22 = d_query[b_id * DIM + lane_id + 672];
-        }
-    #endif
-    #if GRAPH_DIM > 704
-        float q23 = 0;
-        if (lane_id + 704 < GRAPH_DIM) {
-            q23 = d_query[b_id * DIM + lane_id + 704];
-        }
-    #endif
-    #if GRAPH_DIM > 736
-        float q24 = 0;
-        if (lane_id + 736 < GRAPH_DIM) {
-            q24 = d_query[b_id * DIM + lane_id + 736];
-        }
-    #endif
-    #if GRAPH_DIM > 768
-        float q25 = 0;
-        if (lane_id + 768 < GRAPH_DIM) {
-            q25 = d_query[b_id * DIM + lane_id + 768];
-        }
-    #endif
-    #if GRAPH_DIM > 800
-        float q26 = 0;
-        if (lane_id + 800 < GRAPH_DIM) {
-            q26 = d_query[b_id * DIM + lane_id + 800];
-        }
-    #endif
-    #if GRAPH_DIM > 832
-        float q27 = 0;
-        if (lane_id + 832 < GRAPH_DIM) {
-            q27 = d_query[b_id * DIM + lane_id + 832];
-        }
-    #endif
-    #if GRAPH_DIM > 864
-        float q28 = 0;
-        if (lane_id + 864 < GRAPH_DIM) {
-            q28 = d_query[b_id * DIM + lane_id + 864];
-        }
-    #endif
-    #if GRAPH_DIM > 896
-        float q29 = 0;
-        if (lane_id + 896 < GRAPH_DIM) {
-            q29 = d_query[b_id * DIM + lane_id + 896];
-        }
-    #endif
-    #if GRAPH_DIM > 928
-        float q30 = 0;
-        if (lane_id + 224 < GRAPH_DIM) {
-            q30 = d_query[b_id * DIM + lane_id + 928];
-        }
-    #endif
-  #endif
 
 // insert entry points
   // int* enter_points = d_entries + q_id * n_entries;
@@ -883,7 +787,13 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, int* d_results,
 
     // insert
       if(lane_id == 0){
-        neighbors_array[n_candidates + i].first = dist;
+        neighbors_array[n_candidates + i].first = finalize_distance(dist,
+          static_cast<int>(p_id), q_id,
+          query_top_clusters, cluster_top_t,
+          point_infos, cluster_to_page,
+          cache_data, page_size, dim_partial, dim_total,
+          query_full, linear_w, linear_b, linear_dim);
+        // neighbors_array[n_candidates + i].first = dist;
       }
     }
     __syncthreads();
@@ -1419,7 +1329,13 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, int* d_results,
       #endif
     // insert
       if(lane_id == 0){
-        neighbors_array[n_candidates + i].first = dist;
+        neighbors_array[n_candidates + i].first = finalize_distance(dist,
+          static_cast<int>(p_id), q_id,
+          query_top_clusters, cluster_top_t,
+          point_infos, cluster_to_page,
+          cache_data, page_size, dim_partial, dim_total,
+          query_full, linear_w, linear_b, linear_dim);
+        // neighbors_array[n_candidates + i].first = dist;
       }
     }
     __syncthreads();
@@ -1966,7 +1882,7 @@ __global__ void GraphSearchKernel(float* d_data, float* d_query, int* d_results,
   #endif
 }
 
-template<typename IdType, typename FloatType, int WARP_SIZE>
+/*template<typename IdType, typename FloatType, int WARP_SIZE>
 __global__ void ReorderKernel(float* d_data, float* d_query, int* d_results, int* d_map, int* d_candidates, int n_candidates, int topk){
   int q_id = blockIdx.x;
   int b_id = blockIdx.x;
@@ -2550,10 +2466,15 @@ __global__ void ReorderKernel(float* d_data, float* d_query, int* d_results, int
 
     // insert
       if(lane_id == 0){
-        neighbors_array[i].first = dist;
+        neighbors_array[i].first = finalize_distance(dist,
+          static_cast<int>(p_id), q_id,
+          query_top_clusters, cluster_top_t,
+          point_infos, cluster_to_page,
+          cache_data, page_size, dim_partial, dim_total,
+          query_full, linear_w, linear_b, linear_dim);
       }
-  }
-  __syncthreads();
+    }
+    __syncthreads();
 
   // bitonic sort
   int step_id = 1;
@@ -2593,4 +2514,4 @@ __global__ void ReorderKernel(float* d_data, float* d_query, int* d_results, int
   for(int i=t_id; i<topk; i+=blockSize){
     d_results[q_id * topk + i] = neighbors_array[i].second;
   }
-}
+}*/

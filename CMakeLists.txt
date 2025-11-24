@@ -43,6 +43,11 @@ endif()
 
 find_package(OpenMP REQUIRED)
 
+# 添加 pca 子目录到包含路径
+include_directories(${CMAKE_SOURCE_DIR}/pca)
+# 添加 Eigen 库到包含路径
+include_directories(${CMAKE_SOURCE_DIR})
+
 include(${PROJECT_SOURCE_DIR}/cmake/configure_optix.cmake)
 # include(${PROJECT_SOURCE_DIR}/cmake/FindOptiX.cmake)
 
@@ -60,12 +65,14 @@ add_executable(test
   entry_helper.cu
   matrix.cu
   file_read.cu
-  pca.cpp
+  pca/pca.cpp
   raytracing.cpp
   flags.cpp
   graph.cu
   graph_helper.cu
   graph_search.cuh
+  cache/lru.cpp
+  cache/page_cache.cu
 )
 
 # target_link_libraries(test
@@ -107,5 +114,23 @@ target_link_libraries(test
 )
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/deps/cxxopts)
+
+# 添加 compute_pca 可执行文件
+add_executable(compute_pca 
+    compute_pca.cpp 
+    pca/pca.cpp
+)
+
+target_compile_options(compute_pca PRIVATE
+    -Wall -Wextra -Wpedantic
+    ${OpenMP_CXX_FLAGS}
+    -std=c++14
+    -O3
+)
+
+target_link_libraries(compute_pca
+    OpenMP::OpenMP_CXX
+)
+
 # 使用CUDA编译器对algo.cu进行编译
 # set_source_files_properties(algo.cu PROPERTIES LANGUAGE CUDA)

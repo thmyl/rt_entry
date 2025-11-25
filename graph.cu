@@ -1,6 +1,7 @@
 #include "graph.h"
 #include "auto_tune_bloom.h"
 #include "warpselect/structure_on_device.cuh"
+#include "warpselect/WarpSelect.cuh"
 #include "graph_search.cuh"
 #include "cache/page_cache.h"
 #include <thrust/unique.h>
@@ -8,6 +9,15 @@
 #include <unordered_set>
 #include <algorithm>
 #include <fstream>
+#include <limits>
+
+extern "C" __global__ void topk_warp_kernel(
+  const float* __restrict__ dists,
+  int nq,
+  int n_cluster,
+  int K,
+  int* __restrict__ out_topk
+);
 
 __global__ void mapIdKernel(int *d_unique, int unique_size, int *d_map_id){
   int tid = blockIdx.x * blockDim.x + threadIdx.x;
@@ -434,6 +444,54 @@ void topk_dynamic_kernel(const float* __restrict__ dists,
     }
 }
 
+template <int ThreadsPerBlock, int NumWarpQ, int NumThreadQ>
+__global__ void query_cluster_top_warpselect_kernel(const float* __restrict__ dists,
+                                                    int nq,
+                                                    int n_cluster,
+                                                    int K,
+                                                    int* __restrict__ out_topk) {
+    static_assert(ThreadsPerBlock % 32 == 0, "ThreadsPerBlock 必须是 32 的倍数");
+    constexpr int kWarpSize = 32;
+    constexpr int kWarpsPerBlock = ThreadsPerBlock / kWarpSize;
+
+    int warp_id_in_block = threadIdx.x / kWarpSize;
+    int lane_id = threadIdx.x & (kWarpSize - 1);
+    int global_warp_id = blockIdx.x * kWarpsPerBlock + warp_id_in_block;
+    if (global_warp_id >= nq) {
+        return;
+    }
+
+    using Selector = WarpSelect<float,
+                                int,
+                                false,
+                                Comparator<float>,
+                                NumWarpQ,
+                                NumThreadQ,
+                                ThreadsPerBlock>;
+
+    Selector selector(std::numeric_limits<float>::infinity(), -1, K);
+    const float* row = dists + static_cast<size_t>(global_warp_id) * n_cluster;
+    int iterations = (n_cluster + kWarpSize - 1) / kWarpSize;
+
+    for (int it = 0; it < iterations; ++it) {
+        int cid = it * kWarpSize + lane_id;
+        float dist = (cid < n_cluster) ? row[cid] : std::numeric_limits<float>::infinity();
+        int id = (cid < n_cluster) ? cid : -1;
+        selector.add(dist, id);
+    }
+
+    selector.reduce();
+
+    int out_base = global_warp_id * K;
+    for (int i = 0; i < Selector::kNumWarpQRegisters; ++i) {
+        int idx = i * kWarpSize + lane_id;
+        if (idx < K) {
+            out_topk[out_base + idx] = selector.warpV[i];
+        }
+    }
+}
+
+#if 0
 void Graph::compute_query_cluster_top() {
   if (cluster_top_t <= 0 || n_cluster == 0) {
     return;
@@ -469,7 +527,7 @@ void Graph::compute_query_cluster_top() {
   // Use the existing topk_dynamic_kernel which is more efficient
   d_query_top_clusters.resize(static_cast<size_t>(nq) * cluster_top_t);
   
-  int blockSize = 256;  // One block per query
+  /*int blockSize = 256;  // One block per query
   int gridSize = nq;
   // Dynamic shared memory: blockDim * K * (float + int)
   size_t shmBytes = static_cast<size_t>(blockSize) * cluster_top_t * (sizeof(float) + sizeof(int));
@@ -483,7 +541,25 @@ void Graph::compute_query_cluster_top() {
   );
   
   // Check for errors (only once at the end, no unnecessary synchronization)
+  CUDA_CHECK(cudaGetLastError());*/
+
+  int blockSize = 256;                      // must be multiple of 32
+  int warpsPerBlock = blockSize / 32;
+  int gridSize = (nq + warpsPerBlock - 1) / warpsPerBlock;
+
+  size_t shmBytes = (size_t)warpsPerBlock * 32 * cluster_top_t *
+                    (sizeof(float) + sizeof(int));
+
+  topk_warp_kernel<<<gridSize, blockSize, shmBytes>>>(
+      thrust::raw_pointer_cast(d_query_centroid_dists.data()),
+      nq,
+      n_cluster,
+      cluster_top_t,
+      thrust::raw_pointer_cast(d_query_top_clusters.data())
+  );
+
   CUDA_CHECK(cudaGetLastError());
+
   
   // Copy to host only if needed (for build_query_batches)
   h_query_top_clusters.resize(static_cast<size_t>(nq) * cluster_top_t);
@@ -494,6 +570,64 @@ void Graph::compute_query_cluster_top() {
   thrust::device_vector<float>().swap(d_query_centroid_dists);
   thrust::device_vector<float>().swap(d_query_norms);
 } 
+#endif
+
+void Graph::compute_query_cluster_top() {
+  if (cluster_top_t <= 0 || n_cluster == 0) {
+    return;
+  }
+
+  if (d_centroids_matrix.empty()) {
+    return;
+  }
+
+  d_query_centroid_dists.resize(static_cast<size_t>(nq) * n_cluster);
+  d_query_norms.resize(nq);
+
+  float alpha = -2.0f;
+  float beta = 0.0f;
+
+  matrixMultiplyABT(handle_, d_queries_, d_centroids_matrix, d_query_centroid_dists,
+                 nq, n_cluster, dim_, alpha, beta);
+
+  computeRowNorms(thrust::raw_pointer_cast(d_queries_.data()),
+                  thrust::raw_pointer_cast(d_query_norms.data()),
+                  nq, dim_);
+
+  addNormsToDistances(thrust::raw_pointer_cast(d_query_centroid_dists.data()),
+                      thrust::raw_pointer_cast(d_query_norms.data()),
+                      thrust::raw_pointer_cast(d_centroid_norms.data()),
+                      nq, n_cluster);
+
+  d_query_top_clusters.resize(static_cast<size_t>(nq) * cluster_top_t);
+
+  constexpr int kBlockSize = 256;
+  constexpr int kWarpQueueSize = 256;
+  constexpr int kThreadQueueSize = 4;
+
+  if (cluster_top_t > kWarpQueueSize) {
+    throw std::runtime_error("cluster_top_t 超过 WarpSelect 内部容量限制");
+  }
+
+  int warpsPerBlock = kBlockSize / 32;
+  int gridSize = (nq + warpsPerBlock - 1) / warpsPerBlock;
+
+  query_cluster_top_warpselect_kernel<kBlockSize, kWarpQueueSize, kThreadQueueSize><<<gridSize, kBlockSize>>>(
+      thrust::raw_pointer_cast(d_query_centroid_dists.data()),
+      nq,
+      n_cluster,
+      cluster_top_t,
+      thrust::raw_pointer_cast(d_query_top_clusters.data()));
+
+  CUDA_CHECK(cudaGetLastError());
+
+  h_query_top_clusters.resize(static_cast<size_t>(nq) * cluster_top_t);
+  thrust::copy(d_query_top_clusters.begin(), d_query_top_clusters.end(), 
+               h_query_top_clusters.begin());
+
+  thrust::device_vector<float>().swap(d_query_centroid_dists);
+  thrust::device_vector<float>().swap(d_query_norms);
+}
 
 void Graph::build_query_batches() {
   batch_cluster_ids.clear();

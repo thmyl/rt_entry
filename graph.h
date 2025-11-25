@@ -3,7 +3,7 @@
 #include "pca.h"
 #include "cache/page_cache.h"
 
-struct Pair{
+struct DistPair{
 	float dist;
 	int id;
 };
@@ -30,7 +30,7 @@ public:
 	void check_results(thrust::device_vector<int> &d_gt_);
 	void RB_Graph();
 	void GraphSearchBatch(int query_offset, int batch_size, cudaStream_t stream = nullptr);
-	void parallel_reorder(int* candidates, int* results, int n_candidates, int topk, int dim_, int nq, float* queries, int np, float* points, Pair* candidates_dist);
+	void parallel_reorder(int* candidates, int* results, int n_candidates, int topk, int dim_, int nq, float* queries, int np, float* points, DistPair* candidates_dist);
 	void CopyHostToDevice(thrust::host_vector<float> &h_data, thrust::device_vector<float> &d_data, int n, int d, int d_);
 
 public:
@@ -73,7 +73,7 @@ public:
 	thrust::device_vector<int> d_candidates;
 	thrust::host_vector<int> h_candidates;
 
-	thrust::host_vector<Pair> candidates_dist;
+	thrust::host_vector<DistPair> candidates_dist;
 
 	PageCache* page_cache;
 	int page_size;

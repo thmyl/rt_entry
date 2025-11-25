@@ -120,7 +120,7 @@ void Graph::check_results(thrust::device_vector<int> &d_gt_){
   outfile.close();
 }
 
-bool cmp(Pair a, Pair b){
+bool cmp(DistPair a, DistPair b){
   return a.dist < b.dist;
 }
 
@@ -143,14 +143,14 @@ bool cmp(Pair a, Pair b){
   }
 }*/
 
-void Graph::parallel_reorder(int* candidates, int* results, int n_candidates, int topk, int dim_, int nq, float* points, int np, float* queries, Pair* candidates_dist) {
+void Graph::parallel_reorder(int* candidates, int* results, int n_candidates, int topk, int dim_, int nq, float* points, int np, float* queries, DistPair* candidates_dist) {
   // int max_threads = omp_get_max_threads();
   int max_threads = 64;
 
   #pragma omp parallel for schedule(dynamic) num_threads(max_threads)
   for (int q_id_ = 0; q_id_ < nq; ++q_id_) {
     int q_id = q_id_;
-    Pair* cur_candidates_dist = candidates_dist + q_id * n_candidates;
+    DistPair* cur_candidates_dist = candidates_dist + q_id * n_candidates;
 
     // 计算距离并填充cur_candidates_dist
     // for (int j = 0; j < n_candidates; ++j) {

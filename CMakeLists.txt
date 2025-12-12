@@ -65,6 +65,7 @@ add_executable(test
   entry_helper.cu
   matrix.cu
   file_read.cu
+  topk_warp_kernel.cu
   pca/pca.cpp
   raytracing.cpp
   flags.cpp

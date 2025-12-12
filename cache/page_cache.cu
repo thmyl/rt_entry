@@ -7,6 +7,12 @@
 #include <sstream>
 #include <stdexcept>
 
+// 由 graph.cu 提供的 host 辅助函数，用于在同一个 CUDA 模块中更新常量表
+#ifdef ENABLE_CONSTANT_CLUSTER_MAP
+extern "C" void init_cluster_const_table(const int* h_data, int size);
+extern "C" void update_cluster_const_entry(int idx, const int* h_value_ptr);
+#endif
+
 namespace {
 
 inline void cuda_check(cudaError_t err, const char* expr, const char* file, int line) {
@@ -32,6 +38,7 @@ PageCache::PageCache(int page_size, int num_pages, int dim_partial, int num_clus
       num_clusters(num_clusters),
       total_cluster_pages(0),
       device_cluster_to_page(nullptr),
+      constant_cluster_map_enabled(false),
       device_point_info(nullptr),
       lru(nullptr),
       default_stream(nullptr),
@@ -58,6 +65,10 @@ PageCache::PageCache(int page_size, int num_pages, int dim_partial, int num_clus
 
     // 创建LRU管理器
     lru = new LRUList(num_pages);
+    std::cout<<"cache page information: "<<std::endl;
+    std::cout<<"  num_pages = "<<num_pages<<std::endl;
+    std::cout<<"  page_size = "<<page_size<<std::endl;
+    copied_pages = 0;
 
     // 创建内部stream
     CUDA_CHECK(cudaStreamCreateWithFlags(&default_stream, cudaStreamNonBlocking));
@@ -90,6 +101,7 @@ void PageCache::init_data(const float* data,
                          const std::vector<int>& cluster_labels,
                          const std::vector<std::vector<int>>& cluster_points) {
     int num_points = cluster_labels.size();
+    copied_pages = 0;
 
     if (num_points != num_points_total) {
         throw std::runtime_error("init_data: 输入点数与构造时不一致");
@@ -111,6 +123,7 @@ void PageCache::init_data(const float* data,
         int page_cnt = pts.empty() ? 0 : (static_cast<int>(pts.size()) + page_size - 1) / page_size;
         cluster_page_count[cluster_id] = page_cnt;
         cluster_page_offset[cluster_id + 1] = cluster_page_offset[cluster_id] + page_cnt;
+        // printf("cluster_id = %d, page_cnt = %d\n", cluster_id, page_cnt);
     }
     total_cluster_pages = cluster_page_offset[num_clusters];
     int max_pages_per_cluster = max_cluster_size == 0 ? 0 : (max_cluster_size + page_size - 1) / page_size;
@@ -135,6 +148,18 @@ void PageCache::init_data(const float* data,
     } else {
         device_cluster_to_page = nullptr;
     }
+
+    // 初始化常量映射（仅当规模不超过 MAX_CLUSTER_TO_PAGE）
+    #ifdef ENABLE_CONSTANT_CLUSTER_MAP
+        if (total_cluster_pages > 0 && total_cluster_pages <= MAX_CLUSTER_TO_PAGE) {
+            constant_cluster_map_enabled = true;
+            init_cluster_const_table(cluster_to_page.data(), total_cluster_pages);
+        } else {
+            constant_cluster_map_enabled = false;
+            // 通知 graph 侧：禁用常量表（size = 0）
+            init_cluster_const_table(nullptr, 0);
+        }
+    #endif
 
     // 分配full_data并按cluster重新排序
     size_t total_slots = static_cast<size_t>(total_cluster_pages) * page_size;
@@ -221,6 +246,10 @@ void PageCache::prefetch_cluster(int cluster_id, cudaStream_t stream) {
         // 如果不在cache中，加载它
         if (cluster_to_page[global_page_id] == -1) {
             load_page(cluster_id, local_page_id, use_stream);
+            #ifdef DETAIL
+                copied_pages++;
+                // std::cout<<"copied_pages = "<<copied_pages<<std::endl;
+            #endif
         } else {
             // 如果已在cache中，touch它
             lru->touch(cluster_to_page[global_page_id]);
@@ -282,24 +311,15 @@ float* PageCache::load_page(int cluster_id, int local_page_id, cudaStream_t stre
         int old_global_page_id = get_global_page_id(old_cluster_id, old_local_page_id);
 
         cluster_to_page[old_global_page_id] = -1;
-        if (device_cluster_to_page) {
+        #ifdef ENABLE_CONSTANT_CLUSTER_MAP
+            int minus_one = -1;
+            update_cluster_const_entry(old_global_page_id, &minus_one);
+        #else
             CUDA_CHECK(cudaMemcpyAsync(device_cluster_to_page + old_global_page_id,
                                        cluster_to_page.data() + old_global_page_id,
                                        sizeof(int),
                                        cudaMemcpyHostToDevice, stream));
-        }
-    }
-
-    // 建立新映射
-    cluster_to_page[global_page_id] = victim_cache_page_id;
-    // cudaDeviceSynchronize();
-    // std::cout<<"cluster_to_page[global_page_id] = "<<cluster_to_page[global_page_id]<<std::endl;
-    
-    if (device_cluster_to_page) {
-        CUDA_CHECK(cudaMemcpyAsync(device_cluster_to_page + global_page_id,
-                                   cluster_to_page.data() + global_page_id,
-                                   sizeof(int),
-                                   cudaMemcpyHostToDevice, stream));
+        #endif
     }
 
     // 从full_data复制数据到cache
@@ -310,9 +330,17 @@ float* PageCache::load_page(int cluster_id, int local_page_id, cudaStream_t stre
     CUDA_CHECK(cudaMemcpyAsync(cache_addr, src_addr,
                                static_cast<size_t>(page_size) * dim_partial * sizeof(float),
                                cudaMemcpyHostToDevice, stream));
-    // CUDA_CHECK(cudaMemcpy(cache_addr, src_addr,
-    //     static_cast<size_t>(page_size) * dim_partial * sizeof(float),
-    //     cudaMemcpyHostToDevice));
+    
+    // 建立新映射（在数据复制之后，确保数据就绪后再更新映射）
+    cluster_to_page[global_page_id] = victim_cache_page_id;
+    #ifdef ENABLE_CONSTANT_CLUSTER_MAP
+        update_cluster_const_entry(global_page_id, &cluster_to_page[global_page_id]);
+    #else
+        CUDA_CHECK(cudaMemcpyAsync(device_cluster_to_page + global_page_id,
+                                   cluster_to_page.data() + global_page_id,
+                                   sizeof(int),
+                                   cudaMemcpyHostToDevice, stream));
+    #endif
 
     return cache_addr;
 }
@@ -332,5 +360,36 @@ cudaStream_t PageCache::resolve_stream(cudaStream_t stream) const {
         return default_stream;
     }
     return stream;
+}
+
+void PageCache::random_fill_cache() {
+    // 从global_page_id=0开始顺序填充cache
+    int fill_count = std::min(total_cluster_pages, num_pages);
+    
+    for (int global_page_id = 0; global_page_id < fill_count; global_page_id++) {
+        // 从global_page_id反推cluster_id和local_page_id
+        // 找到最大的cluster_id使得cluster_page_offset[cluster_id] <= global_page_id
+        int cluster_id = 0;
+        for (int cid = num_clusters - 1; cid >= 0; cid--) {
+            if (cluster_page_offset[cid] <= global_page_id) {
+                cluster_id = cid;
+                break;
+            }
+        }
+        
+        int local_page_id = global_page_id - cluster_page_offset[cluster_id];
+        
+        // 检查这个page是否有效（在cluster的page范围内）
+        if (local_page_id >= 0 && local_page_id < cluster_page_count[cluster_id]) {
+            // 如果不在cache中，加载它
+            if (cluster_to_page[global_page_id] == -1) {
+                load_page(cluster_id, local_page_id, default_stream);
+            }
+        }
+    }
+    
+    // 等待所有异步操作完成
+    CUDA_CHECK(cudaDeviceSynchronize());
+    std::cout<<"random_fill_cache done"<<std::endl;
 }
 

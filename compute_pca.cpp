@@ -34,6 +34,89 @@ std::vector<std::vector<float>> read_fvecs(const std::string& filename) {
     return vectors;
 }
 
+// 读取fbin格式文件
+std::vector<std::vector<float>> read_fbin(const std::string& filename) {
+    std::ifstream file(filename, std::ios::binary);
+    
+    if (!file.is_open()) {
+        std::cerr << "无法打开文件: " << filename << std::endl;
+        exit(1);
+    }
+    
+    int n, d;
+    file.read(reinterpret_cast<char*>(&n), sizeof(int));
+    file.read(reinterpret_cast<char*>(&d), sizeof(int));
+    
+    std::vector<std::vector<float>> vectors(n, std::vector<float>(d));
+    for (int i = 0; i < n; i++) {
+        file.read(reinterpret_cast<char*>(vectors[i].data()), d * sizeof(float));
+    }
+    
+    file.close();
+    return vectors;
+}
+
+// 读取bvecs格式文件
+std::vector<std::vector<float>> read_bvecs(const std::string& filename) {
+    std::ifstream file(filename, std::ios::binary);
+    
+    if (!file.is_open()) {
+        std::cerr << "无法打开文件: " << filename << std::endl;
+        exit(1);
+    }
+    
+    int d;
+    file.read(reinterpret_cast<char*>(&d), sizeof(int));
+    
+    // 计算文件大小以确定向量数量
+    file.seekg(0, std::ios::end);
+    long long filelength = file.tellg();
+    file.seekg(0, std::ios::beg);
+    
+    int n = filelength / (d + 4);
+    printf("data shape: n = %d, d = %d\n", n, d);
+    if (n > 100000000) n = 100000000; // 读取前100M
+    
+    std::vector<std::vector<float>> vectors;
+    vectors.reserve(n);
+    
+    file.seekg(0, std::ios::beg);
+    
+    for (int i = 0; i < n; i++) {
+        // 跳过每个向量前的维度标识（4字节）
+        file.seekg(4, std::ios::cur);
+        if (file.eof()) break;
+        
+        std::vector<unsigned char> tmp_data(d);
+        file.read(reinterpret_cast<char*>(tmp_data.data()), d);
+        if (file.eof()) break;
+        
+        std::vector<float> vector(d);
+        for (int j = 0; j < d; j++) {
+            vector[j] = static_cast<float>(tmp_data[j]);
+        }
+        vectors.push_back(vector);
+    }
+    
+    file.close();
+    return vectors;
+}
+
+// 根据文件后缀自动选择读取函数
+std::vector<std::vector<float>> read_vectors(const std::string& filename) {
+    if (filename.length() >= 5 && filename.substr(filename.length() - 5) == ".fbin") {
+        return read_fbin(filename);
+    } else if (filename.length() >= 6 && filename.substr(filename.length() - 6) == ".fvecs") {
+        return read_fvecs(filename);
+    } else if (filename.length() >= 6 && filename.substr(filename.length() - 6) == ".bvecs") {
+        return read_bvecs(filename);
+    } else {
+        // 默认尝试使用 fvecs 格式
+        std::cerr << "警告: 未知文件格式，尝试使用 fvecs 格式读取: " << filename << std::endl;
+        return read_fvecs(filename);
+    }
+}
+
 // 读取ivecs格式文件
 std::vector<std::vector<int>> read_ivecs(const std::string& filename) {
     std::vector<std::vector<int>> vectors;
@@ -106,14 +189,21 @@ int main(int argc, char* argv[]) {
     
     std::string dataset_path = "/data/myl/sift1M/sift1M_base.fvecs";// TODO: change dataset path
     std::string queryset_path = "/data/myl/sift1M/sift1M_query.fvecs";// TODO: change dataset path
+    // std::string queryset_path = "/home/myl/cache_search/gen_query/sift1M_query.fvecs";
     std::string groundtruth_path = "/data/myl/sift1M/sift1M_groundtruth.ivecs";// TODO: change dataset path
+    // std::string groundtruth_path = "/home/myl/cache_search/gen_query/sift1M_groundtruth.ivecs";
+
     // std::string queryset_path = "/data/myl/deep1M/deep1M_queries.fvecs";// TODO: change dataset path
     // std::string groundtruth_path = "/data/myl/deep1M/deep1M_gt.ivecs";// TODO: change dataset path
     // std::string dataset_path = "/data/myl/deep1M/deep1M_base.fvecs";// TODO: change dataset path
+
+    // std::string dataset_path = "/data/myl/sift100M/sift100M_base.fbin";// TODO: change dataset path
+    // std::string queryset_path = "/data/myl/sift1B/bigann_query.bvecs";// TODO: change dataset path
+    // std::string groundtruth_path = "/data/myl/sift1B/gnd/idx_100M.ivecs";// TODO: change dataset path
     
     std::string dataset_name = get_dataset_name_from_path(dataset_path);
-    std::string data_root = "data/" + dataset_name;
-    ensure_dir("data");
+    std::string data_root = "/data/myl/cache_search/data/" + dataset_name;
+    // ensure_dir("data");
     ensure_dir(data_root);
     std::string log_file = data_root + "/preprocess.log";
     std::ofstream log_ofs(log_file, std::ios::app);
@@ -135,14 +225,15 @@ int main(int argc, char* argv[]) {
         log("PCA结果读取完成，维度: " + std::to_string(pca.dim));
     } else {
         log("开始计算PCA...");
-        auto dataset = read_fvecs(dataset_path);
+        auto dataset = read_vectors(dataset_path);
         log("数据集大小: " + std::to_string(dataset.size()) + " x " + std::to_string(dataset[0].size()));
         
         // 准备数据
-        float* dataset_data = new float[dataset.size() * dataset[0].size()];
+        float* dataset_data = new float[1LL * dataset.size() * dataset[0].size()];
+        log("dataset_data shape: " + std::to_string(dataset.size()) + " x " + std::to_string(dataset[0].size()));
         for (int i = 0; i < dataset.size(); i++) {
             for (int j = 0; j < dataset[0].size(); j++) {
-                dataset_data[i * dataset[0].size() + j] = dataset[i][j];
+                dataset_data[1LL * i * dataset[0].size() + j] = dataset[i][j];
             }
         }
         
@@ -167,7 +258,7 @@ int main(int argc, char* argv[]) {
         log("开始计算线性参数...");
         
         // 读取query和groundtruth
-        auto queries = read_fvecs(queryset_path);
+        auto queries = read_vectors(queryset_path);
         auto groundtruth = read_ivecs(groundtruth_path);
         
         // 限制用于训练的数据量
@@ -175,9 +266,14 @@ int main(int argc, char* argv[]) {
         log("使用 " + std::to_string(nq) + " 个查询进行线性拟合");
         
         // 准备数据
-        float* query_data = new float[nq * pca.dim];
+        log("pca.dim = " + std::to_string(pca.dim));
+        log("nq = " + std::to_string(nq));
+        float* query_data = new float[1LL * nq * pca.dim];
+        log("query_data shape: " + std::to_string(nq) + " x " + std::to_string(pca.dim));
+
+        log("groundtruth shape: " + std::to_string(groundtruth.size()) + " x " + std::to_string(groundtruth[0].size()));
         int* groundtruth_data = new int[nq * groundtruth[0].size()];
-        
+        log("groundtruth_data shape: " + std::to_string(nq) + " x " + std::to_string(groundtruth[0].size()));
         for (int i = 0; i < nq; i++) {
             for (int j = 0; j < pca.dim; j++) {
                 query_data[i * pca.dim + j] = queries[i][j];
@@ -188,12 +284,13 @@ int main(int argc, char* argv[]) {
         }
         
         // 准备dataset进行PCA旋转
-        auto dataset = read_fvecs(dataset_path);
-        float* dataset_data = new float[dataset.size() * pca.dim];
+        auto dataset = read_vectors(dataset_path);
+        float* dataset_data = new float[1LL * dataset.size() * pca.dim];
+        printf("dataset_data shape: %lld x %lld\n", 1LL * dataset.size(), 1LL * pca.dim);
         
         for (int i = 0; i < dataset.size(); i++) {
             for (int j = 0; j < pca.dim; j++) {
-                dataset_data[i * pca.dim + j] = dataset[i][j];
+                dataset_data[1LL * i * pca.dim + j] = dataset[i][j];
             }
         }
         
@@ -219,7 +316,7 @@ int main(int argc, char* argv[]) {
             Eigen::MatrixXd data_matrix(dataset.size(), pca.dim);
             for (int i = 0; i < dataset.size(); i++) {
                 for (int j = 0; j < pca.dim; j++) {
-                    data_matrix(i, j) = dataset_data[i * pca.dim + j] - pca.meanvecRow(j);
+                    data_matrix(i, j) = dataset_data[1LL * i * pca.dim + j] - pca.meanvecRow(j);
                 }
             }
             rotated_data = data_matrix * pca.vec;
@@ -290,12 +387,13 @@ int main(int argc, char* argv[]) {
         Eigen::MatrixXd rotated_query = rotated_query_all.topRows(nq);
         
         // 转换为float数组
-        float* rotated_dataset = new float[dataset.size() * pca.dim];
+        float* rotated_dataset = new float[1LL * dataset.size() * pca.dim];
+        printf("rotated_dataset shape: %lld x %lld\n", 1LL * dataset.size(), 1LL * pca.dim);
         float* rotated_query_data = new float[nq * pca.dim];
         
         for (int i = 0; i < dataset.size(); i++) {
             for (int j = 0; j < pca.dim; j++) {
-                rotated_dataset[i * pca.dim + j] = rotated_data(i, j);
+                rotated_dataset[1LL * i * pca.dim + j] = rotated_data(i, j);
             }
         }
         for (int i = 0; i < nq; i++) {

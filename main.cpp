@@ -23,6 +23,13 @@ void SetDevice(int device_id=0){
     std::cout<<", using ["<<device_id<<"]: "<<device_prop.name<<std::endl;
     std::cout<<"Available Memory: "<<int(available_memory/1024/1024)<<" MB, ";
     std::cout<<"Total Memory: "<<int(total_memory/1024/1024)<<" MB\n";
+
+    cudaDeviceProp prop;
+    cudaGetDeviceProperties(&prop, 0);
+
+    printf("Shared memory per block: %zu bytes\n", prop.sharedMemPerBlock);
+    printf("Shared memory per SM   : %zu bytes\n", prop.sharedMemPerMultiprocessor);
+    printf("Shared memory per block (optin): %zu bytes\n", prop.sharedMemPerBlockOptin);
 }
 
 void check_gpu_memory() {
@@ -82,7 +89,7 @@ int main(int argc, char **argv){
   char* queryfile = (char*)FLAGS_query_path.c_str();
   char* gtfile = (char*)FLAGS_gt_path.c_str();
 
-  SetDevice(2);
+  SetDevice(3);
   omp_set_num_threads(128);
 
   Graph graph(FLAGS_n_subspaces, FLAGS_buffer_size, FLAGS_n_candidates, FLAGS_max_hits, FLAGS_expand_ratio, FLAGS_point_ratio,

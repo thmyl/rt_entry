@@ -37,6 +37,31 @@ def read_fvecs(filename):
             vectors.append(np.array(vector, dtype=np.float32))
     return np.array(vectors)
 
+def read_fbin(filename):
+    """读取fbin格式文件"""
+    with open(filename, 'rb') as f:
+        # 读取向量数量 n (4字节 int)
+        n_bytes = f.read(4)
+        if not n_bytes:
+            raise ValueError("无法读取文件头: n")
+        n = struct.unpack('i', n_bytes)[0]
+        
+        # 读取维度 d (4字节 int)
+        d_bytes = f.read(4)
+        if not d_bytes:
+            raise ValueError("无法读取文件头: d")
+        d = struct.unpack('i', d_bytes)[0]
+        
+        # 读取所有向量数据 (n*d 个 float，每个4字节)
+        data_bytes = f.read(n * d * 4)
+        if len(data_bytes) != n * d * 4:
+            raise ValueError(f"数据不完整: 期望 {n * d * 4} 字节，实际读取 {len(data_bytes)} 字节")
+        
+        # 将二进制数据转换为 numpy 数组
+        vectors = np.frombuffer(data_bytes, dtype=np.float32).reshape(n, d)
+    
+    return vectors
+
 def write_centroids(centroids_file, n_clusters, labels, centroids, cluster_points):
     """写入聚类结果到文件"""
     with open(centroids_file, 'wb') as f:
@@ -420,7 +445,15 @@ def main():
         return
 
     log(f"开始读取数据集: {dataset_path}")
-    dataset = read_fvecs(dataset_path)
+    # 根据文件后缀选择读取函数
+    if dataset_path.endswith('.fbin'):
+        dataset = read_fbin(dataset_path)
+    elif dataset_path.endswith('.fvecs'):
+        dataset = read_fvecs(dataset_path)
+    else:
+        # 默认尝试使用 fvecs 格式
+        log(f"警告: 未知文件格式，尝试使用 fvecs 格式读取")
+        dataset = read_fvecs(dataset_path)
     n_samples = dataset.shape[0]
     d = dataset.shape[1]
     log(f"数据集大小: {dataset.shape}")

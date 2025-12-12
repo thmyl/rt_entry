@@ -4,6 +4,7 @@
 #include <vector>
 #include <cstdint>
 #include <cuda_runtime.h>
+#include "../head.h"
 
 /**
  * 点的信息结构
@@ -36,14 +37,15 @@ private:
     
     // 映射关系
     int num_clusters;        // 聚类总数
-    std::vector<int> cluster_page_count;    // 每个cluster真实的page数量
+    // std::vector<int> cluster_page_count;    // 每个cluster真实的page数量
     std::vector<int> cluster_page_offset;   // cluster在全局page数组中的前缀和
-    int total_cluster_pages;                // 全部cluster的page总数
-    std::vector<int> cluster_to_page;       // cluster page到cache page的映射，大小为 total_cluster_pages
+    // int total_cluster_pages;                // 全部cluster的page总数
+    // std::vector<int> cluster_to_page;       // cluster page到cache page的映射，大小为 total_cluster_pages
     std::vector<PointInfo> point_info; // 点id到其信息的映射
 
     // 设备端辅助结构
     int* device_cluster_to_page;        // 设备端映射
+    bool constant_cluster_map_enabled;
     PointInfo* device_point_info;       // 设备端点信息
     
     // LRU管理
@@ -54,6 +56,13 @@ private:
     // 统计信息
     long long cache_hits;
     long long cache_misses;
+
+public:
+    std::vector<int> cluster_to_page;       // cluster page到cache page的映射，大小为 total_cluster_pages
+    int total_cluster_pages;                // 全部cluster的page总数
+    std::vector<int> cluster_page_count;    // 每个cluster真实的page数量
+    // 拷贝页数
+    long long copied_pages;
     
 public:
     /**
@@ -114,6 +123,7 @@ public:
     float* device_cache_ptr() const { return cache_data; }
     const int* device_cluster_map() const { return device_cluster_to_page; }
     const PointInfo* device_point_info_ptr() const { return device_point_info; }
+    bool using_constant_cluster_map() const { return constant_cluster_map_enabled; }
 
     /**
      * 获取内部默认stream
@@ -143,6 +153,11 @@ public:
     int get_num_pages() const { return num_pages; }
     int get_dim_partial() const { return dim_partial; }
     
+    /**
+     * 从global_page_id=0开始顺序填充cache
+     */
+    void random_fill_cache();
+    
 private:
     /**
      * 加载指定page到cache
@@ -155,7 +170,7 @@ private:
     /**
      * 计算global page_id
      */
-    int get_global_page_id(int cluster_id, int local_page_id) const;
+    // int get_global_page_id(int cluster_id, int local_page_id) const;
     
     /**
      * 获取点在full_data中的起始索引
@@ -163,5 +178,8 @@ private:
     int get_point_index_in_full_data(int cluster_id, int local_page_id, int offset) const;
 
     cudaStream_t resolve_stream(cudaStream_t stream) const;
+
+public:
+    int get_global_page_id(int cluster_id, int local_page_id) const;
 };
 

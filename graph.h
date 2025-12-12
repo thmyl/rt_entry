@@ -81,7 +81,7 @@ public:
 	int n_cluster;
 	int dim_partial;
 	int cluster_top_t;
-    int batch_size = 1000;
+    int batch_size = 10;
 
     thrust::device_vector<float> d_centroids_matrix;
     thrust::device_vector<float> d_centroid_norms;
@@ -89,7 +89,10 @@ public:
     thrust::device_vector<float> d_query_centroid_dists;
     std::vector<int> h_query_top_clusters;
     thrust::device_vector<int> d_query_top_clusters;
-    std::vector<std::vector<int>> batch_cluster_ids;
+    std::vector<std::vector<int> > batch_cluster_ids;
+	// std::vector<std::vector<int> > query_batch_ids;//每个batch中的query id
+	std::vector<int> query_batch_ids;//每个batch中的query id
+	int* d_query_batch_ids;
 	std::vector<float> linear_w_host;
 	std::vector<float> linear_b_host;
 	thrust::device_vector<float> d_linear_w;
@@ -119,4 +122,5 @@ private:
     void prefetch_batch_clusters(int batch_index, int query_offset, int batch_size, 
                                  const std::vector<cudaStream_t>* prefetch_streams = nullptr);
 	void load_linear_params();
+	void build_query_batches_gpu();
 };

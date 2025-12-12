@@ -120,7 +120,7 @@ float squared_l2_distance(const float* a, const float* b, int dim) {
 
 int main() {
     try {
-        const std::string centroids_path = "/home/myl/cache_search/data/sift1M/centroids_100";
+        const std::string centroids_path = "/data/myl/cache_search/data/sift1M/centroids_100";
         const std::string query_path = "/data/myl/sift1M/sift1M_query.fvecs";
 
         std::cout << "读取 query 文件: " << query_path << std::endl;

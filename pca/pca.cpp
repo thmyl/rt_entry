@@ -188,10 +188,10 @@ void PCA::linear(float* data, float* query, int* groundtruth, int np, int nq, in
 	for(int i=0; i<count_bound; i++){
 		float *q = query + i*D;
 		int *gt = groundtruth + i*gt_k;
-		float *p = data + gt[topk-1]*D;
+		float *p = data + 1LL*gt[topk-1]*D;
 		float thresh_dis = naive_l2_dist_calc(p, q, D);
 		for(int j=0; j<topk; j++){
-			p = data + gt[j]*D;
+			p = data + 1LL*gt[j]*D;
 			float dis_ = 0;
 			float dis = naive_l2_dist_calc(p, q, D);
 			unsigned dis_count = 0;

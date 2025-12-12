@@ -25,10 +25,15 @@
 
 // #define KDTREE
 #define DIM 32
-#define ENTRY_DIM 32 //dimensions used in entry search
-#define GRAPH_DIM 32 //dimensions used in graph search
 #define FULL_DIM 128 //dimensions used in full dimension
+#define PARTIAL_DIM 96
+// #define PARTIAL_DIM 32
 #define USE_L2_DIST_
 // #define REORDER
 #define DETAIL //Whether to output detailed information
 // #define GRID
+
+#define USE_CACHE //使用cache需要开启此开关
+#define MAX_CLUSTER_TO_PAGE 16000   // 64KB / sizeof(int)
+// #define ENABLE_CONSTANT_CLUSTER_MAP //只有total_cluster_pages <= MAX_CLUSTER_TO_PAGE时才可以启用
+#define GROUP_QUERY_BATCHES

@@ -33,8 +33,9 @@ echo "参数: K=$K, test_nq=$test_nq, t=$t, delta_d=${delta_d}, m_partial=${m_pa
 
 # DATASET_PATH="/data/myl/deep1M/deep1M_base.fvecs" # TODO: change dataset path
 DATASET_PATH="/data/myl/sift1M/sift1M_base.fvecs" # TODO: change dataset path
+# DATASET_PATH="/data/myl/sift100M/sift100M_base.fbin"
 DATASET_NAME=$(basename "$DATASET_PATH" | cut -d'_' -f1)
-DATA_ROOT="data/${DATASET_NAME}"
+DATA_ROOT="/data/myl/cache_search/data/${DATASET_NAME}"
 mkdir -p "$DATA_ROOT"
 CENTROIDS_FILE="$DATA_ROOT/centroids_${K}"
 
@@ -51,8 +52,8 @@ fi
 
 echo "=== 第一步：聚类 ==="
 if [ ! -f "$CENTROIDS_FILE" ]; then
-  echo "运行 python scripts/cluster_balanced.py $K ..."
-  python3 scripts/cluster_balanced.py $K
+  echo "运行 python scripts/cluster.py $K ..."
+  python3 scripts/cluster.py $K
 else
   echo "centroids_$K 已存在，跳过"
 fi
@@ -67,5 +68,22 @@ fi
 echo "=== 第三步：运行cache_search ==="
 # compute-sanitizer --print-limit 3 --show-backtrace=yes ./bin/test --ALGO=1 --topk=0 --n_candidates=128 --expand_ratio=0.2 --point_ratio=0.000128 --search_width=1 \
 #           --t=$t --n_cluster=$K --page_size=1000 --n_page=500 --centroids_path="$CENTROIDS_FILE"
-./bin/test --ALGO=1 --topk=0 --n_candidates=64 --expand_ratio=0.2 --point_ratio=0.000064 --search_width=4 \
-          --t=$t --n_cluster=$K --page_size=1000 --n_page=2000 --centroids_path="$CENTROIDS_FILE" --max_iter=100
+# ./bin/test --ALGO=1 --topk=0 --n_candidates=64 --expand_ratio=0.2 --point_ratio=0.000064 --search_width=4 \
+#           --t=$t --n_cluster=$K --page_size=1000 --n_page=2000 --centroids_path="$CENTROIDS_FILE" --max_iter=100
+
+# 用ncu分析kernel
+# ncu --set full --target-processes all -o profile_output \
+# ./bin/test --ALGO=1 --topk=0 --n_candidates=64 --expand_ratio=0.2 --point_ratio=0.000064 --search_width=4 \
+#           --t=$t --n_cluster=$K --page_size=1000 --n_page=2000 --centroids_path="$CENTROIDS_FILE" --max_iter=100
+
+./bin/test --ALGO=2 --topk=0 --n_candidates=128 --expand_ratio=0.2 --point_ratio=0.000128 --search_width=4 \
+          --t=$t --n_cluster=$K --page_size=1000 --n_page=300 --centroids_path="$CENTROIDS_FILE" --max_iter=12
+
+# ./bin/test --ALGO=1 --topk=0 --n_candidates=128 --expand_ratio=0.2 --point_ratio=0.000128 --search_width=4 \
+#           --t=$t --n_cluster=$K --page_size=1000 --n_page=2000 --centroids_path="$CENTROIDS_FILE" --max_iter=100
+
+# ./bin/test --ALGO=1 --topk=0 --n_candidates=32 --expand_ratio=0.2 --point_ratio=0.00000032 --search_width=8 \
+#           --t=$t --n_cluster=$K --page_size=1000 --n_page=1000 --centroids_path="$CENTROIDS_FILE" --max_iter=100
+
+# ./bin/test --ALGO=1 --topk=0 --n_candidates=128 --expand_ratio=0.2 --point_ratio=0.00000128 --search_width=4 \
+#           --t=$t --n_cluster=$K --page_size=1000 --n_page=6461 --centroids_path="$CENTROIDS_FILE" --max_iter=100

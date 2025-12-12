@@ -26,23 +26,42 @@ __global__ void mapIdKernel(int *d_unique, int unique_size, int *d_map_id){
   }
 }
 
+// 常量内存中的 cluster_to_page，仅在 size <= MAX_CLUSTER_TO_PAGE 时启用
+// __constant__ int d_cluster_to_page[MAX_CLUSTER_TO_PAGE];
+// int h_cluster_to_page_size = 0;
+// __constant__ int d_cluster_to_page_size;
+
+#ifdef USE_CACHE
+#ifdef ENABLE_CONSTANT_CLUSTER_MAP
+// 整表初始化常量映射
+extern "C" void init_cluster_const_table(const int* h_data, int size){
+  h_cluster_to_page_size = size;
+  if (size <= 0 || size > MAX_CLUSTER_TO_PAGE) {
+    int zero = 0;
+    cudaMemcpyToSymbol(d_cluster_to_page_size, &zero, sizeof(int));
+    return;
+  }
+  cudaMemcpyToSymbol(d_cluster_to_page_size, &size, sizeof(int));
+  cudaMemcpyToSymbol(d_cluster_to_page, h_data, size * sizeof(int));
+}
+
+// 单元素增量更新常量映射（由 PageCache 调用）
+extern "C" void update_cluster_const_entry(int idx, const int* h_value_ptr) {
+  if (idx < 0) return;
+  if (h_cluster_to_page_size <= 0 || idx >= h_cluster_to_page_size) return;
+  cudaMemcpyToSymbol(d_cluster_to_page,
+                     h_value_ptr,
+                     sizeof(int),
+                     static_cast<size_t>(idx) * sizeof(int),
+                     cudaMemcpyHostToDevice);
+}
+#endif
+#endif
+
 Graph::~Graph(){
   // rt_entry->CleanUp();
 }
 extern void check_gpu_memory();
-// void check_gpu_memory() {
-//   size_t free_memory, total_memory;
-//   cudaMemGetInfo(&free_memory, &total_memory);
-  
-//   std::cout << "Free memory: " << free_memory / 1024 / 1024 << " MB" << std::endl;
-//   std::cout << "Total memory: " << total_memory / 1024 / 1024 << " MB" << std::endl;
-//   std::cout << "Used memory: " << (total_memory - free_memory) / 1024 / 1024 << " MB" << std::endl;
-
-//   std::ofstream outfile;
-//   outfile.open(OUTFILE, std::ios_base::app);
-//   outfile <<  "Used memory: " << (total_memory - free_memory) / 1024 / 1024 << " MB\n" << std::flush;
-//   outfile.close();
-// }
 
 Graph::Graph(int n_subspaces_, int buffer_size_, int n_candidates_, int max_hits_, double expand_ratio_, double point_ratio_,
              std::string data_name_, std::string &data_path_, std::string &query_path_, std::string &gt_path_, std::string &centroids_path_, std::string &graph_path_, int ALGO_, int search_width_, int topk_, int max_iter_, 
@@ -84,6 +103,8 @@ Graph::Graph(int n_subspaces_, int buffer_size_, int n_candidates_, int max_hits
     std::cerr << "!!!! CUBLAS initialization error\n";
     return;
   }
+  d_query_batch_ids = nullptr;
+  page_cache = nullptr;
 }
 
 void Graph::Init_entry(){
@@ -94,6 +115,7 @@ void Graph::Init_entry(){
 }
 
 void Graph::Input(){
+  std::cout<<"Input"<<std::endl;
   #ifdef DETAIL
     printf("Reading data_file: %s ...\n", datafile);
   #endif
@@ -106,46 +128,46 @@ void Graph::Input(){
     printf("Reading gt_file: %s ...\n", gtfile);
   #endif
   file_read::read_ivecs_file(gtfile, nq, gt_k, h_gt_);
-  file_read::read_centroids(centroids_file, cluster_data, np, dim_);
-  std::cout<<"cluster_top_t = "<<cluster_top_t<<std::endl;
 
-  if (cluster_top_t > 0) {
-    if (cluster_data.K != n_cluster) {
-      n_cluster = cluster_data.K;
-    }
-    cluster_top_t = std::min(cluster_top_t, n_cluster);
+  #ifdef USE_CACHE
+    file_read::read_centroids(centroids_file, cluster_data, np, dim_);
+    std::cout<<"cluster_top_t = "<<cluster_top_t<<std::endl;
 
-    thrust::host_vector<float> h_centroids_matrix(
-        cluster_data.centroids.begin(),
-        cluster_data.centroids.end());
-    std::cout<<"w1"<<std::endl;
-    d_centroids_matrix.resize(h_centroids_matrix.size());
-    thrust::copy(h_centroids_matrix.begin(), h_centroids_matrix.end(), d_centroids_matrix.begin());
-    std::cout<<"w2"<<std::endl;
-
-    std::vector<float> centroid_norms_host(n_cluster, 0.0f);
-    for (int cid = 0; cid < n_cluster; ++cid) {
-      const float* centroid = cluster_data.centroids.data() + static_cast<size_t>(cid) * dim_;
-      double sum = 0.0;
-      for (int j = 0; j < dim_; ++j) {
-        double v = centroid[j];
-        sum += v * v;
+    if (cluster_top_t > 0) {
+      if (cluster_data.K != n_cluster) {
+        n_cluster = cluster_data.K;
       }
-      centroid_norms_host[cid] = static_cast<float>(sum);
-    }
-    std::cout<<"w3"<<std::endl;
-    d_centroid_norms.resize(n_cluster);
-    thrust::copy(centroid_norms_host.begin(), centroid_norms_host.end(), d_centroid_norms.begin());
-    // printf("centroid_norms_host size = %d\n", centroid_norms_host.size());
-    std::cout<<"centroid_norms_host size = "<<centroid_norms_host.size()<<std::endl;
-  }
- 
-  dim_partial = dim_ - DIM;
-  std::cout<<"dim_partial = "<<dim_partial<<std::endl;
-  page_cache = new PageCache(page_size, n_page, dim_partial, n_cluster, np);
-  std::cout<<"w4"<<std::endl;
-  load_linear_params();
+      cluster_top_t = std::min(cluster_top_t, n_cluster);
 
+      thrust::host_vector<float> h_centroids_matrix(
+          cluster_data.centroids.begin(),
+          cluster_data.centroids.end());
+      d_centroids_matrix.resize(h_centroids_matrix.size());
+      thrust::copy(h_centroids_matrix.begin(), h_centroids_matrix.end(), d_centroids_matrix.begin());
+
+      std::vector<float> centroid_norms_host(n_cluster, 0.0f);
+      for (int cid = 0; cid < n_cluster; ++cid) {
+        const float* centroid = cluster_data.centroids.data() + static_cast<size_t>(cid) * dim_;
+        double sum = 0.0;
+        for (int j = 0; j < dim_; ++j) {
+          double v = centroid[j];
+          sum += v * v;
+        }
+        centroid_norms_host[cid] = static_cast<float>(sum);
+      }
+      d_centroid_norms.resize(n_cluster);
+      thrust::copy(centroid_norms_host.begin(), centroid_norms_host.end(), d_centroid_norms.begin());
+      // printf("centroid_norms_host size = %d\n", centroid_norms_host.size());
+      std::cout<<"centroid_norms_host size = "<<centroid_norms_host.size()<<std::endl;
+    }
+  
+    dim_partial = PARTIAL_DIM;
+    std::cout<<"dim_partial = "<<dim_partial<<std::endl;
+    page_cache = new PageCache(page_size, n_page, dim_partial, n_cluster, np);
+    load_linear_params();
+  #endif
+
+  std::cout<<"Input: copy points to device"<<std::endl;
   if(ALGO == 0){
     d_points_.resize(h_points_.size());
     thrust::copy(h_points_.begin(), h_points_.end(), d_points_.begin());
@@ -165,6 +187,7 @@ void Graph::Input(){
   // n_entries = point_ratio * np * n_hits;
   // n_entries = n_candidates;
   // if(ALGO==1) n_entries = point_ratio * np;
+  std::cout<<"Input: finish copy points to device"<<std::endl;
   
   #ifdef REORDER
     d_candidates.resize(nq * n_candidates);
@@ -233,9 +256,11 @@ void Graph::RB_Graph(){
       printf("offset_shift_ = %d\n", offset_shift_);
     #endif
   }
+  std::cout<<"RB_Graph: finish read or build graph"<<std::endl;
 }
 
 void Graph::Projection(){
+  std::cout<<"Projection: reading pca base file "<<pca_base_path<<std::endl;
   FILE *pca_base_file = fopen(pca_base_path.c_str(), "rb");
   FILE *rotation_matrix_file = fopen(rotation_matrix_path.c_str(), "rb");
   if(pca_base_file == NULL){
@@ -271,7 +296,6 @@ void Graph::Projection(){
   
   //debug begin
   //只拷贝前DIM维
-  std::cout<<"w5"<<std::endl;
   // CopyHostToDevice(h_pca_points, d_pca_points, np, dim_, DIM);
   d_pca_points.resize(1LL*np*DIM);
   cudaMemcpy2D(
@@ -297,10 +321,11 @@ void Graph::Projection(){
   // h_pca_points_DIM.resize(0);
   //debug end
   
-  std::cout<<"w6"<<std::endl;
-  page_cache->init_data(h_pca_points.data(), dim_, DIM,
-                        cluster_data.labels, cluster_data.cluster_points);
-  std::cout<<"w7"<<std::endl;
+  #ifdef USE_CACHE
+    page_cache->init_data(h_pca_points.data(), dim_, DIM,
+                          cluster_data.labels, cluster_data.cluster_points);
+    page_cache->random_fill_cache();
+  #endif
 
   thrust::host_vector<float> h_rotation;
   file_read::read_data(rotation_matrix_path.c_str(), t_n, t_d, h_rotation);
@@ -364,6 +389,7 @@ void Graph::Projection(){
   #endif
   preheat_cublas(nq, DIM, dim_);
   //将d_centroids_matrix转置
+  std::cout<<"Projection: finish reading pca base file"<<std::endl;
 }
 
 //
@@ -491,87 +517,6 @@ __global__ void query_cluster_top_warpselect_kernel(const float* __restrict__ di
     }
 }
 
-#if 0
-void Graph::compute_query_cluster_top() {
-  if (cluster_top_t <= 0 || n_cluster == 0) {
-    return;
-  }
-
-  if (d_centroids_matrix.empty()) {
-    return;
-  }
-
-  d_query_centroid_dists.resize(static_cast<size_t>(nq) * n_cluster);
-  d_query_norms.resize(nq);
-
-  float alpha = -2.0f;
-  float beta = 0.0f;
-  
-  // Matrix multiplication: compute -2 * queries * centroids^T
-  // No need to synchronize here - CUBLAS operations are queued
-  matrixMultiplyABT(handle_, d_queries_, d_centroids_matrix, d_query_centroid_dists,
-                 nq, n_cluster, dim_, alpha, beta);
-
-  // Compute query norms
-  computeRowNorms(thrust::raw_pointer_cast(d_queries_.data()),
-                  thrust::raw_pointer_cast(d_query_norms.data()),
-                  nq, dim_);
-
-  // Add norms to distances: dist = -2*q*c^T + ||q||^2 + ||c||^2
-  addNormsToDistances(thrust::raw_pointer_cast(d_query_centroid_dists.data()),
-                      thrust::raw_pointer_cast(d_query_norms.data()),
-                      thrust::raw_pointer_cast(d_centroid_norms.data()),
-                      nq, n_cluster);
-
-  // GPU-based top-k selection: avoid copying entire distance matrix to CPU
-  // Use the existing topk_dynamic_kernel which is more efficient
-  d_query_top_clusters.resize(static_cast<size_t>(nq) * cluster_top_t);
-  
-  /*int blockSize = 256;  // One block per query
-  int gridSize = nq;
-  // Dynamic shared memory: blockDim * K * (float + int)
-  size_t shmBytes = static_cast<size_t>(blockSize) * cluster_top_t * (sizeof(float) + sizeof(int));
-  
-  topk_dynamic_kernel<<<gridSize, blockSize, shmBytes>>>(
-    thrust::raw_pointer_cast(d_query_centroid_dists.data()),
-    nq,
-    n_cluster,
-    cluster_top_t,
-    thrust::raw_pointer_cast(d_query_top_clusters.data())
-  );
-  
-  // Check for errors (only once at the end, no unnecessary synchronization)
-  CUDA_CHECK(cudaGetLastError());*/
-
-  int blockSize = 256;                      // must be multiple of 32
-  int warpsPerBlock = blockSize / 32;
-  int gridSize = (nq + warpsPerBlock - 1) / warpsPerBlock;
-
-  size_t shmBytes = (size_t)warpsPerBlock * 32 * cluster_top_t *
-                    (sizeof(float) + sizeof(int));
-
-  topk_warp_kernel<<<gridSize, blockSize, shmBytes>>>(
-      thrust::raw_pointer_cast(d_query_centroid_dists.data()),
-      nq,
-      n_cluster,
-      cluster_top_t,
-      thrust::raw_pointer_cast(d_query_top_clusters.data())
-  );
-
-  CUDA_CHECK(cudaGetLastError());
-
-  
-  // Copy to host only if needed (for build_query_batches)
-  h_query_top_clusters.resize(static_cast<size_t>(nq) * cluster_top_t);
-  thrust::copy(d_query_top_clusters.begin(), d_query_top_clusters.end(), 
-               h_query_top_clusters.begin());
-
-  // Clean up intermediate data
-  thrust::device_vector<float>().swap(d_query_centroid_dists);
-  thrust::device_vector<float>().swap(d_query_norms);
-} 
-#endif
-
 void Graph::compute_query_cluster_top() {
   if (cluster_top_t <= 0 || n_cluster == 0) {
     return;
@@ -629,88 +574,264 @@ void Graph::compute_query_cluster_top() {
   thrust::device_vector<float>().swap(d_query_norms);
 }
 
-void Graph::build_query_batches() {
-  batch_cluster_ids.clear();
-  if (cluster_top_t <= 0 || nq == 0) {
-    return;
+#ifdef USE_CACHE
+  #ifndef GROUP_QUERY_BATCHES
+  void Graph::build_query_batches() {
+    batch_cluster_ids.clear();
+    query_batch_ids.clear();
+    if (cluster_top_t <= 0 || nq == 0) {
+      return;
+    }
+
+    int total_batches = (nq + batch_size - 1) / batch_size;
+    batch_cluster_ids.resize(total_batches);
+    // query_batch_ids.resize(total_batches);
+    query_batch_ids.resize(nq);
+    CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&d_query_batch_ids), nq * sizeof(int)));
+
+    for (int batch_idx = 0; batch_idx < total_batches; ++batch_idx) {
+      int start = batch_idx * batch_size;
+      int count = std::min(batch_size, nq - start);
+      std::unordered_set<int> cluster_set;
+      for (int i = 0; i < count; ++i) {
+        int q = start + i;
+        // query_batch_ids[batch_idx].push_back(q);
+        query_batch_ids[q] = q;
+        // if(q<10)std::cout<<"q = "<<q<<std::endl;
+        for (int k = 0; k < cluster_top_t; ++k) {
+          int cid = h_query_top_clusters[static_cast<size_t>(q) * cluster_top_t + k];
+          // if(q<10)std::cout<<"cid = "<<cid<<std::endl;
+          cluster_set.insert(cid);
+        }
+      }
+      batch_cluster_ids[batch_idx] = std::vector<int>(cluster_set.begin(), cluster_set.end());
+      // CUDA_CHECK(cudaMemcpy(d_query_batch_ids + start, query_batch_ids[batch_idx].data(), count * sizeof(int), cudaMemcpyHostToDevice));
+      // printf("batch_idx = %d, cluster_set.size() = %d\n", batch_idx, cluster_set.size());
+    }
+    CUDA_CHECK(cudaMemcpy(d_query_batch_ids, query_batch_ids.data(), nq * sizeof(int), cudaMemcpyHostToDevice));
   }
+  #endif
+  #ifdef GROUP_QUERY_BATCHES
+  struct QueryInfo {
+    int qid;
+    int rep;  // top-1 cluster
+  };
 
-  int total_batches = (nq + batch_size - 1) / batch_size;
-  batch_cluster_ids.resize(total_batches);
+  std::vector<QueryInfo> queries_to_sort;
+  void Graph::build_query_batches() {
+    batch_cluster_ids.clear();
+    query_batch_ids.clear();
+    if (cluster_top_t <= 0 || nq == 0) {
+        return;
+    }
 
-  for (int batch_idx = 0; batch_idx < total_batches; ++batch_idx) {
-    int start = batch_idx * batch_size;
-    int count = std::min(batch_size, nq - start);
-    std::unordered_set<int> cluster_set;
-    for (int i = 0; i < count; ++i) {
-      int q = start + i;
-      // if(q<10)std::cout<<"q = "<<q<<std::endl;
-      for (int k = 0; k < cluster_top_t; ++k) {
-        int cid = h_query_top_clusters[static_cast<size_t>(q) * cluster_top_t + k];
-        // if(q<10)std::cout<<"cid = "<<cid<<std::endl;
-        cluster_set.insert(cid);
+    // 计算 batch 总数
+    int total_batches = (nq + batch_size - 1) / batch_size;
+    batch_cluster_ids.resize(total_batches);
+    query_batch_ids.resize(nq);
+    CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&d_query_batch_ids), nq * sizeof(int)));
+    // -----------------------------
+    // Step 1: 为每个 query 创建排序键（代表 cluster）
+    // -----------------------------
+    // struct QueryInfo {
+    //     int qid;
+    //     int rep;  // top-1 cluster
+    // };
+
+    // std::vector<QueryInfo> queries_to_sort(nq);
+    queries_to_sort.resize(nq);
+    for (int q = 0; q < nq; ++q) {
+        int top1 = h_query_top_clusters[(size_t)q * cluster_top_t + 0];
+        queries_to_sort[q] = {q, top1};
+    }
+
+    // -----------------------------
+    // Step 2: 按 top-1 cluster 排序
+    // -----------------------------
+    std::sort(queries_to_sort.begin(), queries_to_sort.end(),
+        [](const QueryInfo &a, const QueryInfo &b) {
+            return a.rep < b.rep;
+        }
+    );
+
+    // -----------------------------
+    // Step 3: 顺序划分 batch
+    // -----------------------------
+    int qpos = 0;
+    for (int batch_idx = 0; batch_idx < total_batches; ++batch_idx) {
+
+        int count = std::min(batch_size, nq - qpos);
+        std::unordered_set<int> cluster_set;
+
+        // 遍历该 batch 中的 query
+        for (int i = 0; i < count; ++i) {
+            int qid = queries_to_sort[qpos + i].qid;
+            query_batch_ids[qpos + i] = qid;
+
+            // 收集 top-t cluster
+            for (int k = 0; k < cluster_top_t; ++k) {
+                int cid = h_query_top_clusters[(size_t)qid * cluster_top_t + k];
+                cluster_set.insert(cid);
+            }
+        }
+
+        // 保存 batch 的 cluster 并集
+        batch_cluster_ids[batch_idx] =
+            std::vector<int>(cluster_set.begin(), cluster_set.end());
+
+        qpos += count;
+    }
+    CUDA_CHECK(cudaMemcpy(d_query_batch_ids, query_batch_ids.data(), nq * sizeof(int), cudaMemcpyHostToDevice));
+  }
+  #endif
+#else
+  void Graph::build_query_batches() {
+    query_batch_ids.clear();
+    if (cluster_top_t <= 0 || nq == 0) {
+      return;
+    }
+
+    int total_batches = (nq + batch_size - 1) / batch_size;
+    // query_batch_ids.resize(total_batches);
+    query_batch_ids.resize(nq);
+    CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&d_query_batch_ids), nq * sizeof(int)));
+
+    for (int batch_idx = 0; batch_idx < total_batches; ++batch_idx) {
+      int start = batch_idx * batch_size;
+      int count = std::min(batch_size, nq - start);
+      for (int i = 0; i < count; ++i) {
+        int q = start + i;
+        // query_batch_ids[batch_idx].push_back(q);
+        query_batch_ids[q] = q;
       }
     }
-    batch_cluster_ids[batch_idx] = std::vector<int>(cluster_set.begin(), cluster_set.end());
+    CUDA_CHECK(cudaMemcpy(d_query_batch_ids, query_batch_ids.data(), nq * sizeof(int), cudaMemcpyHostToDevice));
   }
-  // for(int i=0; i<10; i++){
-  //   std::cout<<"batch_cluster_ids["<<i<<"] = ";
-  //   for(int j=0; j<batch_cluster_ids[i].size(); j++){
-  //     std::cout<<batch_cluster_ids[i][j]<<" ";
-  //   }
-  //   std::cout<<std::endl;
-  // }
+#endif
+
+void Graph::build_query_batches_gpu() {
+  if (cluster_top_t <= 0 || nq == 0) return;
+
+  int total_batches = (nq + batch_size - 1) / batch_size;
+  batch_cluster_ids.clear();
+  batch_cluster_ids.resize(total_batches);
+
+  // 1. 拷贝 top cluster 到 GPU
+  thrust::device_vector<int> d_query_top(h_query_top_clusters.begin(), h_query_top_clusters.begin() + nq * cluster_top_t);
+
+  for (int batch_idx = 0; batch_idx < total_batches; ++batch_idx) {
+      int start = batch_idx * batch_size;
+      int count = std::min(batch_size, nq - start);
+
+      // 2. 将 batch 内所有 query 的 top cluster 拼成一个连续数组
+      thrust::device_vector<int> d_batch_clusters(count * cluster_top_t);
+      thrust::copy(
+          d_query_top.begin() + start * cluster_top_t,
+          d_query_top.begin() + (start + count) * cluster_top_t,
+          d_batch_clusters.begin()
+      );
+
+      // 3. GPU 上 sort + unique 去重
+      thrust::sort(d_batch_clusters.begin(), d_batch_clusters.end());
+      auto new_end = thrust::unique(d_batch_clusters.begin(), d_batch_clusters.end());
+
+      // 4. 拷贝回 CPU
+      std::vector<int> h_batch(d_batch_clusters.begin(), new_end);
+      batch_cluster_ids[batch_idx] = std::move(h_batch);
+  }
 }
 
 void Graph::prefetch_batch_clusters(int batch_index, int query_offset, int batch_count, 
                                     const std::vector<cudaStream_t>* prefetch_streams) {
-  if (cluster_top_t <= 0 || !page_cache) {
+  if(cluster_top_t <= 0 || !page_cache){
     return;
   }
-
-  (void)query_offset;
-  (void)batch_count;
-
-  if (batch_index < 0 || batch_index >= static_cast<int>(batch_cluster_ids.size())) {
-    return;
-  }
-
-  const auto& clusters = batch_cluster_ids[batch_index];
-  if (clusters.empty()) {
-    return;
-  }
-
-  // 使用提供的 stream pool，round-robin 方式为每个 cluster 分配 stream
-  // 这样多个 cluster 的 prefetch 操作可以在不同的 stream 上并行执行
-  if (prefetch_streams && !prefetch_streams->empty()) {
-    int num_streams = static_cast<int>(prefetch_streams->size());
-    for (size_t i = 0; i < clusters.size(); ++i) {
-      int cid = clusters[i];
-      cudaStream_t stream = (*prefetch_streams)[i % num_streams];
-      page_cache->prefetch_cluster(cid, stream);
-    }
-  } else {
-    // 如果没有提供 stream pool，使用 page_cache 的默认 stream（向后兼容）
-    cudaStream_t stream = page_cache->get_default_stream();
-    for (int cid : clusters) {
-      page_cache->prefetch_cluster(cid, stream);
+  int global_stream_count = 0;
+  for(int k=cluster_top_t-1; k>=0; --k){
+    for(int q_i = query_offset; q_i < query_offset + batch_count; ++q_i){
+      int q_id = query_batch_ids[q_i];
+      int c_id = h_query_top_clusters[(size_t)q_id * cluster_top_t + k];
+      page_cache->prefetch_cluster(c_id, prefetch_streams->at(global_stream_count % prefetch_streams->size()));
+      global_stream_count++;
     }
   }
 }
+
+// void Graph::prefetch_batch_clusters(int batch_index, int query_offset, int batch_count, 
+//                                     const std::vector<cudaStream_t>* prefetch_streams) {
+//   if (cluster_top_t <= 0 || !page_cache) {
+//     return;
+//   }
+
+//   (void)query_offset;
+//   (void)batch_count;
+
+//   if (batch_index < 0 || batch_index >= static_cast<int>(batch_cluster_ids.size())) {
+//     return;
+//   }
+
+//   const auto& clusters = batch_cluster_ids[batch_index];
+//   if (clusters.empty()) {
+//     return;
+//   }
+
+//   // 使用提供的 stream pool，round-robin 方式为每个 cluster 分配 stream
+//   // 这样多个 cluster 的 prefetch 操作可以在不同的 stream 上并行执行
+//   if (prefetch_streams && !prefetch_streams->empty()) {
+//     // printf(">>> prefetch streams\n");
+//     int num_streams = static_cast<int>(prefetch_streams->size());
+//     for (size_t i = 0; i < clusters.size(); ++i) {
+//       int cid = clusters[i];
+//       // int cid = i;
+//       cudaStream_t stream = (*prefetch_streams)[i % num_streams];
+//       page_cache->prefetch_cluster(cid, stream);
+//     }
+//   } else {
+//     // printf(">>> no prefetch streams\n");
+//     // 如果没有提供 stream pool，使用 page_cache 的默认 stream（向后兼容）
+//     cudaStream_t stream = page_cache->get_default_stream();
+//     for (int cid : clusters) {
+//       page_cache->prefetch_cluster(cid, stream);
+//     }
+//   }
+
+//   //检查是否都加载成功了
+//   // std::cout<<"start synchronize"<<std::endl;
+//   // cudaDeviceSynchronize();
+//   // CUDA_CHECK(cudaGetLastError());
+//   // std::cout<<"start checking"<<std::endl;
+//   // for(size_t i=0; i<clusters.size(); i++){
+//   //   int cid = clusters[i];
+//   //   for(int local_page_id = 0; local_page_id < page_cache->cluster_page_count[cid]; local_page_id++){
+//   //     int global_page_id = page_cache->get_global_page_id(cid, local_page_id);
+//   //     if(page_cache->cluster_to_page[global_page_id] == -1){
+//   //       printf("error!!! --- %d\n", global_page_id);
+//   //     }
+//   //   }
+//   // }
+//   // std::cout<<"prefetch_batch_clusters done"<<std::endl;
+// }
 
 void Graph::Search(){
   Timing::startTiming("search");
   // printf("batch_size = %d\n", batch_size);
   std::cout<<"batch_size = "<<batch_size<<std::endl;
 
-  if (cluster_top_t > 0) {
-    Timing::startTiming("compute_query_cluster_top");
-    compute_query_cluster_top();
-    Timing::stopTiming(2);
+  #ifdef USE_CACHE
+    if (cluster_top_t > 0) {
+      Timing::startTiming("compute_query_cluster_top");
+      compute_query_cluster_top();
+      Timing::stopTiming(2);
+
+      Timing::startTiming("build_query_batches");
+      build_query_batches();
+      Timing::stopTiming(2);
+    }
+  #else
     Timing::startTiming("build_query_batches");
     build_query_batches();
     Timing::stopTiming(2);
-  }
+  #endif
 
   //----- pca projection -----
   if(ALGO == 1 || ALGO == 2){
@@ -722,16 +843,7 @@ void Graph::Search(){
     std::cout<<"matrixMultiply"<<std::endl;
     matrixMultiply(handle_, d_queries_, d_rotation, d_pca_queries_full, nq, dim_, dim_, alpha, beta);
     std::cout<<"finish matrixMultiply"<<std::endl;
-    // thrust::copy_n(d_pca_queries_full.begin(), static_cast<size_t>(nq) * DIM, d_pca_queries.begin());
-    // cudaMemcpy2D(
-    //   thrust::raw_pointer_cast(d_pca_queries.data()),   // 目标起始地址（nq × DIM）
-    //   DIM * sizeof(float),                              // 目标每行跨度（字节）
-    //   thrust::raw_pointer_cast(d_pca_queries_full.data()), // 源起始地址（nq × dim_）
-    //   dim_ * sizeof(float),                             // 源每行跨度（字节）
-    //   DIM * sizeof(float),                              // 每行拷贝宽度（字节）
-    //   nq,                                               // 行数
-    //   cudaMemcpyDeviceToDevice
-    // );
+    
     #ifdef DETAIL
       Timing::stopTiming(2);
     #endif
@@ -754,6 +866,7 @@ void Graph::Search(){
     cudaStream_t graph_stream = nullptr;
     CUDA_CHECK(cudaStreamCreateWithFlags(&graph_stream, cudaStreamNonBlocking));
     
+    #ifdef USE_CACHE
     // 创建 prefetch stream pool 用于并行预取多个 cluster
     std::vector<cudaStream_t> prefetch_streams;
     if (cluster_top_t > 0) {
@@ -763,47 +876,56 @@ void Graph::Search(){
         CUDA_CHECK(cudaStreamCreateWithFlags(&prefetch_streams[i], cudaStreamNonBlocking));
       }
     }
+    #endif
     
     int total_batches = (nq + batch_size - 1) / batch_size;
+    std::cout<<"total_batches = "<<total_batches<<std::endl;
     
-    // 预取第一个 batch（如果启用）
-    // if (cluster_top_t > 0 && total_batches > 0) {
-    //   int first_start = 0;
-    //   int first_count = std::min(batch_size, nq - first_start);
-    //   prefetch_batch_clusters(0, first_start, first_count, &prefetch_streams);
-    // }
-    
-    // for (int batch_idx = 0; batch_idx < total_batches; ++batch_idx) {
-    //   // printf("batch_idx = %d\n", batch_idx);
-    //   int start = batch_idx * batch_size;
-    //   int count = std::min(batch_size, nq - start);
-      
-    //   // 执行当前 batch 的图搜索（与预取并行）
-    //   GraphSearchBatch(start, count, graph_stream);
-      
-    //   // 同时预取下一个 batch（如果存在）
-    //   if (cluster_top_t > 0 && batch_idx + 1 < total_batches) {
-    //     int next_start = (batch_idx + 1) * batch_size;
-    //     int next_count = std::min(batch_size, nq - next_start);
-    //     prefetch_batch_clusters(batch_idx + 1, next_start, next_count, &prefetch_streams);
-    //   }
-    //   // cudaDeviceSynchronize();
-    //   // CUDA_CHECK(cudaGetLastError());  
-    //   // printf("finish batch_idx = %d\n", batch_idx);
-    // }
     for(int batch_idx = 0; batch_idx < total_batches; ++batch_idx){
       int start = batch_idx * batch_size;
       int count = std::min(batch_size, nq - start);
       if(cluster_top_t > 0 && total_batches > 0){
+        #ifdef USE_CACHE
         prefetch_batch_clusters(batch_idx, start, count, &prefetch_streams);
+        // 同方案一：等待所有prefetch streams完成，确保设备端映射更新完成后再启动kernel
+        // if (!prefetch_streams.empty()) {
+        //   for (auto& stream : prefetch_streams) {
+        //     if (stream != nullptr) {
+        //       CUDA_CHECK(cudaStreamSynchronize(stream));
+        //     }
+        //   }
+        // }
+        // 同步方案二：对每个非空 stream 创建 event 并记录，然后让 graph_stream 等待这些 event
+        // for (size_t i = 0; i < prefetch_streams.size(); ++i) {
+        //   cudaStream_t s = prefetch_streams[i];
+        //   if (s == nullptr) continue;
+
+        //   cudaEvent_t ev;
+        //   CUDA_CHECK(cudaEventCreateWithFlags(&ev, cudaEventDisableTiming));
+
+        //   // 记录本流的所有之前提交的工作（拷贝）完成时刻
+        //   CUDA_CHECK(cudaEventRecord(ev, s));
+
+        //   // graph_stream 等待该事件（多个 wait 会累积）
+        //   CUDA_CHECK(cudaStreamWaitEvent(graph_stream, ev, 0));
+
+        //   // 销毁 event（graph_stream 等待的是事件的完成标识，销毁 event 对已排的等待不会影响）
+        //   CUDA_CHECK(cudaEventDestroy(ev));
+        // }
+        // 同步方案三：使用全局同步，能保证正确性
+        cudaDeviceSynchronize();
+        #endif
       }
+      // upload_cluster_to_page(page_cache->cluster_to_page.data(), page_cache->total_cluster_pages);
       GraphSearchBatch(start, count, graph_stream);
+      cudaDeviceSynchronize();
     }
     
     // 同步所有 stream
     CUDA_CHECK(cudaStreamSynchronize(graph_stream));
     CUDA_CHECK(cudaStreamDestroy(graph_stream));
     
+    #ifdef USE_CACHE
     // 同步并销毁 prefetch streams
     if (!prefetch_streams.empty()) {
       for (auto& stream : prefetch_streams) {
@@ -813,6 +935,7 @@ void Graph::Search(){
         }
       }
     }
+    #endif
     cudaDeviceSynchronize();
     CUDA_CHECK(cudaGetLastError());  
     Timing::stopTiming(2);
@@ -824,6 +947,14 @@ void Graph::Search(){
   #endif
   cublasDestroy(handle_);
   check_results(d_gt_);
+
+  #ifdef DETAIL
+    #ifdef USE_CACHE
+      if (page_cache) {
+        std::cout<<"copied_pages = "<<page_cache->copied_pages<<std::endl;
+      }
+    #endif
+  #endif
 }
 
 void Graph::GraphSearchBatch(int query_offset, int batch_count, cudaStream_t stream){
@@ -873,7 +1004,7 @@ void Graph::GraphSearchBatch(int query_offset, int batch_count, cudaStream_t str
   size_t shared_mem = ((search_width << offset_shift_) + n_candidates) * sizeof(KernelPair<float, int>);
   GraphSearchKernel<int, float, WARP_SIZE><<<batch_count, 64, shared_mem, stream>>>
     (d_points_ptr, d_query_full_ptr, /*d_results_batch*/ d_results_ptr, d_graph_ptr, /*d_candidates_batch*/ d_candidates_ptr, np,
-    query_offset,
+    query_offset, d_query_batch_ids,
     offset_shift_, n_candidates, topk, search_width, d_entries_ptr,
     /*d_hits_batch*/ d_hits_all, max_iter, ALGO,
     d_point_infos, d_cluster_to_page, cache_ptr, page_size,
@@ -885,5 +1016,9 @@ void Graph::GraphSearchBatch(int query_offset, int batch_count, cudaStream_t str
 
 void Graph::CleanUp(){
   if(ALGO == 1) rt_entry->CleanUp();
+  if(d_query_batch_ids) {
+    cudaFree(d_query_batch_ids);
+    d_query_batch_ids = nullptr;
+  }
   // cublasDestroy(handle_);
 }

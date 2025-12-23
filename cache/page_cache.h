@@ -158,7 +158,11 @@ public:
      * 从global_page_id=0开始顺序填充cache
      */
     void random_fill_cache();
-    
+
+    /**
+     * 更新cluster_to_page映射
+     */
+    void update_map(cudaStream_t stream);
 private:
     /**
      * 加载指定page到cache

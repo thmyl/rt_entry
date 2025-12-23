@@ -120,7 +120,7 @@ private:
     void compute_query_cluster_top();
     void build_query_batches();
     void prefetch_batch_clusters(int batch_index, int query_offset, int batch_size, 
-                                 const std::vector<cudaStream_t>* prefetch_streams = nullptr);
+                                 cudaStream_t prefetch_streams = nullptr);
 	void load_linear_params();
 	void build_query_batches_gpu();
 };

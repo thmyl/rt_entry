@@ -320,15 +320,15 @@ float* PageCache::load_page(int cluster_id, int local_page_id, cudaStream_t stre
         int old_global_page_id = get_global_page_id(old_cluster_id, old_local_page_id);
 
         cluster_to_page[old_global_page_id] = -1;
-        #ifdef ENABLE_CONSTANT_CLUSTER_MAP
-            int minus_one = -1;
-            update_cluster_const_entry(old_global_page_id, &minus_one);
-        #else
-            CUDA_CHECK(cudaMemcpyAsync(device_cluster_to_page + old_global_page_id,
-                                       cluster_to_page + old_global_page_id,
-                                       sizeof(int),
-                                       cudaMemcpyHostToDevice, stream));
-        #endif
+        // #ifdef ENABLE_CONSTANT_CLUSTER_MAP
+        //     int minus_one = -1;
+        //     update_cluster_const_entry(old_global_page_id, &minus_one);
+        // #else
+        //     CUDA_CHECK(cudaMemcpyAsync(device_cluster_to_page + old_global_page_id,
+        //                                cluster_to_page + old_global_page_id,
+        //                                sizeof(int),
+        //                                cudaMemcpyHostToDevice, stream));
+        // #endif
     }
 
     // 从full_data复制数据到cache
@@ -342,16 +342,20 @@ float* PageCache::load_page(int cluster_id, int local_page_id, cudaStream_t stre
     
     // 建立新映射（在数据复制之后，确保数据就绪后再更新映射）
     cluster_to_page[global_page_id] = victim_cache_page_id;
-    #ifdef ENABLE_CONSTANT_CLUSTER_MAP
-        update_cluster_const_entry(global_page_id, &cluster_to_page[global_page_id]);
-    #else
-        CUDA_CHECK(cudaMemcpyAsync(device_cluster_to_page + global_page_id,
-                                   cluster_to_page + global_page_id,
-                                   sizeof(int),
-                                   cudaMemcpyHostToDevice, stream));
-    #endif
+    // #ifdef ENABLE_CONSTANT_CLUSTER_MAP
+    //     update_cluster_const_entry(global_page_id, &cluster_to_page[global_page_id]);
+    // #else
+    //     CUDA_CHECK(cudaMemcpyAsync(device_cluster_to_page + global_page_id,
+    //                                cluster_to_page + global_page_id,
+    //                                sizeof(int),
+    //                                cudaMemcpyHostToDevice, stream));
+    // #endif
 
     return cache_addr;
+}
+
+void PageCache::update_map(cudaStream_t stream) {
+    CUDA_CHECK(cudaMemcpyAsync(device_cluster_to_page, cluster_to_page, total_cluster_pages * sizeof(int), cudaMemcpyHostToDevice, stream));
 }
 
 int PageCache::get_point_index_in_full_data(int cluster_id, int local_page_id, int offset) const {

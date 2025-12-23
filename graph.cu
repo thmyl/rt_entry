@@ -742,89 +742,38 @@ void Graph::build_query_batches_gpu() {
 }
 
 void Graph::prefetch_batch_clusters(int batch_index, int query_offset, int batch_count, 
-                                    const std::vector<cudaStream_t>* prefetch_streams) {
+                                    cudaStream_t stream) {
   if(cluster_top_t <= 0 || !page_cache){
     return;
   }
+  int copied_pages_prev = page_cache->copied_pages;
   int global_stream_count = 0;
-  int copy_count = 0;
-  // int copy_count = -100000000;//不停止拷贝
-  // for(int k=cluster_top_t-1; k>=0; --k){
-  //   for(int q_i = query_offset; q_i < query_offset + batch_count; ++q_i){
-  //     int q_id = query_batch_ids[q_i];
-  //     int c_id = h_query_top_clusters[(size_t)q_id * cluster_top_t + k];
-  //     // page_cache->prefetch_cluster(c_id, prefetch_streams->at(global_stream_count % prefetch_streams->size()));
-  //     page_cache->prefetch_cluster(c_id, copy_count, prefetch_streams->at(global_stream_count % prefetch_streams->size()));
-  //     global_stream_count++;
-  //   }
-  // }
-  for(int k=0; k<cluster_top_t; ++k){
+  // int copy_count = 0;
+  int copy_count = -100000000;//不停止拷贝
+  for(int k=cluster_top_t-1; k>=0; --k){
     for(int q_i = query_offset; q_i < query_offset + batch_count; ++q_i){
       int q_id = query_batch_ids[q_i];
       int c_id = h_query_top_clusters[(size_t)q_id * cluster_top_t + k];
-      page_cache->prefetch_cluster(c_id, copy_count, prefetch_streams->at(global_stream_count % prefetch_streams->size()));
-      if(copy_count >= page_cache->get_num_pages()) {
-        return;
-      }
+      // page_cache->prefetch_cluster(c_id, prefetch_streams->at(global_stream_count % prefetch_streams->size()));
+      page_cache->prefetch_cluster(c_id, copy_count, stream);
       global_stream_count++;
     }
   }
+  // for(int k=0; k<cluster_top_t; ++k){
+  //   for(int q_i = query_offset; q_i < query_offset + batch_count; ++q_i){
+  //     int q_id = query_batch_ids[q_i];
+  //     int c_id = h_query_top_clusters[(size_t)q_id * cluster_top_t + k];
+  //     page_cache->prefetch_cluster(c_id, copy_count, stream);
+  //     if(copy_count >= page_cache->get_num_pages()) {
+  //       return;
+  //     }
+  //     global_stream_count++;
+  //   }
+  // }
+  if(copied_pages_prev != page_cache->copied_pages) {
+    page_cache->update_map(stream);
+  }
 }
-
-// void Graph::prefetch_batch_clusters(int batch_index, int query_offset, int batch_count, 
-//                                     const std::vector<cudaStream_t>* prefetch_streams) {
-//   if (cluster_top_t <= 0 || !page_cache) {
-//     return;
-//   }
-
-//   (void)query_offset;
-//   (void)batch_count;
-
-//   if (batch_index < 0 || batch_index >= static_cast<int>(batch_cluster_ids.size())) {
-//     return;
-//   }
-
-//   const auto& clusters = batch_cluster_ids[batch_index];
-//   if (clusters.empty()) {
-//     return;
-//   }
-
-//   // 使用提供的 stream pool，round-robin 方式为每个 cluster 分配 stream
-//   // 这样多个 cluster 的 prefetch 操作可以在不同的 stream 上并行执行
-//   if (prefetch_streams && !prefetch_streams->empty()) {
-//     // printf(">>> prefetch streams\n");
-//     int num_streams = static_cast<int>(prefetch_streams->size());
-//     for (size_t i = 0; i < clusters.size(); ++i) {
-//       int cid = clusters[i];
-//       // int cid = i;
-//       cudaStream_t stream = (*prefetch_streams)[i % num_streams];
-//       page_cache->prefetch_cluster(cid, stream);
-//     }
-//   } else {
-//     // printf(">>> no prefetch streams\n");
-//     // 如果没有提供 stream pool，使用 page_cache 的默认 stream（向后兼容）
-//     cudaStream_t stream = page_cache->get_default_stream();
-//     for (int cid : clusters) {
-//       page_cache->prefetch_cluster(cid, stream);
-//     }
-//   }
-
-//   //检查是否都加载成功了
-//   // std::cout<<"start synchronize"<<std::endl;
-//   // cudaDeviceSynchronize();
-//   // CUDA_CHECK(cudaGetLastError());
-//   // std::cout<<"start checking"<<std::endl;
-//   // for(size_t i=0; i<clusters.size(); i++){
-//   //   int cid = clusters[i];
-//   //   for(int local_page_id = 0; local_page_id < page_cache->cluster_page_count[cid]; local_page_id++){
-//   //     int global_page_id = page_cache->get_global_page_id(cid, local_page_id);
-//   //     if(page_cache->cluster_to_page[global_page_id] == -1){
-//   //       printf("error!!! --- %d\n", global_page_id);
-//   //     }
-//   //   }
-//   // }
-//   // std::cout<<"prefetch_batch_clusters done"<<std::endl;
-// }
 
 void Graph::Search(){
   // Timing::startTiming("search");
@@ -941,7 +890,10 @@ void Graph::Search(){
       size_t shared_mem = ((search_width << offset_shift_) + n_candidates) * sizeof(KernelPair<float, int>);
     // #endregion define variables
 
-        
+    int flag = 0; //交替拷贝
+    cudaEvent_t event;
+    CUDA_CHECK(cudaEventCreateWithFlags(&event, cudaEventDisableTiming));
+    
     int total_batches = (nq + batch_size - 1) / batch_size;
     // std::cout<<"total_batches = "<<total_batches<<std::endl;
     for(int batch_idx = 0; batch_idx < total_batches; ++batch_idx){
@@ -949,8 +901,11 @@ void Graph::Search(){
       int count = std::min(batch_size, nq - start);
       #ifdef USE_CACHE
         if(cluster_top_t > 0 && total_batches > 0){
-          prefetch_batch_clusters(batch_idx, start, count, &prefetch_streams);
+          prefetch_batch_clusters(batch_idx, start, count, prefetch_streams[flag]);
           // cudaDeviceSynchronize();
+          //stream同步
+          CUDA_CHECK(cudaEventRecord(event, prefetch_streams[flag]));
+          CUDA_CHECK(cudaStreamWaitEvent(graph_stream, event, 0));
         }
       #endif
       // upload_cluster_to_page(page_cache->cluster_to_page.data(), page_cache->total_cluster_pages);
@@ -964,7 +919,8 @@ void Graph::Search(){
       dim_partial, dim_,
       d_query_top_ptr, cluster_top_t,
       d_linear_w_ptr, d_linear_b_ptr, linear_params_dim);
-      cudaDeviceSynchronize();
+      // cudaDeviceSynchronize();
+      CUDA_CHECK(cudaStreamSynchronize(graph_stream));
     }
     
     cudaDeviceSynchronize();
@@ -1000,6 +956,7 @@ void Graph::Search(){
       }
     }
   #endif
+  CUDA_CHECK(cudaEventDestroy(event));
 }
 
 void Graph::GraphSearchBatch(int query_offset, int batch_count, cudaStream_t stream){

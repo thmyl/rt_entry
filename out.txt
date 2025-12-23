@@ -2381,3 +2381,59 @@ time graph search: 691.563 ms
 time search: 694.802 ms
 recall@10 = 0.9026 ms
 Used memory: 840 MB
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 12	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+time compute_query_cluster_top: 21.7844 ms
+time build_query_batches: 1.85942 ms
+time pca projection: 0.126102 ms
+time graph search: 697.663 ms
+time search: 721.91 ms
+recall@10 = 0.90253 ms
+Used memory: 840 MB
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 12	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+time compute_query_cluster_top: 0.782859 ms
+time build_query_batches: 1.91811 ms
+time pca projection: 0.104483 ms
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 12	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+time compute_query_cluster_top: 20.9485 ms
+time build_query_batches: 1.83303 ms
+time pca projection: 0.10487 ms
+time graph search: 814.228 ms
+time search: 837.464 ms
+recall@10 = 0.90246 ms
+Used memory: 840 MB
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 12	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+time compute_query_cluster_top: 0.816803 ms
+time build_query_batches: 1.8936 ms
+time pca projection: 0.106394 ms
+time graph search: 779.702 ms
+time search: 782.934 ms
+recall@10 = 0.90246 ms
+Used memory: 840 MB
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 12	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+time compute_query_cluster_top: 0.760979 ms
+time build_query_batches: 1.92607 ms
+time pca projection: 0.097504 ms
+time graph search: 778.965 ms
+time search: 782.114 ms
+recall@10 = 0.90246 ms
+Used memory: 840 MB
+
+---------- n_candidates = 128	point_ratio = 0.000128	max_iter = 12	graph_path = /data/myl/sift1M/index/sift1M_64_32_cagra.nsw	DIM = 32	REORDER = 0 ----------
+
+time compute_query_cluster_top: 21.2664 ms
+time build_query_batches: 1.80747 ms
+time pca projection: 0.106553 ms
+time graph search: 780.212 ms
+time search: 803.753 ms
+recall@10 = 0.90246 ms
+Used memory: 840 MB

@@ -82,7 +82,7 @@ def main():
     # dataset_path = "/data/myl/deep1M/deep1M_base.fvecs" # TODO: change dataset path
     # dataset_path = "/data/myl/sift100M/sift100M_base.fbin"  # TODO: change dataset path
     dataset_name = os.path.basename(dataset_path).split('_')[0]
-    data_root = os.path.join("data", dataset_name)
+    data_root = os.path.join("/data/myl/cache_search/data", dataset_name)
     # os.makedirs("data", exist_ok=True)
     os.makedirs(data_root, exist_ok=True)
     centroids_file = os.path.join(data_root, f"centroids_{K}")

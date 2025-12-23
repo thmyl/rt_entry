@@ -46,7 +46,7 @@ PageCache::PageCache(int page_size, int num_pages, int dim_partial, int num_clus
       cache_hits(0),
       cache_misses(0) {
 
-    if (page_size <= 0 || num_pages <= 0 || dim_partial <= 0) {
+    if (page_size < 0 || num_pages < 0 || dim_partial < 0) {
         throw std::invalid_argument("PageCache 参数必须为正数");
     }
 
@@ -136,7 +136,9 @@ void PageCache::init_data(const float* data,
     std::cout << "  cache容量: " << num_pages << " pages" << std::endl;
     
     // 初始化cluster_to_page映射（初始全部为-1，表示不在cache中）
-    cluster_to_page.assign(total_cluster_pages, -1);
+    // cluster_to_page.assign(total_cluster_pages, -1);
+    CUDA_CHECK(cudaMallocHost(&cluster_to_page, total_cluster_pages * sizeof(int)));
+    CUDA_CHECK(cudaMemset(cluster_to_page, 0xFF, total_cluster_pages * sizeof(int)));
     printf("total_cluster_pages = %d\n", total_cluster_pages);
     
     if (device_cluster_to_page) {
@@ -153,7 +155,7 @@ void PageCache::init_data(const float* data,
     #ifdef ENABLE_CONSTANT_CLUSTER_MAP
         if (total_cluster_pages > 0 && total_cluster_pages <= MAX_CLUSTER_TO_PAGE) {
             constant_cluster_map_enabled = true;
-            init_cluster_const_table(cluster_to_page.data(), total_cluster_pages);
+            init_cluster_const_table(cluster_to_page, total_cluster_pages);
         } else {
             constant_cluster_map_enabled = false;
             // 通知 graph 侧：禁用常量表（size = 0）
@@ -230,7 +232,10 @@ float* PageCache::get_point(int point_id, cudaStream_t stream) {
     }
 }
 
-void PageCache::prefetch_cluster(int cluster_id, cudaStream_t stream) {
+void PageCache::prefetch_cluster(int cluster_id, int& copy_count, cudaStream_t stream) {
+    if(copy_count >= num_pages) {
+        return;
+    }
     if (cluster_id < 0 || cluster_id >= num_clusters) {
         throw std::out_of_range("prefetch_cluster: cluster_id 超出范围");
     }
@@ -254,13 +259,17 @@ void PageCache::prefetch_cluster(int cluster_id, cudaStream_t stream) {
             // 如果已在cache中，touch它
             lru->touch(cluster_to_page[global_page_id]);
         }
+        copy_count++;
     }
 }
 
-void PageCache::prefetch_clusters_async(const std::vector<int>& cluster_ids, cudaStream_t stream) {
+void PageCache::prefetch_clusters_async(const std::vector<int>& cluster_ids, int& copy_count, cudaStream_t stream) {
     cudaStream_t use_stream = resolve_stream(stream);
     for (int cluster_id : cluster_ids) {
-        prefetch_cluster(cluster_id, use_stream);
+        prefetch_cluster(cluster_id, copy_count, use_stream);
+        if(copy_count >= num_pages) {
+            return;
+        }
     }
 }
 
@@ -316,7 +325,7 @@ float* PageCache::load_page(int cluster_id, int local_page_id, cudaStream_t stre
             update_cluster_const_entry(old_global_page_id, &minus_one);
         #else
             CUDA_CHECK(cudaMemcpyAsync(device_cluster_to_page + old_global_page_id,
-                                       cluster_to_page.data() + old_global_page_id,
+                                       cluster_to_page + old_global_page_id,
                                        sizeof(int),
                                        cudaMemcpyHostToDevice, stream));
         #endif
@@ -337,7 +346,7 @@ float* PageCache::load_page(int cluster_id, int local_page_id, cudaStream_t stre
         update_cluster_const_entry(global_page_id, &cluster_to_page[global_page_id]);
     #else
         CUDA_CHECK(cudaMemcpyAsync(device_cluster_to_page + global_page_id,
-                                   cluster_to_page.data() + global_page_id,
+                                   cluster_to_page + global_page_id,
                                    sizeof(int),
                                    cudaMemcpyHostToDevice, stream));
     #endif

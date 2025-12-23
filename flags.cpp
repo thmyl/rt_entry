@@ -36,8 +36,11 @@ DEFINE_string(graph_path, "/data/myl/sift1M/index/sift1M_64_32_cagra.nsw", "path
 // DEFINE_string(data_name, "/data/myl/cache_search/data/sift100M", "name of datasets");
 // // DEFINE_string(data_path, "/data/myl/sift1B/bigann_base.bvecs", "path of datasets");
 // DEFINE_string(data_path, "/data/myl/sift100M/sift100M_base.fbin", "path of datasets");
-// DEFINE_string(query_path, "/data/myl/sift1B/bigann_query.bvecs", "path of queries");
-// DEFINE_string(gt_path, "/data/myl/sift1B/gnd/idx_100M.ivecs", "path of the ground truth");
+// // DEFINE_string(data_path, "/data/myl/sift100M/sift100M_base.fvecs", "path of datasets");
+// // DEFINE_string(query_path, "/data/myl/sift1B/bigann_query.bvecs", "path of queries");
+// DEFINE_string(query_path, "/data/myl/sift100M/sift100M_query.fvecs", "path of queries");
+// // DEFINE_string(gt_path, "/data/myl/sift1B/gnd/idx_100M.ivecs", "path of the ground truth");
+// DEFINE_string(gt_path, "/data/myl/sift100M/sift100M_groundtruth.ivecs", "path of the ground truth");
 // DEFINE_string(centroids_path, "data/sift100M/centroids_10000", "path of centroids file produced by clustering");
 // DEFINE_string(graph_path, "/data/myl/sift1B/sift100M_index/sift100M_degree64.nsw", "path of the graph");
 // // DEFINE_string(graph_path, "/data/myl/sift100M/index/sift100M_128_64_diskann.nsw", "path of the graph");
@@ -45,8 +48,8 @@ DEFINE_string(graph_path, "/data/myl/sift1M/index/sift1M_64_32_cagra.nsw", "path
 /* deep1M */
 // DEFINE_string(data_name, "/data/myl/cache_search/data/deep1M", "name of datasets");
 // DEFINE_string(data_path, "/data/myl/deep1M/deep1M_base.fvecs", "path of datasets");
-// DEFINE_string(query_path, "/data/myl/deep1M/deep1M_queries.fvecs", "path of queries");
-// DEFINE_string(gt_path, "/data/myl/deep1M/deep1M_gt.ivecs", "path of the ground truth");
+// DEFINE_string(query_path, "/data/myl/deep1M/deep1M_query.fvecs", "path of queries");
+// DEFINE_string(gt_path, "/data/myl/deep1M/deep1M_groundtruth.ivecs", "path of the ground truth");
 // // DEFINE_string(graph_path, "/data/myl/deep1M/deep_128_64_1M.nsw", "path of the graph");
 // // DEFINE_string(graph_path, "/home/myl/rt_entry/input_file/deep1M_32_16.nsw", "path of the graph");
 // // DEFINE_string(graph_path, "/home/myl/rt_entry/input_file/deep1M_64_32.nsw", "path of the graph");

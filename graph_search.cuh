@@ -22,6 +22,12 @@ __device__ inline int fetch_cluster_cache_page(int global_page,
     #else
         return cluster_to_page[global_page];
     #endif
+
+    // 随机返回一个cache page（使用设备端随机数生成）
+    // uint seed = static_cast<uint>(global_page) * 1103515245U + 12345U;
+    // seed = seed * 1103515245U + 12345U;
+    // const int MAX_CACHE_PAGES = 300;
+    // return seed % MAX_CACHE_PAGES;
 }
 #endif
 
@@ -91,126 +97,86 @@ __device__ inline bool is_cluster_in_top(const int* __restrict__ top_clusters,
     return false;
 }
 
-__device__ inline float finalize_distance(float base_dist,
-                                          int point_id,
-                                          int query_id,
-                                          const int* query_top_clusters,
-                                          int cluster_top_t,
-                                          const PointInfo* point_infos,
-                                          const int* cluster_to_page,
-                                          const float* cache_data,
-                                          int page_size,
-                                          int dim_partial,
-                                          int dim_total,
-                                          const float* query_full,
-                                          const float* linear_w,
-                                          const float* linear_b,
-                                          int linear_dim) {
-    int cluster_id = -1;
-    int global_page = -1;
-    int offset = 0;
-    if (point_infos) {
-        const PointInfo& info = point_infos[point_id];
-        cluster_id = info.belong;
-        global_page = info.global_page_id;
-        offset = info.offset;
-    }
+struct return_type{
+    bool in_cache;
+    const float* page_ptr;
+};
 
-    bool in_top = false;
-    if (cluster_top_t > 0 && query_top_clusters) {
-        const int* top_list = query_top_clusters + static_cast<size_t>(query_id) * cluster_top_t;
-        in_top = is_cluster_in_top(top_list, cluster_top_t, cluster_id);
-    }
+// __device__ inline return_type whether_cache(float base_dist,
+//                                         int point_id,
+//                                         int query_id,
+//                                         const int* query_top_clusters,
+//                                         int cluster_top_t,
+//                                         const PointInfo* point_infos,
+//                                         const int* cluster_to_page,
+//                                         const float* cache_data,
+//                                         int page_size,
+//                                         int dim_partial,
+//                                         int dim_total,
+//                                         const float* query_full,
+//                                         const float* linear_w,
+//                                         const float* linear_b,
+//                                         int linear_dim) {
+//     return_type ret;
+//     ret.in_cache = false;
+//     ret.page_ptr = nullptr;
+    
+//     int cluster_id = -1;
+//     int global_page = -1;
+//     int offset = 0;
+//     if (point_infos) {
+//         const PointInfo& info = point_infos[point_id];
+//         cluster_id = info.belong;
+//         global_page = info.global_page_id;
+//         offset = info.offset;
+//     }
 
-    if(cache_data && dim_partial > 0 && query_full && global_page >= 0){
-        int cache_page = fetch_cluster_cache_page(global_page, cluster_to_page);
-        // if(in_top){
-        //     while (cache_page == -1) { //缺页，等待读入
-        //         // 对于常量内存，需要使用 __threadfence() 来刷新常量内存缓存
-        //         // __threadfence_system() 主要用于全局内存，对常量内存可能无效
-        //         #ifdef ENABLE_CONSTANT_CLUSTER_MAP
-        //             __threadfence(); // 刷新常量内存缓存
-        //         #else
-        //             __threadfence_system(); // 确保看到其他 stream 的全局内存更新
-        //         #endif
-        //         cache_page = fetch_cluster_cache_page(global_page, cluster_to_page);
-        //         // printf("rolling\n");
-        //     }
-        // }
-        if(cache_page != -1){
-            long long page_base = (static_cast<long long>(cache_page) * page_size + offset) * dim_partial;
-            const float* page_ptr = cache_data + page_base;
-            const float* query_tail = query_full + static_cast<long long>(query_id) * dim_total + DIM;
-            for (int j = 0; j < dim_partial; ++j) {
-                float diff = query_tail[j] - page_ptr[j];
-                base_dist += diff * diff;
-            }
-            return base_dist;
-        }
-    }
+//     if(cache_data && dim_partial > 0 && query_full && global_page >= 0){
+//         int cache_page = cluster_to_page[global_page];
+        
+//         if(cache_page != -1){
+//             unsigned long long page_base = (static_cast<unsigned long long>(cache_page) * page_size + offset) * PARTIAL_DIM;
+//             ret.page_ptr = cache_data + page_base;
+//             // 生成随机数作为page_ptr（不使用 cache_page / global_page）
+//             // unsigned long long random_val = 5ULL * 1103515245ULL + 12345ULL;
+//             // ret.page_ptr = reinterpret_cast<const float*>(random_val);
+//             // ret.page_ptr = 12345;
+//             // ret.page_ptr = nullptr;
+//             ret.in_cache = true;
+//             return ret;
+//         }
+//     }
+//     return ret;
+// }
 
-    if (linear_dim > 0 && linear_w && linear_b) {
-        int idx = (linear_dim < DIM ? linear_dim : DIM);
-        if (idx >= 0) {
-            base_dist = linear_w[idx] * base_dist + linear_b[idx];
-            if (base_dist < 0.0f) {
-                base_dist = 0.0f;
-            }
-        }
-    }
-    return base_dist;
-}
-
-__device__ inline bool whether_cache(float base_dist,
-                                        int point_id,
-                                        int query_id,
-                                        const int* query_top_clusters,
-                                        int cluster_top_t,
+__device__ inline return_type whether_cache(int point_id,
                                         const PointInfo* point_infos,
                                         const int* cluster_to_page,
                                         const float* cache_data,
-                                        int page_size,
-                                        int dim_partial,
-                                        int dim_total,
-                                        const float* query_full,
-                                        const float* linear_w,
-                                        const float* linear_b,
-                                        int linear_dim,
-                                        const float*& page_ptr) {
-    // return false;
-    int cluster_id = -1;
-    int global_page = -1;
-    int offset = 0;
-    if (point_infos) {
-        const PointInfo& info = point_infos[point_id];
-        cluster_id = info.belong;
-        global_page = info.global_page_id;
-        offset = info.offset;
-    }
+                                        int page_size) {
+    return_type ret;
+    ret.in_cache = false;
+    ret.page_ptr = nullptr;
 
-    bool in_top = false;
-    if (cluster_top_t > 0 && query_top_clusters) {
-        const int* top_list = query_top_clusters + static_cast<size_t>(query_id) * cluster_top_t;
-        in_top = is_cluster_in_top(top_list, cluster_top_t, cluster_id);
-    }
+    const PointInfo* info_ptr = &point_infos[point_id];
+    int global_page = __ldg(&info_ptr->global_page_id);
+    if(global_page < 0) return ret;
+    int cache_page = __ldg(&cluster_to_page[global_page]);
+    // return ret;
 
-    if(cache_data && dim_partial > 0 && query_full && global_page >= 0){
-        int cache_page = fetch_cluster_cache_page(global_page, cluster_to_page);
-        // if(in_top){
-        //     while (cache_page == -1) { //缺页，等待读入
-        //         cache_page = fetch_cluster_cache_page(global_page, cluster_to_page);
-        //         // printf("rolling\n");
-        //     }
-        // }
-        
-        if(cache_page != -1){
-            long long page_base = (static_cast<long long>(cache_page) * page_size + offset) * PARTIAL_DIM;
-            page_ptr = cache_data + page_base;
-            return true;
-        }
+    if(cache_page != -1){
+        int offset = __ldg(&info_ptr->offset);
+        unsigned long long page_idx = static_cast<unsigned long long>(cache_page);
+        unsigned long long flat_offset = (page_idx * page_size + offset);
+        unsigned long long byte_offset = flat_offset * PARTIAL_DIM;
+        ret.page_ptr = cache_data + byte_offset;
+        // ret.page_ptr = nullptr;
+        ret.in_cache = true;
+        return ret;
     }
-    return false;
+    return ret;
 }
+
 #endif
 
 template<typename IdType, typename FloatType, int WARP_SIZE>
@@ -1066,20 +1032,18 @@ __global__ void GraphSearchKernel(float* d_data, const float* query_full, int* d
     // insert
       #ifdef USE_CACHE
         const float* page_ptr = nullptr;
-        bool in_cache_line0 = false;
+        return_type ret;
         if(lane_id == 0){
-            in_cache_line0 = whether_cache(dist,
-                static_cast<int>(p_id), q_id,
-                query_top_clusters, cluster_top_t,
+            ret = whether_cache(static_cast<int>(p_id),
                 point_infos, cluster_to_page,
-                cache_data, page_size, dim_partial, dim_total,
-                query_full, linear_w, linear_b, linear_dim, page_ptr);
+                cache_data, page_size);
         }
-        bool in_cache = __shfl_sync(FULL_MASK, in_cache_line0, 0);
-        unsigned long long page_u64 = __shfl_sync(FULL_MASK, reinterpret_cast<unsigned long long>(page_ptr), 0);
+        bool in_cache = __shfl_sync(FULL_MASK, ret.in_cache, 0);
+        unsigned long long page_u64 = __shfl_sync(FULL_MASK, reinterpret_cast<unsigned long long>(ret.page_ptr), 0);
         page_ptr = reinterpret_cast<float*>(page_u64);
 
         if(in_cache){
+            float partial_dist = 0;
             //read point
             // #region PARTIAL_DIM d_data loading
                 #if PARTIAL_DIM > 0
@@ -1362,7 +1326,7 @@ __global__ void GraphSearchKernel(float* d_data, const float* query_full, int* d
 
             // #region PARTIAL_DIM distance reduction
                 #ifdef USE_L2_DIST_
-                    float partial_dist = 0;
+                    
                 #if PARTIAL_DIM > 0
                     partial_dist += delta1;
                 #endif
@@ -1473,6 +1437,16 @@ __global__ void GraphSearchKernel(float* d_data, const float* query_full, int* d
                 }
                 neighbors_array[n_candidates + i].first = dist;
             }
+            // if(lane_id == 0){
+            //     if (linear_dim > 0 && linear_w && linear_b) {
+            //         int idx = (linear_dim < DIM ? linear_dim : DIM);
+            //         if (idx >= 0) {
+            //             dist = linear_w[idx] * dist + linear_b[idx];
+            //             dist = max(dist, 0.0f);
+            //         }
+            //     }
+            //     neighbors_array[n_candidates + i].first = dist;
+            // }
         }
         else{
             if(lane_id == 0){
@@ -2044,20 +2018,18 @@ __global__ void GraphSearchKernel(float* d_data, const float* query_full, int* d
     //   }
       #ifdef USE_CACHE
         const float* page_ptr = nullptr;
-        bool in_cache_line0 = false;
+        return_type ret;
         if(lane_id == 0){
-            in_cache_line0 = whether_cache(dist,
-                static_cast<int>(p_id), q_id,
-                query_top_clusters, cluster_top_t,
+            ret = whether_cache(static_cast<int>(p_id),
                 point_infos, cluster_to_page,
-                cache_data, page_size, dim_partial, dim_total,
-                query_full, linear_w, linear_b, linear_dim, page_ptr);
+                cache_data, page_size);
         }
-        bool in_cache = __shfl_sync(FULL_MASK, in_cache_line0, 0);
-        unsigned long long page_u64 = __shfl_sync(FULL_MASK, reinterpret_cast<unsigned long long>(page_ptr), 0);
+        bool in_cache = __shfl_sync(FULL_MASK, ret.in_cache, 0);
+        unsigned long long page_u64 = __shfl_sync(FULL_MASK, reinterpret_cast<unsigned long long>(ret.page_ptr), 0);
         page_ptr = reinterpret_cast<float*>(page_u64);
 
         if(in_cache){
+            float partial_dist = 0;
             //read point
             // #region PARTIAL_DIM d_data loading
                 #if PARTIAL_DIM > 0
@@ -2340,7 +2312,7 @@ __global__ void GraphSearchKernel(float* d_data, const float* query_full, int* d
 
             // #region PARTIAL_DIM distance reduction
                 #ifdef USE_L2_DIST_
-                    float partial_dist = 0;
+                    
                 #if PARTIAL_DIM > 0
                     partial_dist += delta1;
                 #endif
@@ -2451,6 +2423,16 @@ __global__ void GraphSearchKernel(float* d_data, const float* query_full, int* d
                 }
                 neighbors_array[n_candidates + i].first = dist;
             }
+            // if(lane_id == 0){
+            //     if (linear_dim > 0 && linear_w && linear_b) {
+            //         int idx = (linear_dim < DIM ? linear_dim : DIM);
+            //         if (idx >= 0) {
+            //             dist = linear_w[idx] * dist + linear_b[idx];
+            //             dist = max(dist, 0.0f);
+            //         }
+            //     }
+            //     neighbors_array[n_candidates + i].first = dist;
+            // }
         }
         else{
             if(lane_id == 0){

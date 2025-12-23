@@ -58,7 +58,8 @@ private:
     long long cache_misses;
 
 public:
-    std::vector<int> cluster_to_page;       // cluster page到cache page的映射，大小为 total_cluster_pages
+    // std::vector<int> cluster_to_page;       // cluster page到cache page的映射，大小为 total_cluster_pages
+    int* cluster_to_page;
     int total_cluster_pages;                // 全部cluster的page总数
     std::vector<int> cluster_page_count;    // 每个cluster真实的page数量
     // 拷贝页数
@@ -105,12 +106,12 @@ public:
      * 预加载指定cluster的所有page到cache
      * @param cluster_id 要预加载的cluster_id
      */
-    void prefetch_cluster(int cluster_id, cudaStream_t stream = nullptr);
+    void prefetch_cluster(int cluster_id, int& copy_count, cudaStream_t stream = nullptr);
 
     /**
      * 按批次预加载多个cluster的所有page（使用同一个stream异步拷贝）
      */
-    void prefetch_clusters_async(const std::vector<int>& cluster_ids, cudaStream_t stream = nullptr);
+    void prefetch_clusters_async(const std::vector<int>& cluster_ids, int& copy_count, cudaStream_t stream = nullptr);
 
     /**
      * 将指定点的数据拷贝回主机内存（便于调试）

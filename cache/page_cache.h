@@ -10,14 +10,34 @@
  * 点的信息结构
  */
 struct PointInfo {
-    int belong;          // 所属的cluster_id
-    int local_page_id;   // 在cluster内的page_id
+    // int belong;          // 所属的cluster_id
+    // int local_page_id;   // 在cluster内的page_id
     int offset;          // 在page内的偏移
     int global_page_id;  // 在全局page列表中的ID
 
-    __host__ __device__ PointInfo() : belong(-1), local_page_id(-1), offset(-1), global_page_id(-1) {}
-    __host__ __device__ PointInfo(int b, int lpid, int off, int gpid)
-        : belong(b), local_page_id(lpid), offset(off), global_page_id(gpid) {}
+    __host__ __device__ PointInfo() : offset(-1), global_page_id(-1) {}
+    __host__ __device__ PointInfo(int off, int gpid)
+        : offset(off), global_page_id(gpid) {}
+};
+
+// struct PointInfo {
+//     int belong;          // 所属的cluster_id
+//     int local_page_id;   // 在cluster内的page_id
+//     int offset;          // 在page内的偏移
+//     int global_page_id;  // 在全局page列表中的ID
+
+//     __host__ __device__ PointInfo() : belong(-1), local_page_id(-1), offset(-1), global_page_id(-1) {}
+//     __host__ __device__ PointInfo(int b, int lpid, int off, int gpid)
+//         : belong(b), local_page_id(lpid), offset(off), global_page_id(gpid) {}
+// };
+
+struct PointInfo_local {
+    int belong;          // 所属的cluster_id
+    int local_page_id;   // 在cluster内的page_id
+
+    __host__ __device__ PointInfo_local() : belong(-1), local_page_id(-1) {}
+    __host__ __device__ PointInfo_local(int b, int lpid)
+        : belong(b), local_page_id(lpid) {}
 };
 
 /**
@@ -42,6 +62,7 @@ private:
     // int total_cluster_pages;                // 全部cluster的page总数
     // std::vector<int> cluster_to_page;       // cluster page到cache page的映射，大小为 total_cluster_pages
     std::vector<PointInfo> point_info; // 点id到其信息的映射
+    std::vector<PointInfo_local> point_info_local;
 
     // 设备端辅助结构
     int* device_cluster_to_page;        // 设备端映射
@@ -162,7 +183,7 @@ public:
     /**
      * 更新cluster_to_page映射
      */
-    void update_map(cudaStream_t stream);
+    void update_map(cudaStream_t stream = nullptr);
 private:
     /**
      * 加载指定page到cache

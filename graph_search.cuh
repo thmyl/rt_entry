@@ -102,53 +102,6 @@ struct return_type{
     const float* page_ptr;
 };
 
-// __device__ inline return_type whether_cache(float base_dist,
-//                                         int point_id,
-//                                         int query_id,
-//                                         const int* query_top_clusters,
-//                                         int cluster_top_t,
-//                                         const PointInfo* point_infos,
-//                                         const int* cluster_to_page,
-//                                         const float* cache_data,
-//                                         int page_size,
-//                                         int dim_partial,
-//                                         int dim_total,
-//                                         const float* query_full,
-//                                         const float* linear_w,
-//                                         const float* linear_b,
-//                                         int linear_dim) {
-//     return_type ret;
-//     ret.in_cache = false;
-//     ret.page_ptr = nullptr;
-    
-//     int cluster_id = -1;
-//     int global_page = -1;
-//     int offset = 0;
-//     if (point_infos) {
-//         const PointInfo& info = point_infos[point_id];
-//         cluster_id = info.belong;
-//         global_page = info.global_page_id;
-//         offset = info.offset;
-//     }
-
-//     if(cache_data && dim_partial > 0 && query_full && global_page >= 0){
-//         int cache_page = cluster_to_page[global_page];
-        
-//         if(cache_page != -1){
-//             unsigned long long page_base = (static_cast<unsigned long long>(cache_page) * page_size + offset) * PARTIAL_DIM;
-//             ret.page_ptr = cache_data + page_base;
-//             // 生成随机数作为page_ptr（不使用 cache_page / global_page）
-//             // unsigned long long random_val = 5ULL * 1103515245ULL + 12345ULL;
-//             // ret.page_ptr = reinterpret_cast<const float*>(random_val);
-//             // ret.page_ptr = 12345;
-//             // ret.page_ptr = nullptr;
-//             ret.in_cache = true;
-//             return ret;
-//         }
-//     }
-//     return ret;
-// }
-
 __device__ inline return_type whether_cache(int point_id,
                                         const PointInfo* point_infos,
                                         const int* cluster_to_page,

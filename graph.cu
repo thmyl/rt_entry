@@ -104,7 +104,10 @@ Graph::Graph(int n_subspaces_, int buffer_size_, int n_candidates_, int max_hits
     return;
   }
   d_query_batch_ids = nullptr;
-  page_cache = nullptr;
+  // 初始化双 buffer cache 指针
+  for (int i = 0; i < 2; ++i) {
+    page_caches[i] = nullptr;
+  }
 }
 
 void Graph::Init_entry(){
@@ -160,10 +163,14 @@ void Graph::Input(){
       // printf("centroid_norms_host size = %d\n", centroid_norms_host.size());
       std::cout<<"centroid_norms_host size = "<<centroid_norms_host.size()<<std::endl;
     }
-  
+
     dim_partial = PARTIAL_DIM;
     std::cout<<"dim_partial = "<<dim_partial<<std::endl;
-    page_cache = new PageCache(page_size, n_page, dim_partial, n_cluster, np);
+    // 将原本单个 cache 拆成两个 buffer，page 数量按 2 份划分
+    int pages_buf0 = n_page / 2;
+    int pages_buf1 = n_page - pages_buf0;
+    page_caches[0] = new PageCache(page_size, pages_buf0, dim_partial, n_cluster, np);
+    page_caches[1] = new PageCache(page_size, pages_buf1, dim_partial, n_cluster, np);
     load_linear_params();
   #endif
 
@@ -322,9 +329,16 @@ void Graph::Projection(){
   //debug end
   
   #ifdef USE_CACHE
-    page_cache->init_data(h_pca_points.data(), dim_, DIM,
-                          cluster_data.labels, cluster_data.cluster_points);
-    page_cache->random_fill_cache();
+    // 为两个 buffer 分别初始化各自的 cache 数据
+    for (int buf = 0; buf < 2; ++buf) {
+      if (page_caches[buf]) {
+        page_caches[buf]->init_data(h_pca_points.data(), dim_, DIM,
+                                    cluster_data.labels, cluster_data.cluster_points);
+        page_caches[buf]->random_fill_cache();
+        page_caches[buf]->update_map();
+      }
+    }
+    cudaDeviceSynchronize();
   #endif
 
   thrust::host_vector<float> h_rotation;
@@ -655,10 +669,29 @@ void Graph::compute_query_cluster_top() {
     );
 
     // -----------------------------
-    // Step 3: 顺序划分 batch
+    // Step 3: 生成交错的Batch映射表
+    // -----------------------------
+    std::vector<int> target_batch_indices;
+    target_batch_indices.reserve(total_batches);
+    int num_full_batches = nq / batch_size;
+    for(int i=0; i<num_full_batches; i+=2){
+      target_batch_indices.push_back(i);
+    }
+    for(int i=1; i<num_full_batches; i+=2){
+      target_batch_indices.push_back(i);
+    }
+    if(total_batches > num_full_batches){
+      target_batch_indices.push_back(total_batches - 1);
+    }
+
+
+    // -----------------------------
+    // Step 4: 顺序划分 batch
     // -----------------------------
     int qpos = 0;
     for (int batch_idx = 0; batch_idx < total_batches; ++batch_idx) {
+        int target_batch_idx = target_batch_indices[batch_idx];
+        // int target_batch_idx = batch_idx;
 
         int count = std::min(batch_size, nq - qpos);
         std::unordered_set<int> cluster_set;
@@ -676,7 +709,7 @@ void Graph::compute_query_cluster_top() {
         }
 
         // 保存 batch 的 cluster 并集
-        batch_cluster_ids[batch_idx] =
+        batch_cluster_ids[target_batch_idx] =
             std::vector<int>(cluster_set.begin(), cluster_set.end());
 
         qpos += count;
@@ -741,35 +774,38 @@ void Graph::build_query_batches_gpu() {
   }
 }
 
-void Graph::prefetch_batch_clusters(int batch_index, int query_offset, int batch_count, 
+void Graph::prefetch_batch_clusters(int buffer_id, int batch_index, int query_offset, int batch_count, 
                                     cudaStream_t stream) {
+  if (buffer_id < 0 || buffer_id >= 2) {
+    return;
+  }
+  PageCache* page_cache = page_caches[buffer_id];
   if(cluster_top_t <= 0 || !page_cache){
     return;
   }
   int copied_pages_prev = page_cache->copied_pages;
-  int global_stream_count = 0;
-  // int copy_count = 0;
-  int copy_count = -100000000;//不停止拷贝
-  for(int k=cluster_top_t-1; k>=0; --k){
-    for(int q_i = query_offset; q_i < query_offset + batch_count; ++q_i){
-      int q_id = query_batch_ids[q_i];
-      int c_id = h_query_top_clusters[(size_t)q_id * cluster_top_t + k];
-      // page_cache->prefetch_cluster(c_id, prefetch_streams->at(global_stream_count % prefetch_streams->size()));
-      page_cache->prefetch_cluster(c_id, copy_count, stream);
-      global_stream_count++;
-    }
-  }
-  // for(int k=0; k<cluster_top_t; ++k){
+  int copy_count = 0;
+  // int copy_count = -100000000;//不停止拷贝
+  // for(int k=cluster_top_t-1; k>=0; --k){
   //   for(int q_i = query_offset; q_i < query_offset + batch_count; ++q_i){
   //     int q_id = query_batch_ids[q_i];
   //     int c_id = h_query_top_clusters[(size_t)q_id * cluster_top_t + k];
   //     page_cache->prefetch_cluster(c_id, copy_count, stream);
-  //     if(copy_count >= page_cache->get_num_pages()) {
-  //       return;
-  //     }
-  //     global_stream_count++;
   //   }
   // }
+  for(int k=0; k<cluster_top_t; ++k){
+    for(int q_i = query_offset; q_i < query_offset + batch_count; ++q_i){
+      int q_id = query_batch_ids[q_i];
+      int c_id = h_query_top_clusters[(size_t)q_id * cluster_top_t + k];
+      page_cache->prefetch_cluster(c_id, copy_count, stream);
+      if(copy_count >= page_cache->get_num_pages()) {
+        break;
+      }
+    }
+    if(copy_count >= page_cache->get_num_pages()) {
+      break;
+    }
+  }
   if(copied_pages_prev != page_cache->copied_pages) {
     page_cache->update_map(stream);
   }
@@ -843,7 +879,7 @@ void Graph::Search(){
     rt_entry->Search(d_pca_points, d_pca_queries_full, d_gt_, d_entries, d_entries_dist, n_entries);
     Timing::stopTiming(2);
   }
-  // ======================= graph search =======================
+  // ======================= parameter declaration =======================
     Timing::startTiming("graph search");
 
     // #region define variables
@@ -877,9 +913,9 @@ void Graph::Search(){
       auto *d_candidates_ptr = thrust::raw_pointer_cast(d_candidates.data());
       // int* d_candidates_batch = d_candidates_ptr + static_cast<size_t>(query_offset) * n_candidates;
 
-      const PointInfo* d_point_infos = page_cache ? page_cache->device_point_info_ptr() : nullptr;
-      const int* d_cluster_to_page = page_cache ? page_cache->device_cluster_map() : nullptr;
-      const float* cache_ptr = page_cache ? page_cache->device_cache_ptr() : nullptr;
+      // point_info 在两个 cache 中是一致的，这里统一使用 buffer 0 的指针
+      const PointInfo* d_point_infos =
+          (page_caches[0] ? page_caches[0]->device_point_info_ptr() : nullptr);
       const float* d_query_full_ptr = d_pca_queries_full.empty() ? nullptr : thrust::raw_pointer_cast(d_pca_queries_full.data());
       const int* d_query_top_ptr = (!d_query_top_clusters.empty() && cluster_top_t > 0)
                                     ? thrust::raw_pointer_cast(d_query_top_clusters.data())
@@ -890,26 +926,49 @@ void Graph::Search(){
       size_t shared_mem = ((search_width << offset_shift_) + n_candidates) * sizeof(KernelPair<float, int>);
     // #endregion define variables
 
-    int flag = 0; //交替拷贝
-    cudaEvent_t event;
-    CUDA_CHECK(cudaEventCreateWithFlags(&event, cudaEventDisableTiming));
-    
+    // 双 buffer 预取完成事件
+    cudaEvent_t prefetch_done[2];
+    cudaEvent_t compute_done[2];
+    for (int i = 0; i < 2; ++i) {
+      CUDA_CHECK(cudaEventCreateWithFlags(&prefetch_done[i], cudaEventDisableTiming));
+      CUDA_CHECK(cudaEventCreateWithFlags(&compute_done[i], cudaEventDisableTiming));
+    }
+ 
+  // ======================= graph search batch =======================
     int total_batches = (nq + batch_size - 1) / batch_size;
     // std::cout<<"total_batches = "<<total_batches<<std::endl;
+    // 先为第 0 个 batch 启动预取
+    #ifdef USE_CACHE
+      if (cluster_top_t > 0 && total_batches > 0) {
+        int start0 = 0;
+        int count0 = std::min(batch_size, nq);
+        int buf0 = 0;
+        prefetch_batch_clusters(buf0, 0, start0, count0, prefetch_streams[buf0]);
+        CUDA_CHECK(cudaEventRecord(prefetch_done[buf0], prefetch_streams[buf0]));
+      }
+    #endif
+
     for(int batch_idx = 0; batch_idx < total_batches; ++batch_idx){
       int start = batch_idx * batch_size;
       int count = std::min(batch_size, nq - start);
+      int buffer_id = batch_idx % 2;
+
+      // 当前 batch 等待对应 buffer 的预取完成
       #ifdef USE_CACHE
         if(cluster_top_t > 0 && total_batches > 0){
-          prefetch_batch_clusters(batch_idx, start, count, prefetch_streams[flag]);
-          // cudaDeviceSynchronize();
-          //stream同步
-          CUDA_CHECK(cudaEventRecord(event, prefetch_streams[flag]));
-          CUDA_CHECK(cudaStreamWaitEvent(graph_stream, event, 0));
+          CUDA_CHECK(cudaStreamWaitEvent(graph_stream, prefetch_done[buffer_id], 0));
         }
+        // cudaDeviceSynchronize();
       #endif
-      // upload_cluster_to_page(page_cache->cluster_to_page.data(), page_cache->total_cluster_pages);
-      // GraphSearchBatch(start, count, graph_stream);
+
+      // 为本 batch 选择正确的 cache buffer 指针
+      const int* d_cluster_to_page = nullptr;
+      const float* cache_ptr = nullptr;
+      if (page_caches[buffer_id]) {
+        d_cluster_to_page = page_caches[buffer_id]->device_cluster_map();
+        cache_ptr = page_caches[buffer_id]->device_cache_ptr();
+      }
+
       GraphSearchKernel<int, float, WARP_SIZE><<<count, 64, shared_mem, graph_stream>>>
       (d_points_ptr, d_queries_ptr, /*d_results_batch*/ d_results_ptr, d_graph_ptr, /*d_candidates_batch*/ d_candidates_ptr, np,
       start, d_query_batch_ids,
@@ -919,10 +978,34 @@ void Graph::Search(){
       dim_partial, dim_,
       d_query_top_ptr, cluster_top_t,
       d_linear_w_ptr, d_linear_b_ptr, linear_params_dim);
-      // cudaDeviceSynchronize();
-      CUDA_CHECK(cudaStreamSynchronize(graph_stream));
+
+      #ifdef USE_CACHE
+        if(cluster_top_t > 0){
+          CUDA_CHECK(cudaEventRecord(compute_done[buffer_id], graph_stream));
+          // cudaDeviceSynchronize();
+        }
+      #endif
+
+      // 在 kernel 运行的同时，为下一批次在另一 buffer 上启动预取
+      #ifdef USE_CACHE
+        if (cluster_top_t > 0) {
+          int next_batch = batch_idx + 1;
+          if (next_batch < total_batches) {
+            int next_start = next_batch * batch_size;
+            int next_count = std::min(batch_size, nq - next_start);
+            int next_buffer = next_batch % 2;
+            CUDA_CHECK(cudaStreamWaitEvent(prefetch_streams[next_buffer], compute_done[next_buffer], 0));
+            CUDA_CHECK(cudaEventSynchronize(compute_done[next_buffer]));
+            prefetch_batch_clusters(next_buffer, next_batch, next_start, next_count, prefetch_streams[next_buffer]);
+            CUDA_CHECK(cudaEventRecord(prefetch_done[next_buffer], prefetch_streams[next_buffer]));
+          }
+        }
+      #endif
     }
     
+    // 等待 graph_stream 中所有 kernel 完成
+    CUDA_CHECK(cudaStreamSynchronize(graph_stream));
+
     cudaDeviceSynchronize();
     CUDA_CHECK(cudaGetLastError());  
     Timing::stopTiming(2);
@@ -939,8 +1022,11 @@ void Graph::Search(){
 
   #ifdef DETAIL
     #ifdef USE_CACHE
-      if (page_cache) {
-        std::cout<<"copied_pages = "<<page_cache->copied_pages<<std::endl;
+      // 打印第一个 buffer 的 copy 统计
+      if (page_caches[0]) {
+        std::cout<<"copied_pages (buffer 0) = "<<page_caches[0]->copied_pages<<std::endl;
+        std::cout<<"copied_pages (buffer 1) = "<<page_caches[1]->copied_pages<<std::endl;
+        std::cout<<"total_copied_pages = "<<page_caches[0]->copied_pages + page_caches[1]->copied_pages<<std::endl;
       }
     #endif
   #endif
@@ -956,67 +1042,73 @@ void Graph::Search(){
       }
     }
   #endif
-  CUDA_CHECK(cudaEventDestroy(event));
+  // 销毁双 buffer 预取事件
+  // 注意：只有在上面成功创建的情况下才销毁，这里简单假定始终创建成功
+  for (int i = 0; i < 2; ++i) {
+    // 防止未初始化时调用，CUDA 自身会检查
+    // 这里不再单独存标志位，代码保持简洁
+    CUDA_CHECK(cudaEventDestroy(prefetch_done[i]));
+  }
 }
 
-void Graph::GraphSearchBatch(int query_offset, int batch_count, cudaStream_t stream){
-  if (batch_count <= 0) {
-    return;
-  }
+// void Graph::GraphSearchBatch(int query_offset, int batch_count, cudaStream_t stream){
+//   if (batch_count <= 0) {
+//     return;
+//   }
 
-  int hash_len, bit, hash;
-  hash_parameter(n_candidates, hash_len, bit, hash);
-  constexpr int WARP_SIZE = 32;
+//   int hash_len, bit, hash;
+//   hash_parameter(n_candidates, hash_len, bit, hash);
+//   constexpr int WARP_SIZE = 32;
 
-  float *d_points_ptr;
-  float *d_queries_ptr;
-  int query_dim;
-  if(ALGO == 1 || ALGO == 2){
-    d_points_ptr = thrust::raw_pointer_cast(d_pca_points.data());
-    d_queries_ptr = thrust::raw_pointer_cast(d_pca_queries_full.data());
-    query_dim = dim_;
-  }
-  else{
-    d_points_ptr = thrust::raw_pointer_cast(d_points_.data());
-    d_queries_ptr = thrust::raw_pointer_cast(d_queries_.data());
-    query_dim = dim_;
-  }
+//   float *d_points_ptr;
+//   float *d_queries_ptr;
+//   int query_dim;
+//   if(ALGO == 1 || ALGO == 2){
+//     d_points_ptr = thrust::raw_pointer_cast(d_pca_points.data());
+//     d_queries_ptr = thrust::raw_pointer_cast(d_pca_queries_full.data());
+//     query_dim = dim_;
+//   }
+//   else{
+//     d_points_ptr = thrust::raw_pointer_cast(d_points_.data());
+//     d_queries_ptr = thrust::raw_pointer_cast(d_queries_.data());
+//     query_dim = dim_;
+//   }
 
-  // float* d_query_batch = d_queries_ptr + static_cast<size_t>(query_offset) * query_dim;
-  auto *d_results_ptr = thrust::raw_pointer_cast(d_results.data());
-  // int* d_results_batch = d_results_ptr + static_cast<size_t>(query_offset) * topk;
-  auto *d_graph_ptr = thrust::raw_pointer_cast(d_graph_.data());
+//   // float* d_query_batch = d_queries_ptr + static_cast<size_t>(query_offset) * query_dim;
+//   auto *d_results_ptr = thrust::raw_pointer_cast(d_results.data());
+//   // int* d_results_batch = d_results_ptr + static_cast<size_t>(query_offset) * topk;
+//   auto *d_graph_ptr = thrust::raw_pointer_cast(d_graph_.data());
 
-  auto *d_hits_all = thrust::raw_pointer_cast((rt_entry->subspaces_[0]).hits.data());
-  // int* d_hits_batch = d_hits_all ? d_hits_all + query_offset : nullptr;
-  auto *d_entries_ptr = thrust::raw_pointer_cast(rt_entry->subspaces_[0].aabb_entries.data());
+//   auto *d_hits_all = thrust::raw_pointer_cast((rt_entry->subspaces_[0]).hits.data());
+//   // int* d_hits_batch = d_hits_all ? d_hits_all + query_offset : nullptr;
+//   auto *d_entries_ptr = thrust::raw_pointer_cast(rt_entry->subspaces_[0].aabb_entries.data());
 
-  auto *d_candidates_ptr = thrust::raw_pointer_cast(d_candidates.data());
-  // int* d_candidates_batch = d_candidates_ptr + static_cast<size_t>(query_offset) * n_candidates;
+//   auto *d_candidates_ptr = thrust::raw_pointer_cast(d_candidates.data());
+//   // int* d_candidates_batch = d_candidates_ptr + static_cast<size_t>(query_offset) * n_candidates;
 
-  const PointInfo* d_point_infos = page_cache ? page_cache->device_point_info_ptr() : nullptr;
-  const int* d_cluster_to_page = page_cache ? page_cache->device_cluster_map() : nullptr;
-  const float* cache_ptr = page_cache ? page_cache->device_cache_ptr() : nullptr;
-  const float* d_query_full_ptr = d_pca_queries_full.empty() ? nullptr : thrust::raw_pointer_cast(d_pca_queries_full.data());
-  const int* d_query_top_ptr = (!d_query_top_clusters.empty() && cluster_top_t > 0)
-                                ? thrust::raw_pointer_cast(d_query_top_clusters.data())
-                                : nullptr;
-  const float* d_linear_w_ptr = linear_params_dim > 0 ? thrust::raw_pointer_cast(d_linear_w.data()) : nullptr;
-  const float* d_linear_b_ptr = linear_params_dim > 0 ? thrust::raw_pointer_cast(d_linear_b.data()) : nullptr;
+//   const PointInfo* d_point_infos = page_cache ? page_cache->device_point_info_ptr() : nullptr;
+//   const int* d_cluster_to_page = page_cache ? page_cache->device_cluster_map() : nullptr;
+//   const float* cache_ptr = page_cache ? page_cache->device_cache_ptr() : nullptr;
+//   const float* d_query_full_ptr = d_pca_queries_full.empty() ? nullptr : thrust::raw_pointer_cast(d_pca_queries_full.data());
+//   const int* d_query_top_ptr = (!d_query_top_clusters.empty() && cluster_top_t > 0)
+//                                 ? thrust::raw_pointer_cast(d_query_top_clusters.data())
+//                                 : nullptr;
+//   const float* d_linear_w_ptr = linear_params_dim > 0 ? thrust::raw_pointer_cast(d_linear_w.data()) : nullptr;
+//   const float* d_linear_b_ptr = linear_params_dim > 0 ? thrust::raw_pointer_cast(d_linear_b.data()) : nullptr;
 
-  size_t shared_mem = ((search_width << offset_shift_) + n_candidates) * sizeof(KernelPair<float, int>);
+//   size_t shared_mem = ((search_width << offset_shift_) + n_candidates) * sizeof(KernelPair<float, int>);
   
-  GraphSearchKernel<int, float, WARP_SIZE><<<batch_count, 64, shared_mem, stream>>>
-    (d_points_ptr, d_queries_ptr, /*d_results_batch*/ d_results_ptr, d_graph_ptr, /*d_candidates_batch*/ d_candidates_ptr, np,
-    query_offset, d_query_batch_ids,
-    offset_shift_, n_candidates, topk, search_width, d_entries_ptr,
-    /*d_hits_batch*/ d_hits_all, max_iter, ALGO,
-    d_point_infos, d_cluster_to_page, cache_ptr, page_size,
-    dim_partial, dim_,
-    d_query_top_ptr, cluster_top_t,
-    d_linear_w_ptr, d_linear_b_ptr, linear_params_dim);
-  CUDA_CHECK(cudaGetLastError());  
-}
+//   GraphSearchKernel<int, float, WARP_SIZE><<<batch_count, 64, shared_mem, stream>>>
+//     (d_points_ptr, d_queries_ptr, /*d_results_batch*/ d_results_ptr, d_graph_ptr, /*d_candidates_batch*/ d_candidates_ptr, np,
+//     query_offset, d_query_batch_ids,
+//     offset_shift_, n_candidates, topk, search_width, d_entries_ptr,
+//     /*d_hits_batch*/ d_hits_all, max_iter, ALGO,
+//     d_point_infos, d_cluster_to_page, cache_ptr, page_size,
+//     dim_partial, dim_,
+//     d_query_top_ptr, cluster_top_t,
+//     d_linear_w_ptr, d_linear_b_ptr, linear_params_dim);
+//   CUDA_CHECK(cudaGetLastError());  
+// }
 
 void Graph::CleanUp(){
   if(ALGO == 1) rt_entry->CleanUp();

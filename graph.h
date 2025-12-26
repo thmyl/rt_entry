@@ -73,15 +73,16 @@ public:
 	thrust::device_vector<int> d_candidates;
 	thrust::host_vector<int> h_candidates;
 
-	thrust::host_vector<DistPair> candidates_dist;
+    thrust::host_vector<DistPair> candidates_dist;
 
-	PageCache* page_cache;
+    // 双 buffer page cache，用于与 graph search 交替配合
+    PageCache* page_caches[2];
 	int page_size;
 	int n_page;
 	int n_cluster;
 	int dim_partial;
 	int cluster_top_t;
-    int batch_size = 10;
+    int batch_size = 100;
 
     thrust::device_vector<float> d_centroids_matrix;
     thrust::device_vector<float> d_centroid_norms;
@@ -119,8 +120,9 @@ private:
 private:
     void compute_query_cluster_top();
     void build_query_batches();
-    void prefetch_batch_clusters(int batch_index, int query_offset, int batch_size, 
-                                 cudaStream_t prefetch_streams = nullptr);
+    // 为指定 buffer 预取某个 batch 需要的 cluster 到对应的 page cache 中
+	void prefetch_batch_clusters(int buffer_id, int batch_index, int query_offset, int batch_size, 
+                                 cudaStream_t stream = nullptr);
 	void load_linear_params();
 	void build_query_batches_gpu();
 };

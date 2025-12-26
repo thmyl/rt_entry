@@ -7,20 +7,20 @@ DEFINE_int32(ALGO, 1, "0 random entry, 1 rt entry");
 DEFINE_int32(search_width, 1, "search width");
 
 /* sift1m */
-DEFINE_string(data_name, "/data/myl/cache_search/data/sift1M", "name of datasets");
-DEFINE_string(data_path, "/data/myl/sift1M/sift1M_base.fvecs", "path of datasets");
-DEFINE_string(query_path, "/data/myl/sift1M/sift1M_query.fvecs", "path of queries");
-// DEFINE_string(query_path, "/home/myl/cache_search/gen_query/sift1M_query.fvecs", "path of queries");
-DEFINE_string(gt_path, "/data/myl/sift1M/sift1M_groundtruth.ivecs", "path of the ground truth");
-// DEFINE_string(gt_path, "/home/myl/cache_search/gen_query/sift1M_groundtruth.ivecs", "path of the ground truth");
-DEFINE_string(centroids_path, "data/sift1M/centroids_100", "path of centroids file produced by clustering");
-DEFINE_string(graph_path, "/data/myl/sift1M/index/sift1M_64_32_cagra.nsw", "path of the graph");
-// DEFINE_string(graph_path, "/data/myl/sift1M/sift_128_64_1M.nsw", "path of the graph");
-// DEFINE_string(graph_path, "/home/myl/cagra/python/sift1m_128_64.nsw", "path of the graph");
-// DEFINE_string(graph_path, "/home/myl/graph/index_diskann/sift1M_64_diskann.nsw", "path of the graph");
-// DEFINE_string(graph_path, "/home/myl/pcsearch/input_file/sift1M_32_16.nsw", "path of the graph");
-// DEFINE_string(graph_path, "/home/myl/pcsearch/input_file/sift1M_64_32.nsw", "path of the graph");
-// DEFINE_string(graph_path, "/home/myl/graph/index/sift_128_64_1M.nsw", "path of the graph");
+// DEFINE_string(data_name, "/data/myl/cache_search/data/sift1M", "name of datasets");
+// DEFINE_string(data_path, "/data/myl/sift1M/sift1M_base.fvecs", "path of datasets");
+// DEFINE_string(query_path, "/data/myl/sift1M/sift1M_query.fvecs", "path of queries");
+// // DEFINE_string(query_path, "/home/myl/cache_search/gen_query/sift1M_query.fvecs", "path of queries");
+// DEFINE_string(gt_path, "/data/myl/sift1M/sift1M_groundtruth.ivecs", "path of the ground truth");
+// // DEFINE_string(gt_path, "/home/myl/cache_search/gen_query/sift1M_groundtruth.ivecs", "path of the ground truth");
+// DEFINE_string(centroids_path, "data/sift1M/centroids_100", "path of centroids file produced by clustering");
+// DEFINE_string(graph_path, "/data/myl/sift1M/index/sift1M_64_32_cagra.nsw", "path of the graph");
+// // DEFINE_string(graph_path, "/data/myl/sift1M/sift_128_64_1M.nsw", "path of the graph");
+// // DEFINE_string(graph_path, "/home/myl/cagra/python/sift1m_128_64.nsw", "path of the graph");
+// // DEFINE_string(graph_path, "/home/myl/graph/index_diskann/sift1M_64_diskann.nsw", "path of the graph");
+// // DEFINE_string(graph_path, "/home/myl/pcsearch/input_file/sift1M_32_16.nsw", "path of the graph");
+// // DEFINE_string(graph_path, "/home/myl/pcsearch/input_file/sift1M_64_32.nsw", "path of the graph");
+// // DEFINE_string(graph_path, "/home/myl/graph/index/sift_128_64_1M.nsw", "path of the graph");
 
 /* sift10m */
 // DEFINE_string(data_name, "/data/myl/cache_search/data/sift10M", "name of datasets");
@@ -32,18 +32,18 @@ DEFINE_string(graph_path, "/data/myl/sift1M/index/sift1M_64_32_cagra.nsw", "path
 // // DEFINE_string(graph_path, "/home/myl/pcsearch/input_file/sift10M_32_16.nsw", "path of the graph");
 
 /* sift100m */
-// // DEFINE_string(data_name, "/data/myl/sift1B/sift100M_index/pca", "name of datasets");
-// DEFINE_string(data_name, "/data/myl/cache_search/data/sift100M", "name of datasets");
-// // DEFINE_string(data_path, "/data/myl/sift1B/bigann_base.bvecs", "path of datasets");
-// DEFINE_string(data_path, "/data/myl/sift100M/sift100M_base.fbin", "path of datasets");
-// // DEFINE_string(data_path, "/data/myl/sift100M/sift100M_base.fvecs", "path of datasets");
-// // DEFINE_string(query_path, "/data/myl/sift1B/bigann_query.bvecs", "path of queries");
-// DEFINE_string(query_path, "/data/myl/sift100M/sift100M_query.fvecs", "path of queries");
-// // DEFINE_string(gt_path, "/data/myl/sift1B/gnd/idx_100M.ivecs", "path of the ground truth");
-// DEFINE_string(gt_path, "/data/myl/sift100M/sift100M_groundtruth.ivecs", "path of the ground truth");
-// DEFINE_string(centroids_path, "data/sift100M/centroids_10000", "path of centroids file produced by clustering");
-// DEFINE_string(graph_path, "/data/myl/sift1B/sift100M_index/sift100M_degree64.nsw", "path of the graph");
-// // DEFINE_string(graph_path, "/data/myl/sift100M/index/sift100M_128_64_diskann.nsw", "path of the graph");
+// DEFINE_string(data_name, "/data/myl/sift1B/sift100M_index/pca", "name of datasets");
+DEFINE_string(data_name, "/data/myl/cache_search/data/sift100M", "name of datasets");
+// DEFINE_string(data_path, "/data/myl/sift1B/bigann_base.bvecs", "path of datasets");
+DEFINE_string(data_path, "/data/myl/sift100M/sift100M_base.fbin", "path of datasets");
+// DEFINE_string(data_path, "/data/myl/sift100M/sift100M_base.fvecs", "path of datasets");
+// DEFINE_string(query_path, "/data/myl/sift1B/bigann_query.bvecs", "path of queries");
+DEFINE_string(query_path, "/data/myl/sift100M/sift100M_query.fvecs", "path of queries");
+// DEFINE_string(gt_path, "/data/myl/sift1B/gnd/idx_100M.ivecs", "path of the ground truth");
+DEFINE_string(gt_path, "/data/myl/sift100M/sift100M_groundtruth.ivecs", "path of the ground truth");
+DEFINE_string(centroids_path, "data/sift100M/centroids_1000", "path of centroids file produced by clustering");
+DEFINE_string(graph_path, "/data/myl/sift1B/sift100M_index/sift100M_degree64.nsw", "path of the graph");
+// DEFINE_string(graph_path, "/data/myl/sift100M/index/sift100M_128_64_diskann.nsw", "path of the graph");
 
 /* deep1M */
 // DEFINE_string(data_name, "/data/myl/cache_search/data/deep1M", "name of datasets");

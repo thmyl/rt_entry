@@ -62,6 +62,7 @@ PageCache::PageCache(int page_size, int num_pages, int dim_partial, int num_clus
 
     // 初始化point_info
     point_info.resize(num_points_total);
+    point_info_local.resize(num_points_total);
 
     // 创建LRU管理器
     lru = new LRUList(num_pages);
@@ -187,7 +188,8 @@ void PageCache::init_data(const float* data,
             int global_page_id = get_global_page_id(cluster_id, local_page_id);
 
             // 设置point_info
-            point_info[point_id] = PointInfo(cluster_id, local_page_id, offset, global_page_id);
+            point_info[point_id] = PointInfo(offset, global_page_id);
+            point_info_local[point_id] = PointInfo_local(cluster_id, local_page_id);
 
             // 复制数据到full_data
             if (full_data) {
@@ -214,6 +216,7 @@ float* PageCache::get_point(int point_id, cudaStream_t stream) {
     cudaStream_t use_stream = resolve_stream(stream);
 
     const PointInfo& info = point_info[point_id];
+    const PointInfo_local& info_local = point_info_local[point_id];
     int global_page_id = info.global_page_id;
     
     // 检查是否在cache中
@@ -222,7 +225,7 @@ float* PageCache::get_point(int point_id, cudaStream_t stream) {
     if (cache_page_id == -1) {
         // Cache miss - 加载page
         cache_misses++;
-        float* page_addr = load_page(info.belong, info.local_page_id, use_stream);
+        float* page_addr = load_page(info_local.belong, info_local.local_page_id, use_stream);
         return page_addr + info.offset * dim_partial;
     } else {
         // Cache hit - 更新LRU
@@ -260,6 +263,9 @@ void PageCache::prefetch_cluster(int cluster_id, int& copy_count, cudaStream_t s
             lru->touch(cluster_to_page[global_page_id]);
         }
         copy_count++;
+        if(copy_count >= num_pages) {
+            return;
+        }
     }
 }
 
@@ -355,6 +361,9 @@ float* PageCache::load_page(int cluster_id, int local_page_id, cudaStream_t stre
 }
 
 void PageCache::update_map(cudaStream_t stream) {
+    if(stream == nullptr) {
+        stream = default_stream;
+    }
     CUDA_CHECK(cudaMemcpyAsync(device_cluster_to_page, cluster_to_page, total_cluster_pages * sizeof(int), cudaMemcpyHostToDevice, stream));
 }
 

@@ -69,7 +69,8 @@ void RT_Entry::BlockUp(){
     thrust::copy(h_aabb_entries.begin(), h_aabb_entries.end(), aabb_entries.begin());
 
     expandAabb(h_aabbs, expand_ratio);
-    d_aabbs.resize(n_aabbs * n_candidates);
+    // d_aabbs.resize(n_aabbs * n_candidates);
+    d_aabbs.resize(n_aabbs);
     thrust::copy(h_aabbs.begin(), h_aabbs.end(), d_aabbs.begin());
     h_aabbs.resize(0);
     h_aabb_entries.resize(0);

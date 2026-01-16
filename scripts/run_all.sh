@@ -32,8 +32,9 @@ topk=${8:-100}
 echo "参数: K=$K, test_nq=$test_nq, t=$t, delta_d=${delta_d}, m_partial=${m_partial}, nq_eval=${nq_eval}, tmp_topk=${tmp_topk}, topk=${topk}"
 
 # DATASET_PATH="/data/myl/deep1M/deep1M_base.fvecs" # TODO: change dataset path
-# DATASET_PATH="/data/myl/sift1M/sift1M_base.fvecs" # TODO: change dataset path
-DATASET_PATH="/data/myl/sift100M/sift100M_base.fbin"
+DATASET_PATH="/data/myl/sift1M/sift1M_base.fvecs" # TODO: change dataset path
+# DATASET_PATH="/data/myl/sift100M/sift100M_base.fbin"
+# DATASET_PATH="/data/myl/deep100M/fbin/deep100M_base.fbin"
 DATASET_NAME=$(basename "$DATASET_PATH" | cut -d'_' -f1)
 DATA_ROOT="/data/myl/cache_search/data/${DATASET_NAME}"
 mkdir -p "$DATA_ROOT"
@@ -93,13 +94,16 @@ echo "=== 第三步：运行cache_search ==="
 # ./bin/test --ALGO=1 --topk=0 --n_candidates=256 --expand_ratio=0.2 --point_ratio=0.00000256 --search_width=4 \
 #           --t=$t --n_cluster=$K --page_size=1000 --n_page=6460 --centroids_path="$CENTROIDS_FILE" --max_iter=100
 
-nsys profile \
-  -t cuda,nvtx,osrt,cudnn,cublas \
-  -o double_buffer \
-  --force-overwrite=true \
-  --stats=true \
-./bin/test --ALGO=1 --topk=0 --n_candidates=256 --expand_ratio=0.2 --point_ratio=0.00000256 --search_width=4 \
-          --t=$t --n_cluster=$K --page_size=10000 --n_page=600 --centroids_path="$CENTROIDS_FILE" --max_iter=100
+# nsys profile \
+#   -t cuda,nvtx,osrt,cudnn,cublas \
+#   -o double_buffer \
+#   --force-overwrite=true \
+#   --stats=true \
+# ./bin/test --ALGO=1 --topk=0 --n_candidates=1024 --expand_ratio=0.2 --point_ratio=0.00001024 --search_width=4 \
+#           --t=$t --n_cluster=$K --page_size=10000 --n_page=2000 --centroids_path="$CENTROIDS_FILE" --max_iter=1000
 
-# ./bin/test --ALGO=2 --topk=0 --n_candidates=512 --expand_ratio=0.2 --point_ratio=0.00000512 --search_width=4 \
-#           --t=$t --n_cluster=$K --page_size=1000 --n_page=1000 --centroids_path="$CENTROIDS_FILE" --max_iter=100
+./test --ALGO=1 --topk=0 --n_candidates=1024 --expand_ratio=0.2 --point_ratio=0.00001024 --search_width=4 \
+          --t=10 --n_cluster=1000 --page_size=10000 --n_page=2400 --max_iter=1000
+
+# ./test --ALGO=2 --topk=0 --n_candidates=1024 --expand_ratio=0.2 --point_ratio=0.00001024 --search_width=4 \
+#           --page_size=1000 --n_page=1000 --max_iter=100

@@ -61,7 +61,7 @@ void Graph::check_entries(thrust::device_vector<int> &d_gt_){
 }
 
 
-__global__ void check_results_kernel(int *d_results, int n_results, int nq, int *d_gt, int gt_k, float *d_recall_1, float *d_recall_10, float *d_recall_100){
+__global__ void check_results_kernel(int *d_results, int n_results, int nq, int *d_gt, int gt_k, float *d_recall_1, float *d_recall_10, float *d_recall_100, float *d_recall_1000){
   int tid = blockIdx.x * blockDim.x + threadIdx.x;
   if(tid < nq){
     int offset = tid * n_results;
@@ -72,6 +72,26 @@ __global__ void check_results_kernel(int *d_results, int n_results, int nq, int 
           if(i<1)d_recall_1[tid] += 1;
           if(i<10)d_recall_10[tid] += 1;
           if(i<100)d_recall_100[tid] += 1;
+          if(i<1000)d_recall_1000[tid] += 1;
+          break;
+        }
+      }
+    }
+  }
+}
+
+__global__ void check_results_kernel(int *d_results, int n_results, int search_k, int nq, int *d_gt, int gt_k, float *d_recall_1, float *d_recall_10, float *d_recall_100, float *d_recall_1000){
+  int tid = blockIdx.x * blockDim.x + threadIdx.x;
+  if(tid < nq){
+    int offset = tid * n_results;
+    for(int i=0; i<gt_k; i++){
+      int gt = d_gt[tid * gt_k + i];
+      for(int j=0; j<search_k; j++){
+        if(gt == d_results[offset + j]){
+          if(i<1)d_recall_1[tid] += 1;
+          if(i<10)d_recall_10[tid] += 1;
+          if(i<100)d_recall_100[tid] += 1;
+          if(i<1000)d_recall_1000[tid] += 1;
           break;
         }
       }
@@ -88,35 +108,89 @@ void Graph::check_results(thrust::device_vector<int> &d_gt_){
   thrust::device_vector<float> d_recall_1(nq, 0);
   thrust::device_vector<float> d_recall_10(nq, 0);
   thrust::device_vector<float> d_recall_100(nq, 0);
-  check_results_kernel<<<(nq + 255)/256, 256>>>(d_results_ptr, topk, nq, d_gt_ptr, gt_k,
+  thrust::device_vector<float> d_recall_1000(nq, 0);
+  // 使用带 search_k 的 kernel，search_k 取 topk，这样可以顺便计算 recall1000
+  check_results_kernel<<<(nq + 255)/256, 256>>>(d_results_ptr, topk, topk, nq, d_gt_ptr, gt_k,
                                                     thrust::raw_pointer_cast(d_recall_1.data()),
                                                     thrust::raw_pointer_cast(d_recall_10.data()),
-                                                    thrust::raw_pointer_cast(d_recall_100.data()));
+                                                    thrust::raw_pointer_cast(d_recall_100.data()),
+                                                    thrust::raw_pointer_cast(d_recall_1000.data()));
   CUDA_SYNC_CHECK();
   thrust::host_vector<float> h_recall_1 = d_recall_1;
   thrust::host_vector<float> h_recall_10 = d_recall_10;
   thrust::host_vector<float> h_recall_100 = d_recall_100;
+  thrust::host_vector<float> h_recall_1000 = d_recall_1000;
   float sum_1 = 0;
   float sum_10 = 0;
   float sum_100 = 0;
+  float sum_1000 = 0;
   for(int i=0; i<nq; i++){
     sum_1 += h_recall_1[i];
     sum_10 += h_recall_10[i];
     sum_100 += h_recall_100[i];
+    sum_1000 += h_recall_1000[i];
   }
   sum_1 = sum_1 / nq;
   sum_10 = sum_10 / nq / 10;
   sum_100 = sum_100 / nq / 100;
-  printf("recall@1 = %f\n", sum_1);
-  printf("recall@10 = %f\n", sum_10);
-  printf("recall@100 = %f\n", sum_100);
+  sum_1000 = sum_1000 / nq / 1000;
+  printf("recall1@%d = %f\n", topk, sum_1);
+  printf("recall10@%d = %f\n", topk, sum_10);
+  printf("recall100@%d = %f\n", topk, sum_100);
+  printf("recall1000@%d = %f\n", topk, sum_1000);
 
   std::ofstream outfile;
   outfile.open(OUTFILE, std::ios_base::app);
-  // outfile << "results recall:\n";
-  // outfile <<  "recall@1 = " << sum_1 << " ms\n";
-  outfile <<  "recall@10 = " << sum_10 << " ms\n" << std::flush;
-  // outfile <<  "recall@100 = " << sum_100 << " ms\n" << std::flush;
+  outfile << "recall1@" << topk << " = " << sum_1 << "\n";
+  outfile << "recall10@" << topk << " = " << sum_10 << "\n";
+  outfile << "recall100@" << topk << " = " << sum_100 << "\n";
+  outfile << "recall1000@" << topk << " = " << sum_1000 << "\n" << std::flush;
+  outfile.close();
+}
+
+void Graph::check_results(thrust::device_vector<int> &d_gt_, int search_k){
+  auto *d_results_ptr = thrust::raw_pointer_cast(d_results.data());
+  auto *d_gt_ptr = thrust::raw_pointer_cast(d_gt_.data());
+  printf("gt_k = %d\n", gt_k);
+  thrust::device_vector<float> d_recall_1(nq, 0);
+  thrust::device_vector<float> d_recall_10(nq, 0);
+  thrust::device_vector<float> d_recall_100(nq, 0);
+  thrust::device_vector<float> d_recall_1000(nq, 0);
+  check_results_kernel<<<(nq + 255)/256, 256>>>(d_results_ptr, topk, search_k, nq, d_gt_ptr, gt_k,
+                                                    thrust::raw_pointer_cast(d_recall_1.data()),
+                                                    thrust::raw_pointer_cast(d_recall_10.data()),
+                                                    thrust::raw_pointer_cast(d_recall_100.data()),
+                                                    thrust::raw_pointer_cast(d_recall_1000.data()));
+  CUDA_SYNC_CHECK();
+  thrust::host_vector<float> h_recall_1 = d_recall_1;
+  thrust::host_vector<float> h_recall_10 = d_recall_10;
+  thrust::host_vector<float> h_recall_100 = d_recall_100;
+  thrust::host_vector<float> h_recall_1000 = d_recall_1000;
+  float sum_1 = 0;
+  float sum_10 = 0;
+  float sum_100 = 0;
+  float sum_1000 = 0;
+  for(int i=0; i<nq; i++){
+    sum_1 += h_recall_1[i];
+    sum_10 += h_recall_10[i];
+    sum_100 += h_recall_100[i];
+    sum_1000 += h_recall_1000[i];
+  }
+  sum_1 = sum_1 / nq;
+  sum_10 = sum_10 / nq / 10;
+  sum_100 = sum_100 / nq / 100;
+  sum_1000 = sum_1000 / nq / 1000;
+  printf("recall1@%d = %f\n", search_k, sum_1);
+  printf("recall10@%d = %f\n", search_k, sum_10);
+  printf("recall100@%d = %f\n", search_k, sum_100);
+  printf("recall1000@%d = %f\n", search_k, sum_1000);
+
+  std::ofstream outfile;
+  outfile.open(OUTFILE, std::ios_base::app);
+  outfile << "recall1@" << search_k << " = " << sum_1 << "\n";
+  outfile << "recall10@" << search_k << " = " << sum_10 << "\n";
+  outfile << "recall100@" << search_k << " = " << sum_100 << "\n";
+  outfile << "recall1000@" << search_k << " = " << sum_1000 << "\n" << std::flush;
   outfile.close();
 }
 

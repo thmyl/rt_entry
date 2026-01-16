@@ -187,22 +187,26 @@ int main(int argc, char* argv[]) {
     int topk_cli = 100;  // 默认值
     if (argc >= 4) topk_cli = std::max(1, std::atoi(argv[3]));
     
-    std::string dataset_path = "/data/myl/sift1M/sift1M_base.fvecs";// TODO: change dataset path
-    std::string queryset_path = "/data/myl/sift1M/sift1M_query.fvecs";// TODO: change dataset path
-    // std::string queryset_path = "/home/myl/cache_search/gen_query/sift1M_query.fvecs";
-    std::string groundtruth_path = "/data/myl/sift1M/sift1M_groundtruth.ivecs";// TODO: change dataset path
-    // std::string groundtruth_path = "/home/myl/cache_search/gen_query/sift1M_groundtruth.ivecs";
+    // std::string dataset_path = "/data/myl/sift1M/sift1M_base.fvecs";// TODO: change dataset path
+    // std::string queryset_path = "/data/myl/sift1M/sift1M_query.fvecs";// TODO: change dataset path
+    // // std::string queryset_path = "/home/myl/cache_search/gen_query/sift1M_query.fvecs";
+    // std::string groundtruth_path = "/data/myl/sift1M/sift1M_groundtruth.ivecs";// TODO: change dataset path
+    // // std::string groundtruth_path = "/home/myl/cache_search/gen_query/sift1M_groundtruth.ivecs";
 
     // std::string queryset_path = "/data/myl/deep1M/deep1M_queries.fvecs";// TODO: change dataset path
     // std::string groundtruth_path = "/data/myl/deep1M/deep1M_gt.ivecs";// TODO: change dataset path
     // std::string dataset_path = "/data/myl/deep1M/deep1M_base.fvecs";// TODO: change dataset path
 
-    // std::string dataset_path = "/data/myl/sift100M/sift100M_base.fbin";// TODO: change dataset path
-    // std::string queryset_path = "/data/myl/sift1B/bigann_query.bvecs";// TODO: change dataset path
-    // std::string groundtruth_path = "/data/myl/sift1B/gnd/idx_100M.ivecs";// TODO: change dataset path
+    // std::string dataset_path = "/mnt/IntelP5520_8T_1/myl/sift100M/sift100M_base.fbin";// TODO: change dataset path
+    // std::string queryset_path = "/mnt/IntelP5520_8T_1/myl/sift100M/sift100M_learn.fvecs";// TODO: change dataset path
+    // std::string groundtruth_path = "/mnt/IntelP5520_8T_1/myl/sift100M/sift100M_learn_groundtruth.ivecs";// TODO: change dataset path
+
+    std::string dataset_path = "/mnt/IntelP5520_8T_1/myl/deep100M/fbin/deep100M_base.fbin";// TODO: change dataset path
+    std::string queryset_path = "/mnt/IntelP5520_8T_1/myl/deep100M/deep100M_learn.fvecs";// TODO: change dataset path
+    std::string groundtruth_path = "/mnt/IntelP5520_8T_1/myl/deep100M/deep100M_learn_groundtruth.ivecs";// TODO: change dataset path
     
     std::string dataset_name = get_dataset_name_from_path(dataset_path);
-    std::string data_root = "/data/myl/cache_search/data/" + dataset_name;
+    std::string data_root = "/mnt/IntelP5520_8T_1/myl/cache_search/data/" + dataset_name;
     // ensure_dir("data");
     ensure_dir(data_root);
     std::string log_file = data_root + "/preprocess.log";
@@ -236,9 +240,14 @@ int main(int argc, char* argv[]) {
                 dataset_data[1LL * i * dataset[0].size() + j] = dataset[i][j];
             }
         }
+        int dataset_n = dataset.size();
+        int dataset_d = dataset[0].size();
+        
+        // 释放dataset内存，因为数据已经复制到dataset_data
+        std::vector<std::vector<float>>().swap(dataset);
         
         // 创建PCA对象并计算
-        pca = PCA(dataset_data, dataset.size(), dataset[0].size());
+        pca = PCA(dataset_data, dataset_n, dataset_d);
         pca.calc_eigenvalues();
         
         // 保存结果
@@ -294,8 +303,12 @@ int main(int argc, char* argv[]) {
             }
         }
         
+        // 保存dataset大小，然后释放dataset内存
+        int dataset_size = dataset.size();
+        std::vector<std::vector<float>>().swap(dataset);
+        
         // 对dataset进行PCA旋转（或读取缓存）
-        Eigen::MatrixXd rotated_data;
+        Eigen::MatrixXf rotated_data;
         if (file_exists(rotated_base_file.c_str())) {
             log("检测到缓存的旋转后的dataset，直接读取: " + rotated_base_file);
             std::ifstream ifs(rotated_base_file, std::ios::binary);
@@ -313,17 +326,21 @@ int main(int argc, char* argv[]) {
             ifs.close();
         } else {
             log("对dataset进行PCA旋转...");
-            Eigen::MatrixXd data_matrix(dataset.size(), pca.dim);
-            for (int i = 0; i < dataset.size(); i++) {
+            Eigen::MatrixXf data_matrix(dataset_size, pca.dim);
+            for (int i = 0; i < dataset_size; i++) {
                 for (int j = 0; j < pca.dim; j++) {
                     data_matrix(i, j) = dataset_data[1LL * i * pca.dim + j] - pca.meanvecRow(j);
                 }
             }
-            rotated_data = data_matrix * pca.vec;
+            delete[] dataset_data;
+            log("data_matrix shape: " + std::to_string(data_matrix.rows()) + " x " + std::to_string(data_matrix.cols()));
+            rotated_data = data_matrix * pca.vec.cast<float>();
+            // 释放data_matrix内存
+            Eigen::MatrixXf().swap(data_matrix);
             // 保存到缓存文件
             log("保存旋转后的dataset到文件: " + rotated_base_file);
             std::ofstream ofs(rotated_base_file, std::ios::binary);
-            uint nb_u = (uint)dataset.size();
+            uint nb_u = (uint)dataset_size;
             uint dim_u = (uint)pca.dim;
             ofs.write(reinterpret_cast<const char*>(&nb_u), sizeof(uint));
             ofs.write(reinterpret_cast<const char*>(&dim_u), sizeof(uint));
@@ -337,7 +354,7 @@ int main(int argc, char* argv[]) {
         }
         
         // 对query进行PCA旋转（保证保存全量 queries）
-        Eigen::MatrixXd rotated_query_all;
+        Eigen::MatrixXf rotated_query_all;
         bool need_recompute_queries = true;
         if (file_exists(rotated_query_file.c_str())) {
             std::ifstream ifs(rotated_query_file, std::ios::binary);
@@ -360,13 +377,13 @@ int main(int argc, char* argv[]) {
         if (need_recompute_queries) {
             log("对全量query进行PCA旋转...");
             int all_nq = (int)queries.size();
-            Eigen::MatrixXd query_matrix(all_nq, pca.dim);
+            Eigen::MatrixXf query_matrix(all_nq, pca.dim);
             for (int i = 0; i < all_nq; i++) {
                 for (int j = 0; j < pca.dim; j++) {
                     query_matrix(i, j) = queries[i][j] - pca.meanvecRow(j);
                 }
             }
-            rotated_query_all = query_matrix * pca.vec;
+            rotated_query_all = query_matrix * pca.vec.cast<float>();
             // 保存全量到缓存文件
             log("保存全量旋转后的query到文件: " + rotated_query_file);
             std::ofstream ofs(rotated_query_file, std::ios::binary);
@@ -384,14 +401,14 @@ int main(int argc, char* argv[]) {
         }
 
         // 为线性拟合准备仅 test_nq 条旋转query到数组 rotated_query_data
-        Eigen::MatrixXd rotated_query = rotated_query_all.topRows(nq);
+        Eigen::MatrixXf rotated_query = rotated_query_all.topRows(nq);
         
         // 转换为float数组
-        float* rotated_dataset = new float[1LL * dataset.size() * pca.dim];
-        printf("rotated_dataset shape: %lld x %lld\n", 1LL * dataset.size(), 1LL * pca.dim);
+        float* rotated_dataset = new float[1LL * dataset_size * pca.dim];
+        printf("rotated_dataset shape: %lld x %lld\n", 1LL * dataset_size, 1LL * pca.dim);
         float* rotated_query_data = new float[nq * pca.dim];
         
-        for (int i = 0; i < dataset.size(); i++) {
+        for (int i = 0; i < dataset_size; i++) {
             for (int j = 0; j < pca.dim; j++) {
                 rotated_dataset[1LL * i * pca.dim + j] = rotated_data(i, j);
             }
@@ -407,7 +424,7 @@ int main(int argc, char* argv[]) {
         int D = pca.dim;
         int delta_d = (delta_d_cli > 0) ? delta_d_cli : std::max(1, D / 4);
         pca.linear(rotated_dataset, rotated_query_data, groundtruth_data,
-                   dataset.size(), nq, nq, topk_cli, groundtruth[0].size(), D, delta_d);
+                   dataset_size, nq, nq, topk_cli, groundtruth[0].size(), D, delta_d);
         
         // 保存结果
         log("保存线性参数...");
@@ -415,7 +432,7 @@ int main(int argc, char* argv[]) {
         
         delete[] query_data;
         delete[] groundtruth_data;
-        delete[] dataset_data;
+        // delete[] dataset_data;
         delete[] rotated_dataset;
         delete[] rotated_query_data;
         

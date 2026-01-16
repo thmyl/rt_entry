@@ -28,6 +28,7 @@ public:
 	void CleanUp();
 	void check_entries(thrust::device_vector<int> &d_gt_);
 	void check_results(thrust::device_vector<int> &d_gt_);
+	void check_results(thrust::device_vector<int> &d_gt_, int search_k);
 	void RB_Graph();
 	void GraphSearchBatch(int query_offset, int batch_size, cudaStream_t stream = nullptr);
 	void parallel_reorder(int* candidates, int* results, int n_candidates, int topk, int dim_, int nq, float* queries, int np, float* points, DistPair* candidates_dist);
@@ -63,8 +64,8 @@ public:
 	thrust::device_vector<float> d_pca_points;
 	thrust::device_vector<float> d_pca_queries_full;
 
-	thrust::device_vector<int> d_entries;
-	thrust::device_vector<float> d_entries_dist;
+	thrust::device_vector<int> d_entries; //已弃用
+	thrust::device_vector<float> d_entries_dist; //已弃用
 
 	thrust::device_vector<int> d_results;
 	thrust::host_vector<int> h_results;

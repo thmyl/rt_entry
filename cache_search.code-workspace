@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "../pcsearch"
+		},
+		{
+			"path": "../../../mnt/IntelP5520_8T_1"
 		}
 	],
 	"settings": {

@@ -78,10 +78,13 @@ int main(int argc, char **argv){
     reorder = 1;
   #endif
   outfile <<  "\n---------- n_candidates = " << FLAGS_n_candidates << "\t" 
+                        << "DIM = " << DIM << "\t" 
+                        << "ALGO = " << FLAGS_ALGO << "\t"
+                        << "centroids_path = " << FLAGS_centroids_path << "\t"
+                        << "n_pages = " << FLAGS_n_page << "\t"
                         << "point_ratio = " << FLAGS_point_ratio << "\t" 
                         << "max_iter = " << FLAGS_max_iter << "\t" 
                         << "graph_path = " << FLAGS_graph_path << "\t" 
-                        << "DIM = " << DIM << "\t" 
                         << "REORDER = " << reorder <<" ----------\n\n" << std::flush;
   outfile.close();
 

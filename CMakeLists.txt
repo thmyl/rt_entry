@@ -114,7 +114,7 @@ target_link_libraries(test
     ${GFLAGS_LIBRARIES}
 )
 
-target_compile_options(test PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-Xptxas -v>)
+# target_compile_options(test PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-Xptxas -v>)
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/deps/cxxopts)
 

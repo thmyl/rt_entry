@@ -8,6 +8,13 @@
 #define num_hash 3
 #define max_hash_iteration 4
 
+#ifdef COMPUTE_COUNT
+// 全局设备变量用于统计计算次数
+// 使用 unsigned long long 类型，因为 compute_dim 可能很大
+__device__ unsigned long long compute_dim = 0;
+__device__ unsigned long long compute_dis = 0;
+#endif
+
 #ifdef USE_CACHE
 #ifdef ENABLE_CONSTANT_CLUSTER_MAP
     __constant__ int d_cluster_to_page[MAX_CLUSTER_TO_PAGE];
@@ -143,7 +150,7 @@ __global__ void GraphSearchKernel(float* d_data, const float* query_full, int* d
                       int page_size,
                       int dim_partial,
                       int dim_total,
-                      const int* query_top_clusters,
+                      // const int* query_top_clusters,
                       int cluster_top_t,
                       const float* linear_w,
                       const float* linear_b,
@@ -878,6 +885,14 @@ __global__ void GraphSearchKernel(float* d_data, const float* query_full, int* d
       #endif
     // #endregion DIM distance computation
 
+    #ifdef COMPUTE_COUNT
+    // 统计维度计算次数和距离计算次数
+    if(lane_id == 0){
+      atomicAdd(&compute_dim, (unsigned long long)DIM);
+      atomicAdd(&compute_dis, 1ULL);
+    }
+    #endif
+
     // reduce
     // #region DIM distance reduction
       #ifdef USE_L2_DIST_
@@ -1276,6 +1291,14 @@ __global__ void GraphSearchKernel(float* d_data, const float* query_full, int* d
                 #endif
                 #endif
             // #endregion PARTIAL_DIM distance computation
+
+            #ifdef COMPUTE_COUNT
+            // 统计维度计算次数和距离计算次数
+            if(lane_id == 0){
+              atomicAdd(&compute_dim, (unsigned long long)PARTIAL_DIM);
+            //   atomicAdd(&compute_dis, 1ULL);
+            }
+            #endif
 
             // #region PARTIAL_DIM distance reduction
                 #ifdef USE_L2_DIST_
@@ -1856,6 +1879,14 @@ __global__ void GraphSearchKernel(float* d_data, const float* query_full, int* d
       #endif
     // #endregion DIM distance computation
 
+    #ifdef COMPUTE_COUNT
+    // 统计维度计算次数和距离计算次数
+    if(lane_id == 0){
+      atomicAdd(&compute_dim, (unsigned long long)DIM);
+      atomicAdd(&compute_dis, 1ULL);
+    }
+    #endif
+
     // #region DIM distance reduction
       #ifdef USE_L2_DIST_
           float dist = 0;
@@ -2263,6 +2294,14 @@ __global__ void GraphSearchKernel(float* d_data, const float* query_full, int* d
                 #endif
             // #endregion PARTIAL_DIM distance computation
 
+            #ifdef COMPUTE_COUNT
+            // 统计维度计算次数和距离计算次数
+            if(lane_id == 0){
+              atomicAdd(&compute_dim, (unsigned long long)PARTIAL_DIM);
+            //   atomicAdd(&compute_dis, 1ULL);
+            }
+            #endif
+
             // #region PARTIAL_DIM distance reduction
                 #ifdef USE_L2_DIST_
                     
@@ -2521,423 +2560,423 @@ __global__ void GraphSearchKernel(float* d_data, const float* query_full, int* d
 
 // 重排序
   /*#ifdef REORDER
-  if(DIM != DIM){
-    for(int i = warp_id; i < n_candidates; i += n_warp){
-      int p_id = _abs(neighbors_array[i].second);
-    //   int p_id = neighbors_array[i].second;
-      if(p_id >= np) continue;
-      //read point
-        #if DIM > 0
-        float p1 = 0;
-        if (lane_id < DIM){
-            p1 = d_data[p_id * DIM + lane_id];
-        }
-        #endif
-        #if DIM > 32
-        float p2 = 0;
-        if (lane_id + 32 < DIM) {
-            p2 = d_data[p_id * DIM + lane_id + 32];
-        }
-        #endif
-        #if DIM > 64
-        float p3 = 0;
-        if (lane_id + 64 < DIM) {
-            p3 = d_data[p_id * DIM + lane_id + 64];
-        }
-        #endif
-        #if DIM > 96
-        float p4 = 0;
-        if (lane_id + 96 < DIM) {
-            p4 = d_data[p_id * DIM + lane_id + 96];
-        }
-        #endif
-        #if DIM > 128
-        float p5 = 0;
-        if (lane_id + 128 < DIM) {
-            p5 = d_data[p_id * DIM + lane_id + 128];
-        }
-        #endif
-        #if DIM > 160
-        float p6 = 0;
-        if (lane_id + 160 < DIM) {
-            p6 = d_data[p_id * DIM + lane_id + 160];
-        }
-        #endif
-        #if DIM > 192
-        float p7 = 0;
-        if (lane_id + 192 < DIM) {
-            p7 = d_data[p_id * DIM + lane_id + 192];
-        }
-        #endif
-        #if DIM > 224
-        float p8 = 0;
-        if (lane_id + 224 < DIM) {
-            p8 = d_data[p_id * DIM + lane_id + 224];
-        }
-        #endif
-        #if DIM > 256
-        float p9 = 0;
-        if (lane_id + 256 < DIM) {
-            p9 = d_data[p_id * DIM + lane_id + 256];
-        }
-        #endif
-        #if DIM > 288
-        float p10 = 0;
-        if (lane_id + 288 < DIM) {
-            p10 = d_data[p_id * DIM + lane_id + 288];
-        }
-        #endif
-        #if DIM > 320
-        float p11 = 0;
-        if (lane_id + 320 < DIM) {
-            p11 = d_data[p_id * DIM + lane_id + 320];
-        }
-        #endif
-        #if DIM > 352
-        float p12 = 0;
-        if (lane_id + 352 < DIM) {
-            p12 = d_data[p_id * DIM + lane_id + 352];
-        }
-        #endif
-        #if DIM > 384
-        float p13 = 0;
-        if (lane_id + 384 < DIM) {
-            p13 = d_data[p_id * DIM + lane_id + 384];
-        }
-        #endif
-        #if DIM > 416
-        float p14 = 0;
-        if (lane_id + 416 < DIM) {
-            p14 = d_data[p_id * DIM + lane_id + 416];
-        }
-        #endif
-        #if DIM > 448
-        float p15 = 0;
-        if (lane_id + 448 < DIM) {
-            p15 = d_data[p_id * DIM + lane_id + 448];
-        }
-        #endif
-        #if DIM > 480
-        float p16 = 0;
-        if (lane_id + 480 < DIM) {
-            p16 = d_data[p_id * DIM + lane_id + 480];
-        }
-        #endif
-        #if DIM > 512
-        float p17 = 0;
-        if (lane_id + 512 < DIM) {
-            p17 = d_data[p_id * DIM + lane_id + 512];
-        }
-        #endif
-        #if DIM > 544
-        float p18 = 0;
-        if (lane_id + 544 < DIM) {
-            p18 = d_data[p_id * DIM + lane_id + 544];
-        }
-        #endif
-        #if DIM > 576
-        float p19 = 0;
-        if (lane_id + 576 < DIM) {
-            p19 = d_data[p_id * DIM + lane_id + 576];
-        }
-        #endif
-        #if DIM > 608
-        float p20 = 0;
-        if (lane_id + 608 < DIM) {
-            p20 = d_data[p_id * DIM + lane_id + 608];
-        }
-        #endif
-        #if DIM > 640
-        float p21 = 0;
-        if (lane_id + 640 < DIM) {
-            p21 = d_data[p_id * DIM + lane_id + 640];
-        }
-        #endif
-        #if DIM > 672
-        float p22 = 0;
-        if (lane_id + 672 < DIM) {
-            p22 = d_data[p_id * DIM + lane_id + 672];
-        }
-        #endif
-        #if DIM > 704
-        float p23 = 0;
-        if (lane_id + 704 < DIM) {
-            p23 = d_data[p_id * DIM + lane_id + 704];
-        }
-        #endif
-        #if DIM > 736
-        float p24 = 0;
-        if (lane_id + 736 < DIM) {
-            p24 = d_data[p_id * DIM + lane_id + 736];
-        }
-        #endif
-        #if DIM > 768
-        float p25 = 0;
-        if (lane_id + 768 < DIM) {
-            p25 = d_data[p_id * DIM + lane_id + 768];
-        }
-        #endif
-        #if DIM > 800
-        float p26 = 0;
-        if (lane_id + 800 < DIM) {
-            p26 = d_data[p_id * DIM + lane_id + 800];
-        }
-        #endif
-        #if DIM > 832
-        float p27 = 0;
-        if (lane_id + 832 < DIM) {
-            p27 = d_data[p_id * DIM + lane_id + 832];
-        }
-        #endif
-        #if DIM > 864
-        float p28 = 0;
-        if (lane_id + 864 < DIM) {
-            p28 = d_data[p_id * DIM + lane_id + 864];
-        }
-        #endif
-        #if DIM > 896
-        float p29 = 0;
-        if (lane_id + 896 < DIM) {
-            p29 = d_data[p_id * DIM + lane_id + 896];
-        }
-        #endif
-        #if DIM > 928
-        float p30 = 0;
-        if (lane_id + 928 < DIM) {
-            p30 = d_data[p_id * DIM + lane_id + 928];
-        }
-        #endif
-
-      //compute distance
-        #ifdef USE_L2_DIST_
-        #if DIM > 0
-            float delta1 = (p1 - q1) * (p1 - q1);
-        #endif
-        #if DIM > 32
-            float delta2 = (p2 - q2) * (p2 - q2);
-        #endif
-        #if DIM > 64
-            float delta3 = (p3 - q3) * (p3 - q3);
-        #endif
-        #if DIM > 96
-            float delta4 = (p4 - q4) * (p4 - q4);
-        #endif
-        #if DIM > 128
-            float delta5 = (p5 - q5) * (p5 - q5);
-        #endif
-        #if DIM > 160
-            float delta6 = (p6 - q6) * (p6 - q6);
-        #endif
-        #if DIM > 192
-            float delta7 = (p7 - q7) * (p7 - q7);
-        #endif
-        #if DIM > 224
-            float delta8 = (p8 - q8) * (p8 - q8);
-        #endif
-        #if DIM > 256
-            float delta9 = (p9 - q9) * (p9 - q9);
-        #endif
-        #if DIM > 288
-            float delta10 = (p10 - q10) * (p10 - q10);
-        #endif
-        #if DIM > 320
-            float delta11 = (p11 - q11) * (p11 - q11);
-        #endif
-        #if DIM > 352
-            float delta12 = (p12 - q12) * (p12 - q12);
-        #endif
-        #if DIM > 384
-            float delta13 = (p13 - q13) * (p13 - q13);
-        #endif
-        #if DIM > 416
-            float delta14 = (p14 - q14) * (p14 - q14);
-        #endif
-        #if DIM > 448
-            float delta15 = (p15 - q15) * (p15 - q15);
-        #endif
-        #if DIM > 480
-            float delta16 = (p16 - q16) * (p16 - q16);
-        #endif
-        #if DIM > 512
-            float delta17 = (p17 - q17) * (p17 - q17);
-        #endif
-        #if DIM > 544
-            float delta18 = (p18 - q18) * (p18 - q18);
-        #endif
-        #if DIM > 576
-            float delta19 = (p19 - q19) * (p19 - q19);
-        #endif
-        #if DIM > 608
-            float delta20 = (p20 - q20) * (p20 - q20);
-        #endif
-        #if DIM > 640
-            float delta21 = (p21 - q21) * (p21 - q21);
-        #endif
-        #if DIM > 672
-            float delta22 = (p22 - q22) * (p22 - q22);
-        #endif
-        #if DIM > 704
-            float delta23 = (p23 - q23) * (p23 - q23);
-        #endif
-        #if DIM > 736
-            float delta24 = (p24 - q24) * (p24 - q24);
-        #endif
-        #if DIM > 768
-            float delta25 = (p25 - q25) * (p25 - q25);
-        #endif
-        #if DIM > 800
-            float delta26 = (p26 - q26) * (p26 - q26);
-        #endif
-        #if DIM > 832
-            float delta27 = (p27 - q27) * (p27 - q27);
-        #endif
-        #if DIM > 864
-            float delta28 = (p28 - q28) * (p28 - q28);
-        #endif
-        #if DIM > 896
-            float delta29 = (p29 - q29) * (p29 - q29);
-        #endif
-        #if DIM > 928
-            float delta30 = (p30 - q30) * (p30 - q30);
-        #endif
-        #endif           
-        #ifdef USE_L2_DIST_
-            float dist = 0;
-        #if DIM > 0
-            dist += delta1;
-        #endif
-        #if DIM > 32
-            dist += delta2;
-        #endif
-        #if DIM > 64
-            dist += delta3;
-        #endif
-        #if DIM > 96
-            dist += delta4;
-        #endif
-        #if DIM > 128
-            dist += delta5;
-        #endif
-        #if DIM > 160
-            dist += delta6;
-        #endif
-        #if DIM > 192
-            dist += delta7;
-        #endif
-        #if DIM > 224
-            dist += delta8;
-        #endif
-        #if DIM > 256
-            dist += delta9;
-        #endif
-        #if DIM > 288
-            dist += delta10;
-        #endif
-        #if DIM > 320
-            dist += delta11;
-        #endif
-        #if DIM > 352
-            dist += delta12;
-        #endif
-        #if DIM > 384
-            dist += delta13;
-        #endif
-        #if DIM > 416
-            dist += delta14;
-        #endif
-        #if DIM > 448
-            dist += delta15;
-        #endif
-        #if DIM > 480
-            dist += delta16;
-        #endif
-        #if DIM > 512
-            dist += delta17;
-        #endif
-        #if DIM > 544
-            dist += delta18;
-        #endif
-        #if DIM > 576
-            dist += delta19;
-        #endif
-        #if DIM > 608
-            dist += delta20;
-        #endif
-        #if DIM > 640
-            dist += delta21;
-        #endif
-        #if DIM > 672
-            dist += delta22;
-        #endif
-        #if DIM > 704
-            dist += delta23;
-        #endif
-        #if DIM > 736
-            dist += delta24;
-        #endif
-        #if DIM > 768
-            dist += delta25;
-        #endif
-        #if DIM > 800
-            dist += delta26;
-        #endif
-        #if DIM > 832
-            dist += delta27;
-        #endif
-        #if DIM > 864
-            dist += delta28;
-        #endif
-        #if DIM > 896
-            dist += delta29;
-        #endif
-        #if DIM > 928
-            dist += delta30;
-        #endif
-        #endif
-        #ifdef USE_L2_DIST_
-        dist += __shfl_down_sync(FULL_MASK, dist, 16);
-        dist += __shfl_down_sync(FULL_MASK, dist, 8);
-        dist += __shfl_down_sync(FULL_MASK, dist, 4);
-        dist += __shfl_down_sync(FULL_MASK, dist, 2);
-        dist += __shfl_down_sync(FULL_MASK, dist, 1);
-        #endif
-      // insert
-        if(lane_id == 0){
-          neighbors_array[i].first = dist;
-        }
-    }
-    __syncthreads();
-    //bitonic sort
-    step_id = 1;
-    substep_id = 1;
-
-    for(; step_id <= n_candidates/2; step_id *= 2){
-      substep_id = step_id;
-      for(; substep_id >= 1; substep_id /= 2){
-        for(int i = t_id; i < n_candidates; i += blockSize){
-          int unrollt_id = (i/substep_id) * 2 * substep_id + (i & (substep_id - 1));
-          if(unrollt_id < n_candidates && unrollt_id + substep_id < n_candidates){
-            if((i/step_id) % 2 == 0){
-              if(neighbors_array[unrollt_id].first > neighbors_array[unrollt_id + substep_id].first){
-                tmp_neighbor = neighbors_array[unrollt_id];
-                neighbors_array[unrollt_id] = neighbors_array[unrollt_id + substep_id];
-                neighbors_array[unrollt_id + substep_id] = tmp_neighbor;
-              }
+    if(DIM != DIM){
+        for(int i = warp_id; i < n_candidates; i += n_warp){
+        int p_id = _abs(neighbors_array[i].second);
+        //   int p_id = neighbors_array[i].second;
+        if(p_id >= np) continue;
+        //read point
+            #if DIM > 0
+            float p1 = 0;
+            if (lane_id < DIM){
+                p1 = d_data[p_id * DIM + lane_id];
             }
-            else{
-              if(neighbors_array[unrollt_id].first < neighbors_array[unrollt_id + substep_id].first){
-                tmp_neighbor = neighbors_array[unrollt_id];
-                neighbors_array[unrollt_id] = neighbors_array[unrollt_id + substep_id];
-                neighbors_array[unrollt_id + substep_id] = tmp_neighbor;
-              }
+            #endif
+            #if DIM > 32
+            float p2 = 0;
+            if (lane_id + 32 < DIM) {
+                p2 = d_data[p_id * DIM + lane_id + 32];
             }
-          }
+            #endif
+            #if DIM > 64
+            float p3 = 0;
+            if (lane_id + 64 < DIM) {
+                p3 = d_data[p_id * DIM + lane_id + 64];
+            }
+            #endif
+            #if DIM > 96
+            float p4 = 0;
+            if (lane_id + 96 < DIM) {
+                p4 = d_data[p_id * DIM + lane_id + 96];
+            }
+            #endif
+            #if DIM > 128
+            float p5 = 0;
+            if (lane_id + 128 < DIM) {
+                p5 = d_data[p_id * DIM + lane_id + 128];
+            }
+            #endif
+            #if DIM > 160
+            float p6 = 0;
+            if (lane_id + 160 < DIM) {
+                p6 = d_data[p_id * DIM + lane_id + 160];
+            }
+            #endif
+            #if DIM > 192
+            float p7 = 0;
+            if (lane_id + 192 < DIM) {
+                p7 = d_data[p_id * DIM + lane_id + 192];
+            }
+            #endif
+            #if DIM > 224
+            float p8 = 0;
+            if (lane_id + 224 < DIM) {
+                p8 = d_data[p_id * DIM + lane_id + 224];
+            }
+            #endif
+            #if DIM > 256
+            float p9 = 0;
+            if (lane_id + 256 < DIM) {
+                p9 = d_data[p_id * DIM + lane_id + 256];
+            }
+            #endif
+            #if DIM > 288
+            float p10 = 0;
+            if (lane_id + 288 < DIM) {
+                p10 = d_data[p_id * DIM + lane_id + 288];
+            }
+            #endif
+            #if DIM > 320
+            float p11 = 0;
+            if (lane_id + 320 < DIM) {
+                p11 = d_data[p_id * DIM + lane_id + 320];
+            }
+            #endif
+            #if DIM > 352
+            float p12 = 0;
+            if (lane_id + 352 < DIM) {
+                p12 = d_data[p_id * DIM + lane_id + 352];
+            }
+            #endif
+            #if DIM > 384
+            float p13 = 0;
+            if (lane_id + 384 < DIM) {
+                p13 = d_data[p_id * DIM + lane_id + 384];
+            }
+            #endif
+            #if DIM > 416
+            float p14 = 0;
+            if (lane_id + 416 < DIM) {
+                p14 = d_data[p_id * DIM + lane_id + 416];
+            }
+            #endif
+            #if DIM > 448
+            float p15 = 0;
+            if (lane_id + 448 < DIM) {
+                p15 = d_data[p_id * DIM + lane_id + 448];
+            }
+            #endif
+            #if DIM > 480
+            float p16 = 0;
+            if (lane_id + 480 < DIM) {
+                p16 = d_data[p_id * DIM + lane_id + 480];
+            }
+            #endif
+            #if DIM > 512
+            float p17 = 0;
+            if (lane_id + 512 < DIM) {
+                p17 = d_data[p_id * DIM + lane_id + 512];
+            }
+            #endif
+            #if DIM > 544
+            float p18 = 0;
+            if (lane_id + 544 < DIM) {
+                p18 = d_data[p_id * DIM + lane_id + 544];
+            }
+            #endif
+            #if DIM > 576
+            float p19 = 0;
+            if (lane_id + 576 < DIM) {
+                p19 = d_data[p_id * DIM + lane_id + 576];
+            }
+            #endif
+            #if DIM > 608
+            float p20 = 0;
+            if (lane_id + 608 < DIM) {
+                p20 = d_data[p_id * DIM + lane_id + 608];
+            }
+            #endif
+            #if DIM > 640
+            float p21 = 0;
+            if (lane_id + 640 < DIM) {
+                p21 = d_data[p_id * DIM + lane_id + 640];
+            }
+            #endif
+            #if DIM > 672
+            float p22 = 0;
+            if (lane_id + 672 < DIM) {
+                p22 = d_data[p_id * DIM + lane_id + 672];
+            }
+            #endif
+            #if DIM > 704
+            float p23 = 0;
+            if (lane_id + 704 < DIM) {
+                p23 = d_data[p_id * DIM + lane_id + 704];
+            }
+            #endif
+            #if DIM > 736
+            float p24 = 0;
+            if (lane_id + 736 < DIM) {
+                p24 = d_data[p_id * DIM + lane_id + 736];
+            }
+            #endif
+            #if DIM > 768
+            float p25 = 0;
+            if (lane_id + 768 < DIM) {
+                p25 = d_data[p_id * DIM + lane_id + 768];
+            }
+            #endif
+            #if DIM > 800
+            float p26 = 0;
+            if (lane_id + 800 < DIM) {
+                p26 = d_data[p_id * DIM + lane_id + 800];
+            }
+            #endif
+            #if DIM > 832
+            float p27 = 0;
+            if (lane_id + 832 < DIM) {
+                p27 = d_data[p_id * DIM + lane_id + 832];
+            }
+            #endif
+            #if DIM > 864
+            float p28 = 0;
+            if (lane_id + 864 < DIM) {
+                p28 = d_data[p_id * DIM + lane_id + 864];
+            }
+            #endif
+            #if DIM > 896
+            float p29 = 0;
+            if (lane_id + 896 < DIM) {
+                p29 = d_data[p_id * DIM + lane_id + 896];
+            }
+            #endif
+            #if DIM > 928
+            float p30 = 0;
+            if (lane_id + 928 < DIM) {
+                p30 = d_data[p_id * DIM + lane_id + 928];
+            }
+            #endif
+
+        //compute distance
+            #ifdef USE_L2_DIST_
+            #if DIM > 0
+                float delta1 = (p1 - q1) * (p1 - q1);
+            #endif
+            #if DIM > 32
+                float delta2 = (p2 - q2) * (p2 - q2);
+            #endif
+            #if DIM > 64
+                float delta3 = (p3 - q3) * (p3 - q3);
+            #endif
+            #if DIM > 96
+                float delta4 = (p4 - q4) * (p4 - q4);
+            #endif
+            #if DIM > 128
+                float delta5 = (p5 - q5) * (p5 - q5);
+            #endif
+            #if DIM > 160
+                float delta6 = (p6 - q6) * (p6 - q6);
+            #endif
+            #if DIM > 192
+                float delta7 = (p7 - q7) * (p7 - q7);
+            #endif
+            #if DIM > 224
+                float delta8 = (p8 - q8) * (p8 - q8);
+            #endif
+            #if DIM > 256
+                float delta9 = (p9 - q9) * (p9 - q9);
+            #endif
+            #if DIM > 288
+                float delta10 = (p10 - q10) * (p10 - q10);
+            #endif
+            #if DIM > 320
+                float delta11 = (p11 - q11) * (p11 - q11);
+            #endif
+            #if DIM > 352
+                float delta12 = (p12 - q12) * (p12 - q12);
+            #endif
+            #if DIM > 384
+                float delta13 = (p13 - q13) * (p13 - q13);
+            #endif
+            #if DIM > 416
+                float delta14 = (p14 - q14) * (p14 - q14);
+            #endif
+            #if DIM > 448
+                float delta15 = (p15 - q15) * (p15 - q15);
+            #endif
+            #if DIM > 480
+                float delta16 = (p16 - q16) * (p16 - q16);
+            #endif
+            #if DIM > 512
+                float delta17 = (p17 - q17) * (p17 - q17);
+            #endif
+            #if DIM > 544
+                float delta18 = (p18 - q18) * (p18 - q18);
+            #endif
+            #if DIM > 576
+                float delta19 = (p19 - q19) * (p19 - q19);
+            #endif
+            #if DIM > 608
+                float delta20 = (p20 - q20) * (p20 - q20);
+            #endif
+            #if DIM > 640
+                float delta21 = (p21 - q21) * (p21 - q21);
+            #endif
+            #if DIM > 672
+                float delta22 = (p22 - q22) * (p22 - q22);
+            #endif
+            #if DIM > 704
+                float delta23 = (p23 - q23) * (p23 - q23);
+            #endif
+            #if DIM > 736
+                float delta24 = (p24 - q24) * (p24 - q24);
+            #endif
+            #if DIM > 768
+                float delta25 = (p25 - q25) * (p25 - q25);
+            #endif
+            #if DIM > 800
+                float delta26 = (p26 - q26) * (p26 - q26);
+            #endif
+            #if DIM > 832
+                float delta27 = (p27 - q27) * (p27 - q27);
+            #endif
+            #if DIM > 864
+                float delta28 = (p28 - q28) * (p28 - q28);
+            #endif
+            #if DIM > 896
+                float delta29 = (p29 - q29) * (p29 - q29);
+            #endif
+            #if DIM > 928
+                float delta30 = (p30 - q30) * (p30 - q30);
+            #endif
+            #endif           
+            #ifdef USE_L2_DIST_
+                float dist = 0;
+            #if DIM > 0
+                dist += delta1;
+            #endif
+            #if DIM > 32
+                dist += delta2;
+            #endif
+            #if DIM > 64
+                dist += delta3;
+            #endif
+            #if DIM > 96
+                dist += delta4;
+            #endif
+            #if DIM > 128
+                dist += delta5;
+            #endif
+            #if DIM > 160
+                dist += delta6;
+            #endif
+            #if DIM > 192
+                dist += delta7;
+            #endif
+            #if DIM > 224
+                dist += delta8;
+            #endif
+            #if DIM > 256
+                dist += delta9;
+            #endif
+            #if DIM > 288
+                dist += delta10;
+            #endif
+            #if DIM > 320
+                dist += delta11;
+            #endif
+            #if DIM > 352
+                dist += delta12;
+            #endif
+            #if DIM > 384
+                dist += delta13;
+            #endif
+            #if DIM > 416
+                dist += delta14;
+            #endif
+            #if DIM > 448
+                dist += delta15;
+            #endif
+            #if DIM > 480
+                dist += delta16;
+            #endif
+            #if DIM > 512
+                dist += delta17;
+            #endif
+            #if DIM > 544
+                dist += delta18;
+            #endif
+            #if DIM > 576
+                dist += delta19;
+            #endif
+            #if DIM > 608
+                dist += delta20;
+            #endif
+            #if DIM > 640
+                dist += delta21;
+            #endif
+            #if DIM > 672
+                dist += delta22;
+            #endif
+            #if DIM > 704
+                dist += delta23;
+            #endif
+            #if DIM > 736
+                dist += delta24;
+            #endif
+            #if DIM > 768
+                dist += delta25;
+            #endif
+            #if DIM > 800
+                dist += delta26;
+            #endif
+            #if DIM > 832
+                dist += delta27;
+            #endif
+            #if DIM > 864
+                dist += delta28;
+            #endif
+            #if DIM > 896
+                dist += delta29;
+            #endif
+            #if DIM > 928
+                dist += delta30;
+            #endif
+            #endif
+            #ifdef USE_L2_DIST_
+            dist += __shfl_down_sync(FULL_MASK, dist, 16);
+            dist += __shfl_down_sync(FULL_MASK, dist, 8);
+            dist += __shfl_down_sync(FULL_MASK, dist, 4);
+            dist += __shfl_down_sync(FULL_MASK, dist, 2);
+            dist += __shfl_down_sync(FULL_MASK, dist, 1);
+            #endif
+        // insert
+            if(lane_id == 0){
+            neighbors_array[i].first = dist;
+            }
         }
-      }
-      __syncthreads();
+        __syncthreads();
+        //bitonic sort
+        step_id = 1;
+        substep_id = 1;
+
+        for(; step_id <= n_candidates/2; step_id *= 2){
+        substep_id = step_id;
+        for(; substep_id >= 1; substep_id /= 2){
+            for(int i = t_id; i < n_candidates; i += blockSize){
+            int unrollt_id = (i/substep_id) * 2 * substep_id + (i & (substep_id - 1));
+            if(unrollt_id < n_candidates && unrollt_id + substep_id < n_candidates){
+                if((i/step_id) % 2 == 0){
+                if(neighbors_array[unrollt_id].first > neighbors_array[unrollt_id + substep_id].first){
+                    tmp_neighbor = neighbors_array[unrollt_id];
+                    neighbors_array[unrollt_id] = neighbors_array[unrollt_id + substep_id];
+                    neighbors_array[unrollt_id + substep_id] = tmp_neighbor;
+                }
+                }
+                else{
+                if(neighbors_array[unrollt_id].first < neighbors_array[unrollt_id + substep_id].first){
+                    tmp_neighbor = neighbors_array[unrollt_id];
+                    neighbors_array[unrollt_id] = neighbors_array[unrollt_id + substep_id];
+                    neighbors_array[unrollt_id + substep_id] = tmp_neighbor;
+                }
+                }
+            }
+            }
+        }
+        __syncthreads();
+        }
+        __syncthreads();
     }
-    __syncthreads();
-  }
   #endif*/
 
   #ifdef REORDER

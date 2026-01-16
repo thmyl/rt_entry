@@ -180,8 +180,9 @@ void Kdtree::buildWithStack(int l, int r, int node_id, OptixAabb box_bound, thru
       float xM = findxM(box_min[axis], box_max[axis], current_l, current_r, axis);
       int median = split(current_l, current_r, axis, xM);
       if(median == current_l || median == current_r){
-        printf("split failed\n");
-        exit(0);
+        // printf("split failed\n");
+        // exit(0);
+        continue;
       }
 
       OptixAabb left_bound = current_box_bound;

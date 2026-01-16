@@ -1,0 +1,33 @@
+{
+    "DEEP1M": {
+        "pars_memory": 842,
+        "cagra_memory": 940,
+        "reduction_percent": 10.425531914893616
+    },
+    "DEEP10M": {
+        "pars_memory": 5360,
+        "cagra_memory": 6554,
+        "reduction_percent": 18.21788220933781
+    },
+    "GIST": {
+        "pars_memory": 1198,
+        "cagra_memory": 4350,
+        "reduction_percent": 72.45977011494253
+    },
+    "SIFT1M": {
+        "pars_memory": 842,
+        "cagra_memory": 1064,
+        "reduction_percent": 20.86466165413534
+    },
+    "SIFT10M": {
+        "pars_memory": 4238,
+        "cagra_memory": 6592,
+        "reduction_percent": 35.70995145631068
+    },
+    "COCO-I2I": {
+        "pars_memory": 562,
+        "cagra_memory": 692,
+        "reduction_percent": 18.786127167630056
+    },
+    "average_reduction": 29.410654086208336
+}

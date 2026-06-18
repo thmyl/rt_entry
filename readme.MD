@@ -1,6 +1,9 @@
-# RT entry and Graph Search
+# PARS: Optimizing High-Dimensional Vector Search with Dimensional Reduction and Ray Tracing Core (ICDCS'26)
+
 
 ## build and run
+
+Run the following command under the root directory of the folder "cache_search".
 
 ```bash
 mkdir build
@@ -13,16 +16,19 @@ cd bin
 ```
 
 ## parameter
-There are two kinds of parameters. One is runtime parameter, which can be specified in `flags.cpp` or run command. The other is the macro definition parameter, which needs to modify the macro definition in `head.h` or `graph_search.cuh`.
+There are two kinds of parameters. 
+- One is runtime parameter, which can be specified in `flags.cpp` or run command. 
+- The other is the macro definition parameter, which needs to modify the macro definition in `head.h` or `graph_search.cuh`.
 
 ### runtime parameter
-1. Modify flags.cpp directly like
+There are two modification schemes for the runtime parameter. You can choose either one.
+#### 1. Modify flags.cpp directly like
 ```bash
 DEFINE_string(data_path, "/data/myl/sift1M/sift1M_base.fvecs", "path of datasets");
 ```
 If you do this, you need to compile and run again.
 
-2. Specify the value of the parameter at run time
+#### 2. Specify the value of the parameter at run time
 ```bash
 ./test --data_path=/data/myl/sift1M/sift1M_base.fvecs --query_path=/data/myl/sift1M/sift1M_query.fvecs
 ```

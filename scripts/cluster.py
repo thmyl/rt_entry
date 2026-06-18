@@ -78,12 +78,12 @@ def main():
         sys.exit(1)
     K = int(sys.argv[1]) if len(sys.argv) > 1 else 10
 
-    # dataset_path = "/data/myl/sift1M/sift1M_base.fvecs"  # TODO: change dataset path
+    dataset_path = "/mnt/IntelP5520_8T_1/myl/sift1M/sift1M_base.fvecs"  # TODO: change dataset path
     # dataset_path = "/data/myl/deep1M/deep1M_base.fvecs" # TODO: change dataset path
     # dataset_path = "/data/myl/sift100M/sift100M_base.fbin"  # TODO: change dataset path
-    dataset_path = "/data/myl/deep100M/fbin/deep100M_base.fbin"  # TODO: change dataset path
+    # dataset_path = "/data/myl/deep100M/fbin/deep100M_base.fbin"  # TODO: change dataset path
     dataset_name = os.path.basename(dataset_path).split('_')[0]
-    data_root = os.path.join("/data/myl/cache_search/data", dataset_name)
+    data_root = os.path.join("/mnt/IntelP5520_8T_1/myl/cache_search/data", dataset_name)
     # os.makedirs("data", exist_ok=True)
     os.makedirs(data_root, exist_ok=True)
     centroids_file = os.path.join(data_root, f"centroids_{K}")

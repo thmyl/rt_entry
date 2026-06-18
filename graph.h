@@ -83,7 +83,7 @@ public:
 	int n_cluster;
 	int dim_partial;
 	int cluster_top_t;
-    int batch_size = 100;
+    int batch_size = 5;
 
     thrust::device_vector<float> d_centroids_matrix;
     thrust::device_vector<float> d_centroid_norms;
@@ -102,6 +102,10 @@ public:
 	int linear_params_dim = 0;
 
 	ClusterData cluster_data;
+	thrust::host_vector<int> h_query_top1_cluster;
+	thrust::device_vector<int> d_query_top1_cluster;
+	thrust::host_vector<int> h_cluster_entries;
+	thrust::device_vector<int> d_cluster_entries;
 private:
 	int								 ALGO = 1;
 	int                 dim_;

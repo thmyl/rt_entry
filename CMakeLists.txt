@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.20)
 set(CMAKE_CUDA_COMPILER "/usr/local/cuda-12.3/bin/nvcc")
 project(rt_filter C CXX CUDA)
 
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin1)
 set(LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 # set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -I/usr/include")
 

@@ -46,6 +46,8 @@ hatch_pattern = "/"
 fig, axes = plt.subplots(1, 3, figsize=(18, 6), sharey=False)
 sz = 45
 plt.rcParams.update({'font.size': 35})
+# sz = 35
+# plt.rcParams.update({'font.size': 27})
 plt.rcParams['mathtext.fontset'] = 'cm'
 
 # 为图例收集所有 legend handles

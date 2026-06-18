@@ -154,7 +154,8 @@ __global__ void GraphSearchKernel(float* d_data, const float* query_full, int* d
                       int cluster_top_t,
                       const float* linear_w,
                       const float* linear_b,
-                      int linear_dim){
+                      int linear_dim,
+                      int *d_top1_cluster=nullptr, int* d_cluster_entries=nullptr){
   
   int t_id = threadIdx.x;
   int b_id = blockIdx.x;//query batch index
@@ -172,6 +173,8 @@ __global__ void GraphSearchKernel(float* d_data, const float* query_full, int* d
   int n_entries = search_width * (1 << offset_shift);
   if(ALGO==1 && d_hits)
     entries_st = d_hits[q_id] * n_candidates;
+  if(ALGO==3 && d_top1_cluster)
+    entries_st = d_top1_cluster[q_id] * n_candidates;
 
   int* crt_results = d_results + q_id * topk;
   int degree = (1<<offset_shift);
@@ -591,6 +594,8 @@ __global__ void GraphSearchKernel(float* d_data, const float* query_full, int* d
             // neighbors_array[n_candidates + i].second = unrollt_id;
         else if(ALGO == 1)//rt entry
           neighbors_array[n_candidates + i].second = d_entries[entries_st + unrollt_id];
+        else if(ALGO == 3)//cluster_entry
+          neighbors_array[n_candidates + i].second = d_cluster_entries[entries_st + unrollt_id];
 
         add(neighbors_array[n_candidates + i].second, random_number, data);
       }

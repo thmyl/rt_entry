@@ -1,0 +1,335 @@
+---------- n_candidates = 1024	DIM = 52	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 28224022216
+compute_dis = 542769658
+average dimensions per distance computation = 52
+time graph search: 40838.6 ms
+time search: 40838.8 ms
+recall1@1024 = 0.9999
+recall10@1024 = 0.99933
+recall100@1024 = 0.996436
+recall1000@1024 = 0.722601
+Used memory: 45316 MB
+
+---------- n_candidates = 1024	DIM = 51	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 27688738032
+compute_dis = 542916432
+average dimensions per distance computation = 51
+time graph search: 40846.3 ms
+time search: 40846.5 ms
+recall1@1024 = 1
+recall10@1024 = 0.99932
+recall100@1024 = 0.996016
+recall1000@1024 = 0.713611
+Used memory: 44934 MB
+
+---------- n_candidates = 1024	DIM = 50	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 27148388650
+compute_dis = 542967773
+average dimensions per distance computation = 50
+time graph search: 40825 ms
+time search: 40825.3 ms
+recall1@1024 = 0.9999
+recall10@1024 = 0.99932
+recall100@1024 = 0.995661
+recall1000@1024 = 0.706851
+Used memory: 44552 MB
+
+---------- n_candidates = 1024	DIM = 49	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 26612606041
+compute_dis = 543114409
+average dimensions per distance computation = 49
+time graph search: 40828.2 ms
+time search: 40828.5 ms
+recall1@1024 = 0.9998
+recall10@1024 = 0.99929
+recall100@1024 = 0.995062
+recall1000@1024 = 0.698946
+Used memory: 44172 MB
+
+---------- n_candidates = 1024	DIM = 48	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 26077527888
+compute_dis = 543281831
+average dimensions per distance computation = 48
+time graph search: 40755.9 ms
+time search: 40756.2 ms
+recall1@1024 = 0.9999
+recall10@1024 = 0.99919
+recall100@1024 = 0.994335
+recall1000@1024 = 0.691226
+Used memory: 43790 MB
+
+---------- n_candidates = 1024	DIM = 47	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 25540114665
+compute_dis = 543406695
+average dimensions per distance computation = 47
+time graph search: 40808.5 ms
+time search: 40808.7 ms
+recall1@1024 = 0.9998
+recall10@1024 = 0.99907
+recall100@1024 = 0.99356
+recall1000@1024 = 0.6829
+Used memory: 43408 MB
+
+---------- n_candidates = 1024	DIM = 46	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 25005842926
+compute_dis = 543605281
+average dimensions per distance computation = 46
+time graph search: 40796.7 ms
+time search: 40796.9 ms
+recall1@1024 = 0.9999
+recall10@1024 = 0.99909
+recall100@1024 = 0.992649
+recall1000@1024 = 0.674329
+Used memory: 43026 MB
+
+---------- n_candidates = 1024	DIM = 45	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 24470871030
+compute_dis = 543797134
+average dimensions per distance computation = 45
+time graph search: 40815.5 ms
+time search: 40815.7 ms
+recall1@1024 = 0.9999
+recall10@1024 = 0.99909
+recall100@1024 = 0.991475
+recall1000@1024 = 0.665448
+Used memory: 42646 MB
+
+---------- n_candidates = 1024	DIM = 44	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 23939724116
+compute_dis = 544084639
+average dimensions per distance computation = 44
+time graph search: 40780.8 ms
+time search: 40781.1 ms
+recall1@1024 = 0.9998
+recall10@1024 = 0.99896
+recall100@1024 = 0.989887
+recall1000@1024 = 0.654933
+Used memory: 42264 MB
+
+---------- n_candidates = 1024	DIM = 43	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 23406884622
+compute_dis = 544346154
+average dimensions per distance computation = 43
+time graph search: 40804.9 ms
+time search: 40805.2 ms
+recall1@1024 = 0.9997
+recall10@1024 = 0.99895
+recall100@1024 = 0.988289
+recall1000@1024 = 0.645393
+Used memory: 41882 MB
+
+---------- n_candidates = 1024	DIM = 42	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 22864906890
+compute_dis = 544402545
+average dimensions per distance computation = 42
+time graph search: 40781.1 ms
+time search: 40781.4 ms
+recall1@1024 = 0.9997
+recall10@1024 = 0.99894
+recall100@1024 = 0.986913
+recall1000@1024 = 0.639385
+Used memory: 41500 MB
+
+---------- n_candidates = 1024	DIM = 41	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 22332620952
+compute_dis = 544698072
+average dimensions per distance computation = 41
+time graph search: 40792 ms
+time search: 40792.3 ms
+recall1@1024 = 0.9997
+recall10@1024 = 0.99878
+recall100@1024 = 0.984727
+recall1000@1024 = 0.629364
+Used memory: 41120 MB
+
+---------- n_candidates = 1024	DIM = 40	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 21797413240
+compute_dis = 544935331
+average dimensions per distance computation = 40
+time graph search: 40715 ms
+time search: 40715.3 ms
+recall1@1024 = 0.9997
+recall10@1024 = 0.99867
+recall100@1024 = 0.982325
+recall1000@1024 = 0.62044
+Used memory: 40738 MB
+
+---------- n_candidates = 1024	DIM = 39	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 21266300679
+compute_dis = 545289761
+average dimensions per distance computation = 39
+time graph search: 40772.9 ms
+time search: 40773.2 ms
+recall1@1024 = 0.9996
+recall10@1024 = 0.99831
+recall100@1024 = 0.977903
+recall1000@1024 = 0.607137
+Used memory: 40356 MB
+
+---------- n_candidates = 1024	DIM = 38	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 20733450940
+compute_dis = 545617130
+average dimensions per distance computation = 38
+time graph search: 40772.1 ms
+time search: 40772.4 ms
+recall1@1024 = 0.9996
+recall10@1024 = 0.99816
+recall100@1024 = 0.973742
+recall1000@1024 = 0.59571
+Used memory: 39974 MB
+
+---------- n_candidates = 1024	DIM = 37	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 20199405745
+compute_dis = 545929885
+average dimensions per distance computation = 37
+time graph search: 40753.4 ms
+time search: 40753.7 ms
+recall1@1024 = 0.9995
+recall10@1024 = 0.9978
+recall100@1024 = 0.969808
+recall1000@1024 = 0.585789
+Used memory: 39594 MB
+
+---------- n_candidates = 1024	DIM = 36	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 19666206540
+compute_dis = 546283515
+average dimensions per distance computation = 36
+time graph search: 40751.8 ms
+time search: 40752.1 ms
+recall1@1024 = 0.9994
+recall10@1024 = 0.99738
+recall100@1024 = 0.964922
+recall1000@1024 = 0.575011
+Used memory: 39212 MB
+
+---------- n_candidates = 1024	DIM = 35	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 19133600220
+compute_dis = 546674292
+average dimensions per distance computation = 35
+time graph search: 40760.2 ms
+time search: 40760.5 ms
+recall1@1024 = 0.9994
+recall10@1024 = 0.99684
+recall100@1024 = 0.959523
+recall1000@1024 = 0.563759
+Used memory: 38830 MB
+
+---------- n_candidates = 1024	DIM = 34	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 18600431850
+compute_dis = 547071525
+average dimensions per distance computation = 34
+time graph search: 40752.4 ms
+time search: 40752.7 ms
+recall1@1024 = 0.9991
+recall10@1024 = 0.99616
+recall100@1024 = 0.952221
+recall1000@1024 = 0.551279
+Used memory: 38448 MB
+
+---------- n_candidates = 1024	DIM = 33	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 18068870556
+compute_dis = 547541532
+average dimensions per distance computation = 33
+time graph search: 40761.9 ms
+time search: 40762.1 ms
+recall1@1024 = 0.9989
+recall10@1024 = 0.9952
+recall100@1024 = 0.943513
+recall1000@1024 = 0.53743
+Used memory: 38068 MB
+
+---------- n_candidates = 1024	DIM = 32	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 17533719296
+compute_dis = 547928728
+average dimensions per distance computation = 32
+time graph search: 40701.5 ms
+time search: 40701.8 ms
+recall1@1024 = 0.9989
+recall10@1024 = 0.99441
+recall100@1024 = 0.936806
+recall1000@1024 = 0.526818
+Used memory: 37686 MB
+
+---------- n_candidates = 1024	DIM = 31	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 17002689133
+compute_dis = 548473843
+average dimensions per distance computation = 31
+time graph search: 39835.5 ms
+time search: 39835.9 ms
+recall1@1024 = 0.9982
+recall10@1024 = 0.99304
+recall100@1024 = 0.927566
+recall1000@1024 = 0.514214
+Used memory: 37304 MB
+
+---------- n_candidates = 1024	DIM = 30	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 16459134360
+compute_dis = 548637812
+average dimensions per distance computation = 30
+time graph search: 39835 ms
+time search: 39835.3 ms
+recall1@1024 = 0.9979
+recall10@1024 = 0.99184
+recall100@1024 = 0.920078
+recall1000@1024 = 0.5049
+Used memory: 36924 MB
+
+---------- n_candidates = 1024	DIM = 29	ALGO = 1	centroids_path = /mnt/IntelP5520_8T_1/myl/cache_search/data/sift100M/centroids_10000_hilbert	n_pages = 100	point_ratio = 1.024e-05	max_iter = 1000	graph_path = /mnt/IntelP5520_8T_1/myl/sift100M/index/sift100M_128_64_diskann.nsw	REORDER = 0 ----------
+
+n_aabbs: 131072
+compute_dim = 15915676673
+compute_dis = 548816437
+average dimensions per distance computation = 29
+time graph search: 39823.4 ms
+time search: 39823.7 ms
+recall1@1024 = 0.9978
+recall10@1024 = 0.99018
+recall100@1024 = 0.911942
+recall1000@1024 = 0.495534
+Used memory: 36542 MB

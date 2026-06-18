@@ -187,11 +187,11 @@ int main(int argc, char* argv[]) {
     int topk_cli = 100;  // 默认值
     if (argc >= 4) topk_cli = std::max(1, std::atoi(argv[3]));
     
-    // std::string dataset_path = "/data/myl/sift1M/sift1M_base.fvecs";// TODO: change dataset path
-    // std::string queryset_path = "/data/myl/sift1M/sift1M_query.fvecs";// TODO: change dataset path
-    // // std::string queryset_path = "/home/myl/cache_search/gen_query/sift1M_query.fvecs";
-    // std::string groundtruth_path = "/data/myl/sift1M/sift1M_groundtruth.ivecs";// TODO: change dataset path
-    // // std::string groundtruth_path = "/home/myl/cache_search/gen_query/sift1M_groundtruth.ivecs";
+    std::string dataset_path = "/data/myl/sift1M/sift1M_base.fvecs";// TODO: change dataset path
+    std::string queryset_path = "/data/myl/sift1M/sift1M_query.fvecs";// TODO: change dataset path
+    // std::string queryset_path = "/home/myl/cache_search/gen_query/sift1M_query.fvecs";
+    std::string groundtruth_path = "/data/myl/sift1M/sift1M_groundtruth.ivecs";// TODO: change dataset path
+    // std::string groundtruth_path = "/home/myl/cache_search/gen_query/sift1M_groundtruth.ivecs";
 
     // std::string queryset_path = "/data/myl/deep1M/deep1M_queries.fvecs";// TODO: change dataset path
     // std::string groundtruth_path = "/data/myl/deep1M/deep1M_gt.ivecs";// TODO: change dataset path
@@ -201,9 +201,9 @@ int main(int argc, char* argv[]) {
     // std::string queryset_path = "/mnt/IntelP5520_8T_1/myl/sift100M/sift100M_learn.fvecs";// TODO: change dataset path
     // std::string groundtruth_path = "/mnt/IntelP5520_8T_1/myl/sift100M/sift100M_learn_groundtruth.ivecs";// TODO: change dataset path
 
-    std::string dataset_path = "/mnt/IntelP5520_8T_1/myl/deep100M/fbin/deep100M_base.fbin";// TODO: change dataset path
-    std::string queryset_path = "/mnt/IntelP5520_8T_1/myl/deep100M/deep100M_learn.fvecs";// TODO: change dataset path
-    std::string groundtruth_path = "/mnt/IntelP5520_8T_1/myl/deep100M/deep100M_learn_groundtruth.ivecs";// TODO: change dataset path
+    // std::string dataset_path = "/mnt/IntelP5520_8T_1/myl/deep100M/fbin/deep100M_base.fbin";// TODO: change dataset path
+    // std::string queryset_path = "/mnt/IntelP5520_8T_1/myl/deep100M/deep100M_learn.fvecs";// TODO: change dataset path
+    // std::string groundtruth_path = "/mnt/IntelP5520_8T_1/myl/deep100M/deep100M_learn_groundtruth.ivecs";// TODO: change dataset path
     
     std::string dataset_name = get_dataset_name_from_path(dataset_path);
     std::string data_root = "/mnt/IntelP5520_8T_1/myl/cache_search/data/" + dataset_name;

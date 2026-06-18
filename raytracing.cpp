@@ -333,4 +333,3 @@ void OptiXRT::search(float* d_queries, OptixAabb* d_aabbs, int nq, int offset, i
   // CUDA_CHECK(cudaEventDestroy(launch_end));
   // printf("RT Search Time = %f ms\n",search_time_);
 }
-

@@ -10,7 +10,7 @@ top_line = [128, 96, 960]
 
 # 设置图像大小
 plt.figure(figsize=(8, 6))
-plt.rcParams.update({'font.size': 25})
+plt.rcParams.update({'font.size': 20})
 
 # 颜色和纹理设置
 bar_color = "#4C72B0"  # 顶会论文常用蓝色

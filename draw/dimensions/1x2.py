@@ -65,8 +65,10 @@ legend_labels = [
 row_sz = 1
 col_sz = 2
 fig, axs = plt.subplots(row_sz, col_sz, figsize=(20, 7))
-plt.rcParams.update({'font.size': 30})  # 所有文字统一为16号字体
-sz = 40
+# plt.rcParams.update({'font.size': 30})  # 所有文字统一为16号字体
+# sz = 40
+plt.rcParams.update({'font.size': 25})  # 所有文字统一为16号字体
+sz = 30
 line_w=3
 marker_sz=12
 

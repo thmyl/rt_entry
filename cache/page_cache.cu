@@ -254,10 +254,10 @@ void PageCache::prefetch_cluster(int cluster_id, int& copy_count, cudaStream_t s
         // 如果不在cache中，加载它
         if (cluster_to_page[global_page_id] == -1) {
             load_page(cluster_id, local_page_id, use_stream);
-            #ifdef DETAIL
+            // #ifdef DETAIL
                 copied_pages++;
                 // std::cout<<"copied_pages = "<<copied_pages<<std::endl;
-            #endif
+            // #endif
         } else {
             // 如果已在cache中，touch它
             lru->touch(cluster_to_page[global_page_id]);

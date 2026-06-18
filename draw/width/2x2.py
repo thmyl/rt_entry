@@ -5,7 +5,7 @@ plt.rcParams['font.family'] = 'Times New Roman'
 plt.rcParams['mathtext.fontset'] = 'cm'
 
 # 数据集名称
-datasets = ['SIFT1M (PARS)', 'COCO-I2I (PARS)', 'SIFT1M (PARS+RT)', 'COCO-I2I (PARS+RT)']
+datasets = ['SIFT1M (PARS-Base)', 'COCO-I2I (PARS-Base)', 'SIFT1M (PARS)', 'COCO-I2I (PARS)']
 width = [r'$w=1$', r'$w=2$', r'$w=4$', r'$w=8$']
 # colors = ['#1F77B4', '#FF7F0E', '#2CA02C', '#D62728', '#9467BD', '#8C564B']
 colors = [ '#EE822F', '#F2BA02','#4874CB', '#75BD42']
@@ -82,8 +82,10 @@ all_groups = [
 
 # 创建 2 行 2 列的子图布局
 fig, axs = plt.subplots(2, 2, figsize=(20, 13))
-plt.rcParams.update({'font.size': 35})  # 所有文字统一为16号字体
-sz = 45
+# plt.rcParams.update({'font.size': 35})  # 所有文字统一为16号字体
+plt.rcParams.update({'font.size': 27})  # 所有文字统一为16号字体
+# sz = 45
+sz = 35
 line_w=4
 marker_sz=14
 
@@ -106,11 +108,11 @@ for i, (x_data, y_data) in enumerate(all_groups[:4]):
 
     # y
     # 主刻度
-    main_qps = [1e6, 5e6]
+    main_qps = [1e6, 2e6, 3e6, 5e6]
     main_qps_log = np.log10(main_qps)
-    main_labels = ['1e6', '5e6']
+    main_labels = [r'$10^6$', r'$2\times 10^6$', r'$3\times 10^6$', r'$5\times 10^6$']
     # 副刻度
-    minor_qps = [9e5, 2e6, 3e6, 4e6, 7e6]
+    minor_qps = [9e5, 2e6, 3e6, 4e6, 6e6, 7e6]
     minor_qps_log = np.log10(minor_qps)
 
     axs[row, col].set_yticks(main_qps_log)  # 主刻度
@@ -144,9 +146,9 @@ for i, (x_data, y_data) in enumerate(all_groups[4:8]):
 
     # y
     # 主刻度
-    main_qps = [5e6, 1e7]
+    main_qps = [3e6, 4e6, 5e6, 7e6, 1e7]
     main_qps_log = np.log10(main_qps)
-    main_labels = ['5e6', '1e7']
+    main_labels = [r'$3\times10^6$', r'$4\times10^6$', r'$5\times10^6$', r'$7\times10^6$', r'$10^7$']
     # 副刻度
     minor_qps = [3e6, 4e6, 6e6, 7e6, 8e6, 9e6]
     minor_qps_log = np.log10(minor_qps)
@@ -184,9 +186,9 @@ for i, (x_data, y_data) in enumerate(all_groups[8:12]):
 
     # y
     # 主刻度
-    main_qps = [1e6, 5e6]
+    main_qps = [1e6, 2e6, 3e6, 5e6]
     main_qps_log = np.log10(main_qps)
-    main_labels = ['1e6', '5e6']
+    main_labels = [r'$10^6$', r'$2\times10^6$', r'$3\times10^6$', r'$5\times10^6$']
     # 副刻度
     minor_qps = [9e5, 2e6, 3e6, 4e6]
     minor_qps_log = np.log10(minor_qps)
@@ -225,7 +227,7 @@ for i, (x_data, y_data) in enumerate(all_groups[12:16]):
     # 主刻度
     main_qps = [5e6, 1e7]
     main_qps_log = np.log10(main_qps)
-    main_labels = ['5e6', '1e7']
+    main_labels = [r'$5\times10^6$', r'$10^7$']
     # 副刻度
     minor_qps = [3e6, 4e6, 6e6, 7e6, 8e6, 9e6]
     minor_qps_log = np.log10(minor_qps)

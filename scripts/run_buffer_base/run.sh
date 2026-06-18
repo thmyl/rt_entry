@@ -2,7 +2,7 @@
 
 # 定义要修改的文件名
 HEADER_FILE="/home/myl/cache_search/head.h"
-TEST_COMMAND="./test --ALGO=1 --topk=0 --n_candidates=1024 --expand_ratio=0.2 --point_ratio=0.00001024 --search_width=4 --t=50 --n_cluster=1000  --max_iter=100"
+TEST_COMMAND="./test --ALGO=1 --topk=0 --n_candidates=1024 --expand_ratio=0.2 --point_ratio=0.00001024 --search_width=4 --t=50 --n_cluster=1000  --max_iter=1000"
 TEST_DIR="/home/myl/cache_search/bin/"
 BUILD_DIR="/home/myl/cache_search/build/"
 # 备份文件

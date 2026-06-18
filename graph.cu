@@ -132,9 +132,10 @@ void Graph::Input(){
     std::cout<<"Reading gt_file: "<<gtfile<<" ..."<<std::endl;
   #endif
   file_read::read_ivecs_file(gtfile, nq, gt_k, h_gt_);
+  file_read::read_centroids(centroids_file, cluster_data, np, dim_);
 
   #ifdef USE_CACHE
-    file_read::read_centroids(centroids_file, cluster_data, np, dim_);
+    // file_read::read_centroids(centroids_file, cluster_data, np, dim_);
     std::cout<<"cluster_top_t = "<<cluster_top_t<<std::endl;
 
     if (cluster_top_t > 0) {
@@ -174,6 +175,22 @@ void Graph::Input(){
     page_caches[1] = new PageCache(page_size, pages_buf1, dim_partial, n_cluster, np);
     load_linear_params();
   #endif
+
+  //-----------------prepare cluster entries-----------------
+  if(ALGO == 3){
+    h_cluster_entries.resize(n_cluster * n_candidates);
+    for(int i=0; i<n_cluster; i++){
+      for(int j=0; j<min(n_candidates, (int)cluster_data.cluster_points[i].size()); j++){
+        h_cluster_entries[i * n_candidates + j] = cluster_data.cluster_points[i][j];
+      }
+      for(int j=cluster_data.cluster_points[i].size(); j<n_candidates; j++){
+        h_cluster_entries[i * n_candidates + j] = 0;
+      }
+    }
+    d_cluster_entries.resize(h_cluster_entries.size());
+    thrust::copy(h_cluster_entries.begin(), h_cluster_entries.end(), d_cluster_entries.begin());
+  }
+  //-----------------prepare cluster entries-----------------
 
   std::cout<<"Input: copy points to device"<<std::endl;
   if(ALGO == 0){
@@ -219,6 +236,7 @@ void Graph::load_linear_params() {
   }
 
   linear_params_dim = std::min(file_dim, dim_);
+  std::cerr<<"linear_params_dim = "<<linear_params_dim<<std::endl;
   linear_w_host.resize(linear_params_dim+1);
   linear_b_host.resize(linear_params_dim+1);
 
@@ -232,6 +250,7 @@ void Graph::load_linear_params() {
     }
   }
   infile.close();
+  std::cerr<<"linear at 32 = "<<linear_w_host[32]<<", "<<linear_b_host[32]<<std::endl;
 
   d_linear_w.resize(linear_params_dim+1);
   d_linear_b.resize(linear_params_dim+1);
@@ -772,6 +791,15 @@ void Graph::compute_query_cluster_top() {
   h_query_top_clusters.resize(static_cast<size_t>(nq) * cluster_top_t);
   thrust::copy(d_query_top_clusters.begin(), d_query_top_clusters.end(), 
                h_query_top_clusters.begin());
+  if(ALGO == 3){
+    h_query_top1_cluster.resize(nq);
+    for(int q=0; q<nq; ++q){
+      h_query_top1_cluster[q] = h_query_top_clusters[static_cast<size_t>(q) * cluster_top_t + 0];
+    }
+    d_query_top1_cluster.resize(nq);
+    thrust::copy(h_query_top1_cluster.begin(), h_query_top1_cluster.end(), 
+                 d_query_top1_cluster.begin());
+  }
 
   thrust::device_vector<float>().swap(d_query_centroid_dists);
   thrust::device_vector<float>().swap(d_query_norms);
@@ -1012,249 +1040,6 @@ void Graph::prefetch_batch_clusters(int buffer_id, int batch_index, int query_of
   }
 }
 
-
-// void Graph::Search(){
-//   // Timing::startTiming("search");
-//   // printf("batch_size = %d\n", batch_size);
-//   std::cout<<"batch_size = "<<batch_size<<std::endl;
-
-//   // ======================= create stream =======================
-//   cudaStream_t graph_stream = nullptr;
-//   CUDA_CHECK(cudaStreamCreateWithFlags(&graph_stream, cudaStreamNonBlocking));
-
-//   #ifdef USE_CACHE
-//     // 创建 prefetch stream pool 用于并行预取多个 cluster
-//     std::vector<cudaStream_t> prefetch_streams;
-//     if (cluster_top_t > 0) {
-//       const int num_prefetch_streams = 2;  // 限制 stream 数量
-//       prefetch_streams.resize(num_prefetch_streams, nullptr);
-//       for (int i = 0; i < num_prefetch_streams; ++i) {
-//         CUDA_CHECK(cudaStreamCreateWithFlags(&prefetch_streams[i], cudaStreamNonBlocking));
-//       }
-//     }
-//   #endif
-
-//   Timing::startTiming("search");
-//   // ======================= build query batches =======================
-//   #ifdef USE_CACHE
-//     if (cluster_top_t > 0) {
-//       Timing::startTiming("compute_query_cluster_top");
-//       compute_query_cluster_top();
-//       Timing::stopTiming(2);
-
-//       Timing::startTiming("build_query_batches");
-//       build_query_batches();
-//       Timing::stopTiming(2);
-//     }
-//   #else
-//     Timing::startTiming("build_query_batches");
-//     build_query_batches();
-//     Timing::stopTiming(2);
-//   #endif
-  
-
-//   // ======================= pca projection =======================
-//   if(ALGO == 1 || ALGO == 2){
-//     #ifdef DETAIL
-//       Timing::startTiming("pca projection");
-//     #endif
-//     // d_pca_queries.resize(static_cast<size_t>(nq) * DIM);
-//     float alpha = 1.0, beta = -1.0;
-//     // std::cout<<"matrixMultiply"<<std::endl;
-//     matrixMultiply(handle_, d_queries_, d_rotation, d_pca_queries_full, nq, dim_, dim_, alpha, beta);
-//     // std::cout<<"finish matrixMultiply"<<std::endl;
-    
-//     #ifdef DETAIL
-//       Timing::stopTiming(2);
-//     #endif
-//     d_queries_.resize(0);
-//     // d_queries_.shrink_to_fit();
-//     thrust::device_vector<float>().swap(d_queries_);
-//     d_rotation.resize(0);
-//     // d_rotation.shrink_to_fit();
-//     thrust::device_vector<float>().swap(d_rotation);
-//   }
-
-//   if(ALGO == 1){
-//   // ======================= rt search =======================
-//     Timing::startTiming("search_entry");
-//     rt_entry->Search(d_pca_points, d_pca_queries_full, d_gt_, d_entries, d_entries_dist, n_entries);
-//     Timing::stopTiming(2);
-//   }
-//   // ======================= parameter declaration =======================
-//     Timing::startTiming("graph search");
-
-//     // #region define variables
-//       int hash_len, bit, hash;
-//       hash_parameter(n_candidates, hash_len, bit, hash);
-//       constexpr int WARP_SIZE = 32;
-
-//       float *d_points_ptr;
-//       float *d_queries_ptr;
-//       int query_dim;
-//       if(ALGO == 1 || ALGO == 2){
-//         d_points_ptr = thrust::raw_pointer_cast(d_pca_points.data());
-//         d_queries_ptr = thrust::raw_pointer_cast(d_pca_queries_full.data());
-//         query_dim = dim_;
-//       }
-//       else{
-//         d_points_ptr = thrust::raw_pointer_cast(d_points_.data());
-//         d_queries_ptr = thrust::raw_pointer_cast(d_queries_.data());
-//         query_dim = dim_;
-//       }
-
-//       // float* d_query_batch = d_queries_ptr + static_cast<size_t>(query_offset) * query_dim;
-//       auto *d_results_ptr = thrust::raw_pointer_cast(d_results.data());
-//       // int* d_results_batch = d_results_ptr + static_cast<size_t>(query_offset) * topk;
-//       auto *d_graph_ptr = thrust::raw_pointer_cast(d_graph_.data());
-
-//       auto *d_hits_all = thrust::raw_pointer_cast((rt_entry->subspaces_[0]).hits.data());
-//       // int* d_hits_batch = d_hits_all ? d_hits_all + query_offset : nullptr;
-//       auto *d_entries_ptr = thrust::raw_pointer_cast(rt_entry->subspaces_[0].aabb_entries.data());
-
-//       auto *d_candidates_ptr = thrust::raw_pointer_cast(d_candidates.data());
-//       // int* d_candidates_batch = d_candidates_ptr + static_cast<size_t>(query_offset) * n_candidates;
-
-//       // point_info 在两个 cache 中是一致的，这里统一使用 buffer 0 的指针
-//       const PointInfo* d_point_infos =
-//           (page_caches[0] ? page_caches[0]->device_point_info_ptr() : nullptr);
-//       const float* d_query_full_ptr = d_pca_queries_full.empty() ? nullptr : thrust::raw_pointer_cast(d_pca_queries_full.data());
-//       // const int* d_query_top_ptr = (!d_query_top_clusters.empty() && cluster_top_t > 0)
-//       //                               ? thrust::raw_pointer_cast(d_query_top_clusters.data())
-//       //                               : nullptr;
-//       const float* d_linear_w_ptr = linear_params_dim > 0 ? thrust::raw_pointer_cast(d_linear_w.data()) : nullptr;
-//       const float* d_linear_b_ptr = linear_params_dim > 0 ? thrust::raw_pointer_cast(d_linear_b.data()) : nullptr;
-
-//       size_t shared_mem = ((search_width << offset_shift_) + n_candidates) * sizeof(KernelPair<float, int>);
-//     // #endregion define variables
-
-//     // 双 buffer 预取完成事件
-//     cudaEvent_t prefetch_done[2];
-//     cudaEvent_t compute_done[2];
-//     for (int i = 0; i < 2; ++i) {
-//       CUDA_CHECK(cudaEventCreateWithFlags(&prefetch_done[i], cudaEventDisableTiming));
-//       CUDA_CHECK(cudaEventCreateWithFlags(&compute_done[i], cudaEventDisableTiming));
-//     }
- 
-//   // ======================= graph search batch =======================
-//     int total_batches = (nq + batch_size - 1) / batch_size;
-//     // std::cout<<"total_batches = "<<total_batches<<std::endl;
-//     // 先为第 0 个 batch 启动预取
-//     #ifdef USE_CACHE
-//       if (cluster_top_t > 0 && total_batches > 0) {
-//         int start0 = 0;
-//         int count0 = std::min(batch_size, nq);
-//         int buf0 = 0;
-//         prefetch_batch_clusters(buf0, 0, start0, count0, prefetch_streams[buf0]);
-//         CUDA_CHECK(cudaEventRecord(prefetch_done[buf0], prefetch_streams[buf0]));
-//       }
-//     #endif
-
-//     for(int batch_idx = 0; batch_idx < total_batches; ++batch_idx){
-//       int start = batch_idx * batch_size;
-//       int count = std::min(batch_size, nq - start);
-//       int buffer_id = batch_idx % 2;
-
-//       // 当前 batch 等待对应 buffer 的预取完成
-//       #ifdef USE_CACHE
-//         if(cluster_top_t > 0 && total_batches > 0){
-//           CUDA_CHECK(cudaStreamWaitEvent(graph_stream, prefetch_done[buffer_id], 0));
-//         }
-//         // cudaDeviceSynchronize();
-//       #endif
-
-//       // 为本 batch 选择正确的 cache buffer 指针
-//       const int* d_cluster_to_page = nullptr;
-//       const float* cache_ptr = nullptr;
-//       if (page_caches[buffer_id]) {
-//         d_cluster_to_page = page_caches[buffer_id]->device_cluster_map();
-//         cache_ptr = page_caches[buffer_id]->device_cache_ptr();
-//       }
-
-//       GraphSearchKernel<int, float, WARP_SIZE><<<count, 64, shared_mem, graph_stream>>>
-//       (d_points_ptr, d_queries_ptr, /*d_results_batch*/ d_results_ptr, d_graph_ptr, /*d_candidates_batch*/ d_candidates_ptr, np,
-//       start, d_query_batch_ids,
-//       offset_shift_, n_candidates, topk, search_width, d_entries_ptr,
-//       /*d_hits_batch*/ d_hits_all, max_iter, ALGO,
-//       d_point_infos, d_cluster_to_page, cache_ptr, page_size,
-//       dim_partial, dim_,
-//       /*d_query_top_ptr,*/ cluster_top_t,
-//       d_linear_w_ptr, d_linear_b_ptr, linear_params_dim);
-
-//       #ifdef USE_CACHE
-//         if(cluster_top_t > 0){
-//           CUDA_CHECK(cudaEventRecord(compute_done[buffer_id], graph_stream));
-//           // cudaDeviceSynchronize();
-//         }
-//       #endif
-
-//       // 在 kernel 运行的同时，为下一批次在另一 buffer 上启动预取
-//       #ifdef USE_CACHE
-//         if (cluster_top_t > 0) {
-//           int next_batch = batch_idx + 1;
-//           if (next_batch < total_batches) {
-//             int next_start = next_batch * batch_size;
-//             int next_count = std::min(batch_size, nq - next_start);
-//             int next_buffer = next_batch % 2;
-//             CUDA_CHECK(cudaStreamWaitEvent(prefetch_streams[next_buffer], compute_done[next_buffer], 0));
-//             CUDA_CHECK(cudaEventSynchronize(compute_done[next_buffer]));
-//             prefetch_batch_clusters(next_buffer, next_batch, next_start, next_count, prefetch_streams[next_buffer]);
-//             CUDA_CHECK(cudaEventRecord(prefetch_done[next_buffer], prefetch_streams[next_buffer]));
-//           }
-//         }
-//       #endif
-//     }
-    
-//     // 等待 graph_stream 中所有 kernel 完成
-//     CUDA_CHECK(cudaStreamSynchronize(graph_stream));
-
-//     cudaDeviceSynchronize();
-//     CUDA_CHECK(cudaGetLastError());  
-//     Timing::stopTiming(2);
-
-
-
-//   Timing::stopTiming(2);
-//   // if(ALGO == 1) check_entries(d_gt_);
-//   #ifdef REORDER
-//     thrust::copy(h_results.begin(), h_results.end(), d_results.begin());
-//   #endif
-//   cublasDestroy(handle_);
-//   check_results(d_gt_);
-//   check_results(d_gt_, 100);
-//   check_results(d_gt_, 1000);
-
-//   #ifdef DETAIL
-//     #ifdef USE_CACHE
-//       // 打印第一个 buffer 的 copy 统计
-//       if (page_caches[0]) {
-//         std::cout<<"copied_pages (buffer 0) = "<<page_caches[0]->copied_pages<<std::endl;
-//         std::cout<<"copied_pages (buffer 1) = "<<page_caches[1]->copied_pages<<std::endl;
-//         std::cout<<"total_copied_pages = "<<page_caches[0]->copied_pages + page_caches[1]->copied_pages<<std::endl;
-//       }
-//     #endif
-//   #endif
-
-//   #ifdef USE_CACHE
-//     // 同步并销毁 prefetch streams
-//     if (!prefetch_streams.empty()) {
-//       for (auto& stream : prefetch_streams) {
-//         if (stream != nullptr) {
-//           CUDA_CHECK(cudaStreamSynchronize(stream));
-//           CUDA_CHECK(cudaStreamDestroy(stream));
-//         }
-//       }
-//     }
-//   #endif
-//   // 销毁双 buffer 预取事件
-//   // 注意：只有在上面成功创建的情况下才销毁，这里简单假定始终创建成功
-//   for (int i = 0; i < 2; ++i) {
-//     // 防止未初始化时调用，CUDA 自身会检查
-//     // 这里不再单独存标志位，代码保持简洁
-//     CUDA_CHECK(cudaEventDestroy(prefetch_done[i]));
-//   }
-// }
-
 void Graph::Search(){
   std::cout<<"batch_size = "<<batch_size<<std::endl;
 
@@ -1295,7 +1080,7 @@ void Graph::Search(){
   std::cout << "time build_query_batches: " << time_build_batches << " ms" << std::endl;
 
   // PCA 投影：必须先分配空间并执行一次，确保 d_pca_queries_full 有效
-  if(ALGO == 1 || ALGO == 2){
+  if(ALGO != 0){
     auto start_pca = std::chrono::high_resolution_clock::now();
     float alpha = 1.0, beta = -1.0;
     // 确保 d_pca_queries_full 已经分配了足够空间 (nq * dim_)
@@ -1318,8 +1103,8 @@ void Graph::Search(){
   hash_parameter(n_candidates, hash_len, bit, hash);
   constexpr int WARP_SIZE = 32;
 
-  float *d_points_ptr = thrust::raw_pointer_cast((ALGO == 1 || ALGO == 2) ? d_pca_points.data() : d_points_.data());
-  float *d_queries_ptr = thrust::raw_pointer_cast((ALGO == 1 || ALGO == 2) ? d_pca_queries_full.data() : d_queries_.data());
+  float *d_points_ptr = thrust::raw_pointer_cast((ALGO != 0) ? d_pca_points.data() : d_points_.data());
+  float *d_queries_ptr = thrust::raw_pointer_cast((ALGO != 0) ? d_pca_queries_full.data() : d_queries_.data());
   auto *d_results_ptr = thrust::raw_pointer_cast(d_results.data());
   auto *d_graph_ptr = thrust::raw_pointer_cast(d_graph_.data());
   auto *d_hits_all = thrust::raw_pointer_cast((rt_entry->subspaces_[0]).hits.data());
@@ -1329,22 +1114,12 @@ void Graph::Search(){
   const float* d_linear_w_ptr = linear_params_dim > 0 ? thrust::raw_pointer_cast(d_linear_w.data()) : nullptr;
   const float* d_linear_b_ptr = linear_params_dim > 0 ? thrust::raw_pointer_cast(d_linear_b.data()) : nullptr;
   size_t shared_mem = ((search_width << offset_shift_) + n_candidates) * sizeof(KernelPair<float, int>);
+  int* d_top1_cluster_ptr = (ALGO == 3) ? thrust::raw_pointer_cast(d_query_top1_cluster.data()) : nullptr;
+  int* d_cluster_entries_ptr = (ALGO == 3) ? thrust::raw_pointer_cast(d_cluster_entries.data()) : nullptr;
+  // int* d_top1_cluster_ptr = nullptr;
+  // int* d_cluster_entries_ptr = nullptr;
 
-  // ======================= 4. GPU WARMUP (修复位置) =======================
-  // 此时所有指针 (d_query_batch_ids 等) 都已初始化完毕
-  // {
-  //   int warmup_count = std::min(batch_size, nq); 
-  //   // 运行一个小批次来热身
-  //   GraphSearchKernel<int, float, WARP_SIZE><<<warmup_count, 64, shared_mem, graph_stream>>>
-  //   (d_points_ptr, d_queries_ptr, d_results_ptr, d_graph_ptr, d_candidates_ptr, np,
-  //    0, d_query_batch_ids, offset_shift_, n_candidates, topk, search_width, d_entries_ptr,
-  //    d_hits_all, max_iter, ALGO,
-  //    d_point_infos, nullptr, nullptr, page_size, dim_partial, dim_,
-  //    cluster_top_t, d_linear_w_ptr, d_linear_b_ptr, linear_params_dim);
-    
-  //   CUDA_CHECK(cudaStreamSynchronize(graph_stream));
-  // }
-  // ======================= 4. GPU WARMUP (修复位置) =======================
+  // ======================= 4. GPU WARMUP =======================
   {
     int warmup_count = std::min(batch_size, nq); 
     
@@ -1361,7 +1136,8 @@ void Graph::Search(){
      cache_ptr_warmup,         // <--- 【修改这里】：传入真实指针
      page_size, dim_partial, dim_,
      cluster_top_t,            // 保持原样 (10)
-     d_linear_w_ptr, d_linear_b_ptr, linear_params_dim);
+     d_linear_w_ptr, d_linear_b_ptr, linear_params_dim,
+     d_top1_cluster_ptr, d_cluster_entries_ptr);
     
     CUDA_CHECK(cudaStreamSynchronize(graph_stream));
   }
@@ -1406,7 +1182,8 @@ void Graph::Search(){
      d_hits_all, max_iter, ALGO,
      d_point_infos, d_cluster_to_page, cache_ptr, page_size,
      dim_partial, dim_,
-     cluster_top_t, d_linear_w_ptr, d_linear_b_ptr, linear_params_dim);
+     cluster_top_t, d_linear_w_ptr, d_linear_b_ptr, linear_params_dim,
+     d_top1_cluster_ptr, d_cluster_entries_ptr);
 
     #ifdef USE_CACHE
       if(cluster_top_t > 0){
@@ -1487,7 +1264,7 @@ void Graph::Search(){
 
   // ======================= 6. Cleanup & Release =======================
   // 只有在这里才释放原始 query 内存，因为 Warmup 需要用到它们
-  if(ALGO == 1 || ALGO == 2){
+  if(ALGO != 0){
     d_queries_.resize(0);
     thrust::device_vector<float>().swap(d_queries_);
     d_rotation.resize(0);
@@ -1497,10 +1274,10 @@ void Graph::Search(){
 
   cublasDestroy(handle_);
   check_results(d_gt_);
-  check_results(d_gt_, 1);
-  check_results(d_gt_, 10);
-  check_results(d_gt_, 100);
-  check_results(d_gt_, 1000);
+  // check_results(d_gt_, 1);
+  // check_results(d_gt_, 10);
+  // check_results(d_gt_, 100);
+  // check_results(d_gt_, 1000);
 
   #ifdef USE_CACHE
     for (auto& s : prefetch_streams) if(s) CUDA_CHECK(cudaStreamDestroy(s));
